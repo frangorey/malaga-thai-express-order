@@ -1,9 +1,9 @@
 import { MenuCategory } from "@/types/menu";
-import friedRiceImage from "@/assets/fried-rice.jpg";
-import soupImage from "@/assets/soup.jpg";
-import curryImage from "@/assets/curry.jpg";
-import saladImage from "@/assets/salad.jpg";
-import dessertImage from "@/assets/dessert.jpg";
+
+// Helper function to get Supabase storage URL
+const getSupabaseImageUrl = (filename: string) => {
+  return `https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/${encodeURIComponent(filename)}`;
+};
 
 export const menuCategories: MenuCategory[] = [
   {
@@ -16,7 +16,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Arroz Pollo",
         description: "Arroz frito con pollo tierno y verduras frescas",
         price: 8.90,
-        image: friedRiceImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.09.jpeg"),
         category: "arroces",
         customizable: true
       },
@@ -25,7 +25,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Arroz Ternera",
         description: "Arroz frito con ternera y mezcla de verduras asiáticas",
         price: 9.90,
-        image: friedRiceImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.11.jpeg"),
         category: "arroces",
         customizable: true
       },
@@ -34,7 +34,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Arroz Gambas",
         description: "Arroz frito con gambas frescas y vegetales",
         price: 11.90,
-        image: friedRiceImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (1).jpeg"),
         category: "arroces",
         customizable: true
       },
@@ -43,7 +43,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Arroz Mixto",
         description: "Combinación de pollo, ternera y gambas",
         price: 12.90,
-        image: friedRiceImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (2).jpeg"),
         category: "arroces",
         customizable: true
       }
@@ -59,7 +59,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Tallarines Glass",
         description: "Tallarines de cristal con verduras y salsa especial",
         price: 8.90,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (3).jpeg"),
         category: "tallarines",
         customizable: true
       },
@@ -68,7 +68,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Tallarines Finos",
         description: "Tallarines finos con mezcla de verduras asiáticas",
         price: 8.90,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (4).jpeg"),
         category: "tallarines",
         customizable: true
       },
@@ -77,7 +77,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Tallarines Anchos",
         description: "Tallarines anchos salteados con verduras",
         price: 8.90,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (5).jpeg"),
         category: "tallarines",
         customizable: true
       },
@@ -86,7 +86,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Tallarines Udon",
         description: "Tallarines gruesos japoneses con verduras",
         price: 9.90,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (6).jpeg"),
         category: "tallarines",
         customizable: true
       }
@@ -102,7 +102,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Sopa Pollo Langostino",
         description: "Sopa caliente con pollo, langostinos y verduras",
         price: 8.90,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (7).jpeg"),
         category: "sopas"
       },
       {
@@ -110,7 +110,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Sopa Veggie",
         description: "Sopa vegetariana con tofu y verduras asiáticas",
         price: 8.10,
-        image: soupImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.12 (8).jpeg"),
         category: "sopas",
         vegetarian: true
       }
@@ -126,7 +126,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Ensalada Normal",
         description: "Lechuga, parmesano, aguacate, tomate, picatostes, vinagreta",
         price: 10.40,
-        image: saladImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (1).jpeg"),
         category: "ensaladas",
         vegetarian: true
       },
@@ -135,7 +135,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Ensalada César",
         description: "Lechuga, parmesano, aguacate, tomate, pepino, cebolla roja, picatostes, vinagreta, salsa césar",
         price: 11.40,
-        image: saladImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (2).jpeg"),
         category: "ensaladas"
       },
       {
@@ -143,7 +143,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Ensalada Malaysa",
         description: "Lechuga, pepino, picatostes, tomate, nueces, vinagreta, salsa césar, verdura al wok",
         price: 12.90,
-        image: saladImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (3).jpeg"),
         category: "ensaladas"
       }
     ]
@@ -158,7 +158,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Curry Amarillo",
         description: "Curry suave con leche de coco y especias aromáticas",
         price: 9.90,
-        image: curryImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (4).jpeg"),
         category: "curries",
         spicy: true,
         customizable: true
@@ -168,7 +168,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Curry Verde",
         description: "Curry picante con hierbas frescas y verduras",
         price: 9.90,
-        image: curryImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (5).jpeg"),
         category: "curries",
         spicy: true,
         customizable: true
@@ -178,7 +178,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Curry Rojo",
         description: "Curry intenso con chile rojo y especias",
         price: 9.90,
-        image: curryImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (6).jpeg"),
         category: "curries",
         spicy: true,
         customizable: true
@@ -195,7 +195,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Fruta Mediana",
         description: "Selección de frutas tropicales frescas",
         price: 7.50,
-        image: dessertImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.13 (7).jpeg"),
         category: "postres",
         vegetarian: true
       },
@@ -204,7 +204,7 @@ export const menuCategories: MenuCategory[] = [
         name: "Fruta Pequeña",
         description: "Porción individual de fruta fresca",
         price: 3.95,
-        image: dessertImage,
+        image: getSupabaseImageUrl("WhatsApp Image 2025-08-13 at 00.34.14 (1).jpeg"),
         category: "postres",
         vegetarian: true
       }
