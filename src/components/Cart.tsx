@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CartItem } from "@/types/menu";
+import { sanitizeInput, validateCustomerInfo } from "@/lib/security";
 
 interface CartProps {
   isOpen: boolean;
@@ -28,18 +29,29 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const finalTotal = total + deliveryFee;
 
   const handleSubmitOrder = () => {
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
-      alert("Por favor, completa todos los campos obligatorios");
+    // Validate and sanitize customer information
+    const validation = validateCustomerInfo(customerInfo);
+    
+    if (!validation.isValid) {
+      alert(`Por favor, corrige los siguientes errores:\n${validation.errors.join('\n')}`);
       return;
     }
+
+    // Sanitize all inputs before sending
+    const sanitizedInfo = {
+      name: sanitizeInput(customerInfo.name),
+      phone: sanitizeInput(customerInfo.phone),
+      address: sanitizeInput(customerInfo.address),
+      notes: sanitizeInput(customerInfo.notes)
+    };
 
     const orderDetails = `
 NUEVO PEDIDO THAI EXPRESS
 
-Cliente: ${customerInfo.name}
-Teléfono: ${customerInfo.phone}
-Dirección: ${customerInfo.address}
-${customerInfo.notes ? `Notas: ${customerInfo.notes}` : ''}
+Cliente: ${sanitizedInfo.name}
+Teléfono: ${sanitizedInfo.phone}
+Dirección: ${sanitizedInfo.address}
+${sanitizedInfo.notes ? `Notas: ${sanitizedInfo.notes}` : ''}
 
 PEDIDO:
 ${items.map(item => `${item.quantity}x ${item.name} - ${(item.price * item.quantity).toFixed(2)}€`).join('\n')}
