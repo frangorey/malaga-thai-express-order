@@ -17,16 +17,16 @@ All colors MUST be HSL.
     --popover: 0 0% 8%;
     --popover-foreground: 120 100% 95%;
 
-    --primary: 120 100% 50%;
+    --primary: 85 55% 62%;
     --primary-foreground: 0 0% 5%;
 
     --secondary: 0 0% 12%;
-    --secondary-foreground: 120 100% 95%;
+    --secondary-foreground: 85 55% 95%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 120 20% 65%;
+    --muted-foreground: 85 20% 65%;
 
-    --accent: 120 100% 40%;
+    --accent: 85 55% 50%;
     --accent-foreground: 0 0% 5%;
 
     --destructive: 0 84% 60%;
@@ -34,16 +34,16 @@ All colors MUST be HSL.
 
     --border: 0 0% 20%;
     --input: 0 0% 15%;
-    --ring: 120 100% 50%;
+    --ring: 85 55% 62%;
 
-    --neon-green: 120 100% 50%;
-    --neon-green-glow: 120 100% 35%;
+    --neon-green: 85 55% 62%;
+    --neon-green-glow: 85 55% 45%;
     --dark-surface: 0 0% 8%;
     --darker-surface: 0 0% 5%;
     
-    --gradient-neon: linear-gradient(135deg, hsl(120 100% 50% / 0.2), hsl(120 100% 35% / 0.1));
-    --glow-neon: 0 0 20px hsl(120 100% 50% / 0.5);
-    --glow-subtle: 0 0 40px hsl(120 100% 50% / 0.2);
+    --gradient-neon: linear-gradient(135deg, hsl(85 55% 62% / 0.2), hsl(85 55% 45% / 0.1));
+    --glow-neon: 0 0 20px hsl(85 55% 62% / 0.5);
+    --glow-subtle: 0 0 40px hsl(85 55% 62% / 0.2);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
