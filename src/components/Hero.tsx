@@ -25,6 +25,15 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        {/* Logo */}
+        <div className="mb-8 flex justify-center">
+          <img 
+            src="/lovable-uploads/dbb6f288-0c80-46c6-bdb0-5dfe7b0797c5.png" 
+            alt="Thai Express Logo" 
+            className="h-20 md:h-28 lg:h-36 w-auto drop-shadow-2xl"
+          />
+        </div>
+        
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="neon-text">PREPÁRALO</span>
           <br />
