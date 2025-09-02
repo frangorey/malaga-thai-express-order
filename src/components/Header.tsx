@@ -1,5 +1,6 @@
 import { ShoppingCart, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import thaiExpressLogo from "@/assets/thai-express-logo.png";
 
 interface HeaderProps {
   cartItems: number;
@@ -13,10 +14,11 @@ export const Header = ({ cartItems, onCartClick }: HeaderProps) => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="neon-border rounded-lg p-2 bg-card">
-              <div className="text-2xl font-bold neon-text">Thai</div>
-              <div className="text-xs text-muted-foreground">EXPRESS</div>
-            </div>
+            <img 
+              src={thaiExpressLogo} 
+              alt="Thai Express" 
+              className="h-12 w-auto"
+            />
           </div>
 
           {/* Contact Info */}
