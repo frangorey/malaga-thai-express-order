@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/WhatsApp%20Image%202025-08-13%20at%2000.34.14%20(2).jpeg";
+const logoImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/logo-Thaii.png";
 
 interface HeroProps {
   onOrderClick: () => void;
@@ -25,6 +26,18 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        {/* Logo difuminado con fondo negro */}
+        <div className="mb-8 flex justify-center">
+          <div className="relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+            <img 
+              src={logoImage} 
+              alt="Thai Express Logo" 
+              className="h-20 md:h-28 lg:h-36 w-auto drop-shadow-2xl opacity-90 filter blur-[0.5px]"
+            />
+            <div className="absolute inset-0 bg-black/20 rounded-2xl"></div>
+          </div>
+        </div>
+        
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="neon-text">PREPÁRALO</span>
           <br />
