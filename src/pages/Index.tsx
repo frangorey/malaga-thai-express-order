@@ -1,53 +1,47 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { CategoryNav } from "@/components/CategoryNav";
 import { MenuSection } from "@/components/MenuSection";
-import { Cart } from "@/components/Cart";
+import { CategoryNav } from "@/components/CategoryNav";
+import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
-import { menuCategories } from "@/data/menuData";
-import { CartItem, MenuItem } from "@/types/menu";
-import { toast } from "sonner";
+import { useProducts } from "@/hooks/useProducts";
+import { SupabaseProduct } from "@/types/menu";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { products, categories, loading, error, getProductsByCategory } = useProducts();
+  const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("");
 
-  // Get unique categories
-  const categories = menuCategories.map(cat => cat.name);
-
-  // Set first category as active on load
+  // Configurar la categoría activa inicial
   useEffect(() => {
-    if (categories.length > 0) {
+    if (categories.length > 0 && !activeCategory) {
       setActiveCategory(categories[0]);
     }
-  }, []);
+  }, [categories, activeCategory]);
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === item.id);
-      
+      const existingItem = prev.find(item => item.id === product.id);
       if (existingItem) {
-        toast.success(`${item.name} cantidad aumentada`);
-        return prev.map(cartItem =>
-          cartItem.id === item.id 
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
-      } else {
-        toast.success(`${item.name} añadido al carrito`);
-        return [...prev, { ...item, quantity: 1 }];
       }
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity === 0) {
+  const updateQuantity = (id: number, quantity: number) => {
+    if (quantity <= 0) {
       removeFromCart(id);
       return;
     }
-    
     setCartItems(prev =>
       prev.map(item =>
         item.id === id ? { ...item, quantity } : item
@@ -55,14 +49,13 @@ const Index = () => {
     );
   };
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = (id: number) => {
     setCartItems(prev => prev.filter(item => item.id !== id));
-    toast.success("Producto eliminado del carrito");
   };
 
   const scrollToCategory = (categoryName: string) => {
     setActiveCategory(categoryName);
-    const element = document.getElementById(categoryName.toLowerCase());
+    const element = document.getElementById(`category-${categoryName}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -74,45 +67,92 @@ const Index = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-lg text-muted-foreground">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-4">Error: {error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <Header 
-        cartItems={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         onCartClick={() => setIsCartOpen(true)}
       />
       
       <Hero onOrderClick={handleOrderClick} />
       
-      <CategoryNav 
-        categories={categories}
-        activeCategory={activeCategory}
-        onCategoryChange={scrollToCategory}
-      />
+      {categories.length > 0 && (
+        <CategoryNav 
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={scrollToCategory}
+        />
+      )}
 
-      <main>
-        {menuCategories.map((category) => (
-          <div key={category.id} id={category.name.toLowerCase()}>
+      {categories.map((category) => {
+        const categoryProducts = getProductsByCategory(category);
+        if (categoryProducts.length === 0) return null;
+
+        return (
+          <div key={category} id={`category-${category}`}>
             <MenuSection
-              title={category.name}
-              description={category.description}
-              items={category.items}
+              title={category}
+              description={getCategoryDescription(category)}
+              items={categoryProducts}
               onAddToCart={addToCart}
             />
           </div>
-        ))}
-      </main>
+        );
+      })}
 
       <Footer />
 
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
-      />
-    </div>
+      {isCartOpen && (
+        <Cart
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          items={cartItems}
+          onUpdateQuantity={updateQuantity}
+          onRemoveItem={removeFromCart}
+        />
+      )}
+    </main>
   );
+};
+
+// Función para obtener descripciones de categorías
+const getCategoryDescription = (category: string): string => {
+  const descriptions: Record<string, string> = {
+    "Arroces": "Deliciosos arroces fritos al wok con ingredientes frescos y auténticos sabores asiáticos",
+    "Tallarines": "Tallarines tradicionales asiáticos salteados con verduras frescas y proteínas de calidad",
+    "Sopas": "Sopas reconfortantes con sabores auténticos de la cocina asiática",
+    "Ensaladas": "Ensaladas frescas y nutritivas con ingredientes de temporada",
+    "Bebidas": "Refrescantes bebidas para acompañar tu comida",
+    "Entrantes": "Deliciosos entrantes para comenzar tu experiencia culinaria",
+    "Sets": "Menús completos con nuestras mejores combinaciones",
+    "Especialidades": "Nuestros platos más especiales y únicos"
+  };
+  
+  return descriptions[category] || `Descubre nuestra selección de ${category.toLowerCase()}`;
 };
 
 export default Index;

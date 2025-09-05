@@ -2,11 +2,11 @@ import { ShoppingCart, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
-  cartItems: number;
+  cartItemsCount: number;
   onCartClick: () => void;
 }
 
-export const Header = ({ cartItems, onCartClick }: HeaderProps) => {
+export const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -41,9 +41,9 @@ export const Header = ({ cartItems, onCartClick }: HeaderProps) => {
           >
             <ShoppingCart className="w-5 h-5" />
             <span className="hidden sm:inline ml-2">Carrito</span>
-            {cartItems > 0 && (
+            {cartItemsCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 text-xs flex items-center justify-center animate-pulse-soft">
-                {cartItems}
+                {cartItemsCount}
               </span>
             )}
           </Button>

@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Plus, Leaf, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MenuItem } from "@/types/menu";
+import { MenuItem, SupabaseProduct } from "@/types/menu";
 
 interface MenuSectionProps {
   title: string;
   description: string;
-  items: MenuItem[];
-  onAddToCart: (item: MenuItem) => void;
+  items: SupabaseProduct[];
+  onAddToCart: (item: SupabaseProduct) => void;
 }
 
 export const MenuSection = ({ title, description, items, onAddToCart }: MenuSectionProps) => {
@@ -31,17 +31,17 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
             <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm">
               <div className="relative overflow-hidden">
                 <img 
-                  src={item.image} 
+                  src={item.image_url || '/placeholder.svg'} 
                   alt={item.name}
                   className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="absolute top-2 right-2 flex gap-1">
-                  {item.vegetarian && (
+                  {item.is_vegetarian && (
                     <div className="bg-green-500 rounded-full p-1">
                       <Leaf className="w-4 h-4 text-white" />
                     </div>
                   )}
-                  {item.spicy && (
+                  {item.is_spicy && (
                     <div className="bg-red-500 rounded-full p-1">
                       <Flame className="w-4 h-4 text-white" />
                     </div>

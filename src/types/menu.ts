@@ -10,6 +10,22 @@ export interface MenuItem {
   customizable?: boolean;
 }
 
+// Nueva interfaz para productos de Supabase
+export interface SupabaseProduct {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string | null;
+  category: string;
+  subcategory: string | null;
+  is_vegetarian: boolean;
+  is_spicy: boolean;
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CartItem extends MenuItem {
   quantity: number;
   customizations?: string[];

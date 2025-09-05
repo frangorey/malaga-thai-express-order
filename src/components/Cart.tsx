@@ -5,15 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CartItem } from "@/types/menu";
+import { CartItem, SupabaseProduct } from "@/types/menu";
 import { sanitizeInput, validateCustomerInfo } from "@/lib/security";
+
+// Nuevo tipo para el carrito con productos de Supabase
+export interface SupabaseCartItem extends SupabaseProduct {
+  quantity: number;
+  customizations?: string[];
+}
 
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
-  items: CartItem[];
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onRemoveItem: (id: string) => void;
+  items: SupabaseCartItem[];
+  onUpdateQuantity: (id: number, quantity: number) => void;
+  onRemoveItem: (id: number) => void;
 }
 
 export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) => {
@@ -92,11 +98,11 @@ TOTAL: ${finalTotal.toFixed(2)}€
                   <Card key={item.id} className="bg-card/50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded"
-                        />
+                <img 
+                  src={item.image_url || '/placeholder.svg'} 
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded"
+                />
                         <div className="flex-1">
                           <h4 className="font-medium">{item.name}</h4>
                           <p className="text-sm text-muted-foreground">{item.price.toFixed(2)}€</p>
