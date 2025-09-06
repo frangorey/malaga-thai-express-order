@@ -59,6 +59,171 @@ export type Database = {
         }
         Relationships: []
       }
+      ingredients: {
+        Row: {
+          created_at: string | null
+          id: number
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          name?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      product_ingredients: {
+        Row: {
+          created_at: string | null
+          id: number
+          ingredient_id: number
+          product_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          ingredient_id: number
+          product_id: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          ingredient_id?: number
+          product_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_ingredients_ingredient"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_product_ingredients_product"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_sauces: {
+        Row: {
+          created_at: string | null
+          id: number
+          product_id: number
+          sauce_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          product_id: number
+          sauce_id: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          product_id?: number
+          sauce_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_sauces_product"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_product_sauces_sauce"
+            columns: ["sauce_id"]
+            isOneToOne: false
+            referencedRelation: "sauces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: number
+          image_url: string | null
+          is_available: boolean | null
+          is_spicy: boolean | null
+          is_vegetarian: boolean | null
+          name: string
+          price: number
+          subcategory: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          is_available?: boolean | null
+          is_spicy?: boolean | null
+          is_vegetarian?: boolean | null
+          name: string
+          price: number
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          is_available?: boolean | null
+          is_spicy?: boolean | null
+          is_vegetarian?: boolean | null
+          name?: string
+          price?: number
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sauces: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
