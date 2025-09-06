@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      products: {
+      Arroz_frito_classic: {
         Row: {
           category: string
           created_at: string | null
