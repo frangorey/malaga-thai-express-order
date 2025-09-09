@@ -1,15 +1,13 @@
 import { MapPin, Phone, Clock } from "lucide-react";
-
 export const Footer = () => {
-  return (
-    <footer className="bg-darker-surface border-t border-border py-12">
+  return <footer className="bg-darker-surface border-t border-border py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo & Description */}
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <div className="neon-border rounded-lg p-2 bg-card">
-                <div className="text-xl font-bold neon-text">Thai</div>
+                <div className="text-xl font-bold neon-text">Thaii</div>
                 <div className="text-xs text-muted-foreground">EXPRESS</div>
               </div>
             </div>
@@ -66,6 +64,5 @@ export const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
