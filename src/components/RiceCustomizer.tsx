@@ -99,8 +99,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
 
   // Generar URL de la imagen desde Supabase Storage
   const getRiceImageUrl = () => {
-    const { data } = supabase.storage.from('fotos-thai').getPublicUrl('arroz-ternera');
-    return data.publicUrl;
+    return "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg";
   };
 
   const canAddToCart = selectedProtein && selectedSauce;
