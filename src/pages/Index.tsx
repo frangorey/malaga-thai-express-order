@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MenuSection } from "@/components/MenuSection";
-import { CategoryNav } from "@/components/CategoryNav";
+import { MainCategoriesNav } from "@/components/MainCategoriesNav";
+import { RiceCustomizer } from "@/components/RiceCustomizer";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { useProducts } from "@/hooks/useProducts";
@@ -14,14 +15,15 @@ const Index = () => {
   const { products, categories, loading, error, getProductsByCategory } = useProducts();
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("");
+  const [activeCategory, setActiveCategory] = useState("arroz");
 
   // Configurar la categoría activa inicial
   useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0]);
+    // Default to arroz (rice) section
+    if (!activeCategory) {
+      setActiveCategory("arroz");
     }
-  }, [categories, activeCategory]);
+  }, [activeCategory]);
 
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
@@ -62,9 +64,26 @@ const Index = () => {
   };
 
   const handleOrderClick = () => {
-    if (categories.length > 0) {
-      scrollToCategory(categories[0]);
-    }
+    setActiveCategory("arroz");
+    scrollToCategory("arroz");
+  };
+
+  const handleRiceCustomization = (protein: string, sauce: string, price: number) => {
+    const customProduct: SupabaseProduct = {
+      id: Date.now(), // temporary ID for custom products
+      name: `Arroz frito con ${protein} y ${sauce}`,
+      description: `Arroz frito personalizado con ${protein} y ${sauce}`,
+      price,
+      image_url: null,
+      category: "Arroces",
+      subcategory: sauce,
+      is_vegetarian: false,
+      is_spicy: sauce.includes("curry"),
+      is_available: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    addToCart(customProduct);
   };
 
   if (loading) {
@@ -100,29 +119,88 @@ const Index = () => {
       
       <Hero onOrderClick={handleOrderClick} />
       
-      {categories.length > 0 && (
-        <CategoryNav 
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={scrollToCategory}
-        />
-      )}
+      <MainCategoriesNav 
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+      />
 
-      {categories.map((category) => {
-        const categoryProducts = getProductsByCategory(category);
-        if (categoryProducts.length === 0) return null;
-
-        return (
-          <div key={category} id={`category-${category}`}>
-            <MenuSection
-              title={category}
-              description={getCategoryDescription(category)}
-              items={categoryProducts}
-              onAddToCart={addToCart}
-            />
+      <div className="min-h-screen">
+        {activeCategory === "arroz" && (
+          <div id="category-arroz" className="py-8">
+            <RiceCustomizer onAddToCart={handleRiceCustomization} />
           </div>
-        );
-      })}
+        )}
+
+        {activeCategory === "entrantes" && (
+          <div id="category-entrantes" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Entrantes</h2>
+              <p className="text-muted-foreground mb-8">Deliciosos entrantes para comenzar tu experiencia culinaria</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "tallarines" && (
+          <div id="category-tallarines" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Tallarines</h2>
+              <p className="text-muted-foreground mb-8">Tallarines tradicionales asiáticos salteados con verduras frescas</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "sopas" && (
+          <div id="category-sopas" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Sopas</h2>
+              <p className="text-muted-foreground mb-8">Sopas reconfortantes con sabores auténticos de la cocina asiática</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "pokes" && (
+          <div id="category-pokes" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Pokes</h2>
+              <p className="text-muted-foreground mb-8">Pokes frescos y saludables con ingredientes de calidad</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "postres" && (
+          <div id="category-postres" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Postres</h2>
+              <p className="text-muted-foreground mb-8">Deliciosos postres para endulzar tu experiencia</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "ensaladas" && (
+          <div id="category-ensaladas" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Ensaladas</h2>
+              <p className="text-muted-foreground mb-8">Ensaladas frescas y nutritivas con ingredientes de temporada</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+
+        {activeCategory === "bebidas" && (
+          <div id="category-bebidas" className="py-8">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Bebidas</h2>
+              <p className="text-muted-foreground mb-8">Refrescantes bebidas para acompañar tu comida</p>
+              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Footer />
 
