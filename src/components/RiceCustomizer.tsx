@@ -111,7 +111,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
           <img 
             src={getRiceImageUrl()} 
             alt="Arroz frito con ternera" 
-            className="w-full max-w-md mx-auto rounded-lg shadow-lg h-48 object-cover"
+            className="w-full max-w-md mx-auto rounded-lg shadow-lg object-contain"
           />
         </div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Personaliza tu Arroz Frito</h1>
