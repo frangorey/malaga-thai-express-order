@@ -18,7 +18,7 @@ const mainCategories = [
 
 export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCategoriesNavProps) => {
   return (
-    <nav className="sticky top-20 z-40 bg-background/95 backdrop-blur-sm border-b border-border py-6">
+    <nav className="bg-background/95 backdrop-blur-sm border-b border-border py-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {mainCategories.map((category) => (
