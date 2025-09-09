@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ChefHat, Flame, FlameKindling } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Protein {
   id: string;
@@ -47,6 +48,7 @@ interface RiceCustomizerProps {
 export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("protein");
 
   const getPrice = (proteinId: string) => {
     const basePrices: Record<string, number> = {
@@ -72,6 +74,18 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
     }
   };
 
+  const handleProteinSelect = (proteinId: string) => {
+    setSelectedProtein(proteinId);
+    setActiveTab("sauce"); // Cambiar automáticamente a la pestaña de salsa
+  };
+
+  const handleSauceSelect = (sauceId: string) => {
+    setSelectedSauce(sauceId);
+    if (!selectedProtein) {
+      setActiveTab("protein"); // Si no hay proteína seleccionada, cambiar a proteína
+    }
+  };
+
   const handleAddToCart = () => {
     if (selectedProtein && selectedSauce) {
       const price = getPrice(selectedProtein);
@@ -79,7 +93,14 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
       // Reset selections
       setSelectedProtein("");
       setSelectedSauce("");
+      setActiveTab("protein"); // Volver a la primera pestaña
     }
+  };
+
+  // Generar URL de la imagen desde Supabase Storage
+  const getRiceImageUrl = () => {
+    const { data } = supabase.storage.from('fotos-thai').getPublicUrl('arroz-ternera');
+    return data.publicUrl;
   };
 
   const canAddToCart = selectedProtein && selectedSauce;
@@ -87,11 +108,18 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="text-center mb-8">
+        <div className="mb-6">
+          <img 
+            src={getRiceImageUrl()} 
+            alt="Arroz frito con ternera" 
+            className="w-full max-w-md mx-auto rounded-lg shadow-lg h-48 object-cover"
+          />
+        </div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Personaliza tu Arroz Frito</h1>
         <p className="text-muted-foreground">Elige tu proteína favorita y la salsa perfecta</p>
       </div>
 
-      <Tabs defaultValue="protein" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger value="protein" className="text-lg py-3">
             <ChefHat className="h-5 w-5 mr-2" />
@@ -113,7 +141,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                     ? "ring-2 ring-primary shadow-lg neon-glow"
                     : "hover:shadow-md"
                 }`}
-                onClick={() => setSelectedProtein(protein.id)}
+                onClick={() => handleProteinSelect(protein.id)}
               >
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center justify-between text-lg">
@@ -146,7 +174,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                     ? "ring-2 ring-primary shadow-lg neon-glow"
                     : "hover:shadow-md"
                 }`}
-                onClick={() => setSelectedSauce(sauce.id)}
+                onClick={() => handleSauceSelect(sauce.id)}
               >
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center justify-between text-lg">
