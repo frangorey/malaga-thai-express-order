@@ -59,9 +59,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            © 2024 Thai Express Málaga. Todos los derechos reservados.
-          </p>
+          <p className="text-sm text-muted-foreground">© 2024 Thaii Express Málaga. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>;
