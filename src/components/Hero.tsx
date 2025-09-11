@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/WhatsApp%20Image%202025-08-13%20at%2000.34.14%20(2).jpeg";
-const logoImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/logo-Thaii.png";
+const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-Mascota.jpeg";
 
 interface HeroProps {
   onOrderClick: () => void;
@@ -26,16 +27,47 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        {/* Logo difuminado con fondo negro */}
+        {/* Khopi Mascot Button */}
         <div className="mb-8 flex justify-center">
-          <div className="relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-            <img 
-              src={logoImage} 
-              alt="Thai Express Logo" 
-              className="h-20 md:h-28 lg:h-36 w-auto drop-shadow-2xl opacity-90 filter blur-[0.5px]"
-            />
-            <div className="absolute inset-0 bg-black/20 rounded-2xl"></div>
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-black/90 transition-all duration-300 hover:scale-105"
+              >
+                <img 
+                  src={khopiImage} 
+                  alt="Khopi - Mascota de Thai Express" 
+                  className="h-20 md:h-28 lg:h-36 w-auto drop-shadow-2xl"
+                />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-center">¿Tienes dudas sobre nuestros platos?</DialogTitle>
+              </DialogHeader>
+              <div className="text-center space-y-4 py-4">
+                <img 
+                  src={khopiImage} 
+                  alt="Khopi" 
+                  className="h-32 w-auto mx-auto rounded-lg"
+                />
+                <p className="text-muted-foreground">
+                  ¡Hola! Soy Khopi, la mascota de Thaii Express. Si tienes dudas sobre los ingredientes de algún plato o necesitas ayuda para elegir, ¡llámanos!
+                </p>
+                <div className="flex flex-col gap-3">
+                  <Button variant="neon" asChild>
+                    <a href="tel:951401937" className="text-center">
+                      LLAMAR: 951 40 19 37
+                    </a>
+                  </Button>
+                  <Button variant="outline" onClick={onOrderClick}>
+                    VER MENÚ COMPLETO
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
