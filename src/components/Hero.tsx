@@ -1,9 +1,40 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { useLanguage } from "@/contexts/LanguageContext";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
 const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/WhatsApp%20Image%202025-08-13%20at%2000.34.14%20(2).jpeg";
 const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-sinfondonueva";
+
+const topSalesImages = [
+  {
+    src: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg",
+    alt: "Arroz con ternera",
+    title: "Arroz Ternera"
+  },
+  {
+    src: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Ensalada-Noodles.jpeg", 
+    alt: "Ensalada de Noodles",
+    title: "Ensalada Noodles"
+  },
+  {
+    src: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Finos-classic-pollogambas.jpeg",
+    alt: "Tallarines clásicos con pollo y gambas", 
+    title: "Finos Clásicos"
+  },
+  {
+    src: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Poke-Coreano.jpeg",
+    alt: "Poke Coreano",
+    title: "Poke Coreano"
+  },
+  {
+    src: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Sopa-TomYam.jpeg",
+    alt: "Sopa Tom Yam",
+    title: "Sopa Tom Yam"
+  }
+];
 
 interface HeroProps {
   onOrderClick: () => void;
@@ -11,6 +42,9 @@ interface HeroProps {
 
 export const Hero = ({ onOrderClick }: HeroProps) => {
   const { t } = useLanguage();
+  const plugin = useRef(
+    Autoplay({ delay: 8000, stopOnInteraction: true })
+  );
   
   return (
     <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
@@ -78,6 +112,43 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
           <br />
           <span className="text-foreground">{t('to_your_liking')}</span>
         </h1>
+        
+        {/* Eslogan */}
+        <div className="mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+            "No wok, No life"
+          </h2>
+        </div>
+
+        {/* Carrusel de Top Ventas */}
+        <div className="mb-8 max-w-2xl mx-auto">
+          <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
+            {t('top_sales') || 'Top Ventas'}
+          </h3>
+          <Carousel
+            plugins={[plugin.current]}
+            className="w-full"
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
+          >
+            <CarouselContent>
+              {topSalesImages.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="relative h-48 md:h-64 rounded-lg overflow-hidden shadow-2xl">
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      <h4 className="text-white font-semibold text-lg">{image.title}</h4>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
           {t('choose_what_you_like')} <span className="neon-text font-semibold">{t('take_it_home')}</span>
