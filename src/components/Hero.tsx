@@ -43,7 +43,7 @@ interface HeroProps {
 export const Hero = ({ onOrderClick }: HeroProps) => {
   const { t } = useLanguage();
   const plugin = useRef(
-    Autoplay({ delay: 8000, stopOnInteraction: true })
+    Autoplay({ delay: 8000, stopOnInteraction: false })
   );
   
   return (
@@ -128,17 +128,20 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
           <Carousel
             plugins={[plugin.current]}
             className="w-full"
-            onMouseEnter={plugin.current.stop}
-            onMouseLeave={plugin.current.reset}
+            opts={{
+              align: "start",
+              loop: true,
+            }}
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-1">
               {topSalesImages.map((image, index) => (
-                <CarouselItem key={index}>
+                <CarouselItem key={index} className="pl-1">
                   <div className="relative h-48 md:h-64 rounded-lg overflow-hidden shadow-2xl">
                     <img
                       src={image.src}
                       alt={image.alt}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                       <h4 className="text-white font-semibold text-lg">{image.title}</h4>
