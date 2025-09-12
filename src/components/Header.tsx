@@ -14,8 +14,11 @@ export const Header = ({
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className="neon-border rounded-lg p-2 bg-card">
-              <div className="text-2xl font-bold neon-text">Thaii</div>
-              <div className="text-xs text-muted-foreground">EXPRESS</div>
+              <img 
+                src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/logo-Thaii.png" 
+                alt="Thaii Express Logo" 
+                className="h-10 w-auto"
+              />
             </div>
           </div>
 
