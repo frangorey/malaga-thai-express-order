@@ -123,7 +123,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
         {/* Carrusel de Top Ventas */}
         <div className="mb-8 max-w-2xl mx-auto">
           <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
-            {t('top_sales') || 'Top Ventas'}
+            Lo mas vendido..
           </h3>
           <Carousel
             plugins={[plugin.current]}
