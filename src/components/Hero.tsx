@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/WhatsApp%20Image%202025-08-13%20at%2000.34.14%20(2).jpeg";
 const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-Mascota.jpeg";
@@ -9,6 +10,8 @@ interface HeroProps {
 }
 
 export const Hero = ({ onOrderClick }: HeroProps) => {
+  const { t } = useLanguage();
+  
   return (
     <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -44,7 +47,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-center">¿Tienes dudas sobre nuestros platos?</DialogTitle>
+                <DialogTitle className="text-center">{t('doubts_about_dishes')}</DialogTitle>
               </DialogHeader>
               <div className="text-center space-y-4 py-4">
                 <img 
@@ -53,16 +56,16 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
                   className="h-32 w-auto mx-auto rounded-lg"
                 />
                 <p className="text-muted-foreground">
-                  ¡Hola! Soy Khopi, la mascota de Thaii Express. Si tienes dudas sobre los ingredientes de algún plato o necesitas ayuda para elegir, ¡llámanos!
+                  {t('khopi_greeting')}
                 </p>
                 <div className="flex flex-col gap-3">
                   <Button variant="neon" asChild>
                     <a href="tel:951401937" className="text-center">
-                      LLAMAR: 951 40 19 37
+                      {t('call_us')}
                     </a>
                   </Button>
                   <Button variant="outline" onClick={onOrderClick}>
-                    VER MENÚ COMPLETO
+                    {t('see_full_menu')}
                   </Button>
                 </div>
               </div>
@@ -71,13 +74,13 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="neon-text">PREPÁRALO</span>
+          <span className="neon-text">{t('prepare_to_taste')}</span>
           <br />
-          <span className="text-foreground">AL GUSTO</span>
+          <span className="text-foreground">{t('to_your_liking')}</span>
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Escoge lo que más te guste y... <span className="neon-text font-semibold">¡llévátelo a casa!</span>
+          {t('choose_what_you_like')} <span className="neon-text font-semibold">{t('take_it_home')}</span>
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -87,7 +90,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
             onClick={onOrderClick}
             className="text-lg px-8 py-6"
           >
-            HACER PEDIDO ONLINE
+            {t('order_online')}
           </Button>
           
           <Button 
@@ -97,14 +100,14 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
             asChild
           >
             <a href="tel:951401937">
-              LLAMAR: 951 40 19 37
+              {t('call_us')}
             </a>
           </Button>
         </div>
 
         {/* Contact Info for Mobile */}
         <div className="mt-8 md:hidden text-sm text-muted-foreground">
-          <p>Plaza de la Solidaridad, 9 - Málaga</p>
+          <p>{t('address')}</p>
         </div>
       </div>
     </section>

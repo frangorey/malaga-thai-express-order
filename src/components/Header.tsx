@@ -1,5 +1,7 @@
 import { ShoppingCart, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
@@ -8,6 +10,8 @@ export const Header = ({
   cartItemsCount,
   onCartClick
 }: HeaderProps) => {
+  const { t } = useLanguage();
+  
   return <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
@@ -26,7 +30,7 @@ export const Header = ({
           <div className="hidden md:flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <MapPin className="w-4 h-4 text-primary" />
-              <span>Plaza de la Solidaridad, 9 - Málaga</span>
+              <span>{t('address')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Phone className="w-4 h-4 text-primary" />
@@ -36,14 +40,17 @@ export const Header = ({
             </div>
           </div>
 
-          {/* Cart Button */}
-          <Button variant="cart" onClick={onCartClick} className="relative">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="hidden sm:inline ml-2">Carrito</span>
-            {cartItemsCount > 0 && <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 text-xs flex items-center justify-center animate-pulse-soft">
-                {cartItemsCount}
-              </span>}
-          </Button>
+          {/* Language Selector and Cart */}
+          <div className="flex items-center space-x-3">
+            <LanguageSelector />
+            <Button variant="cart" onClick={onCartClick} className="relative">
+              <ShoppingCart className="w-5 h-5" />
+              <span className="hidden sm:inline ml-2">{t('cart')}</span>
+              {cartItemsCount > 0 && <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 text-xs flex items-center justify-center animate-pulse-soft">
+                  {cartItemsCount}
+                </span>}
+            </Button>
+          </div>
         </div>
       </div>
     </header>;
