@@ -1,5 +1,7 @@
 import { MapPin, Phone, Clock } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 export const Footer = () => {
+  const { t } = useLanguage();
   return <footer className="bg-darker-surface border-t border-border py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -12,13 +14,13 @@ export const Footer = () => {
               </div>
             </div>
             <p className="text-muted-foreground mb-4">
-              Comida asiática auténtica para llevar. Prepáralo al gusto y llévátelo a casa.
+              {t('restaurant_description')}
             </p>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-bold neon-text mb-4">CONTACTO</h3>
+            <h3 className="text-lg font-bold neon-text mb-4">{t('contact_title')}</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <MapPin className="w-5 h-5 text-primary" />
@@ -39,27 +41,27 @@ export const Footer = () => {
 
           {/* Hours */}
           <div>
-            <h3 className="text-lg font-bold neon-text mb-4">HORARIOS</h3>
+            <h3 className="text-lg font-bold neon-text mb-4">{t('hours_title')}</h3>
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <Clock className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-sm">Lunes - Domingo</p>
-                  <p className="text-sm text-muted-foreground">12:00 - 23:00</p>
+                  <p className="text-sm">{t('monday_sunday')}</p>
+                  <p className="text-sm text-muted-foreground">{t('hours_time')}</p>
                 </div>
               </div>
             </div>
             
             <div className="mt-6">
               <p className="text-sm text-muted-foreground">
-                Pedidos online disponibles durante todo el horario de apertura
+                {t('online_orders_available')}
               </p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center">
-          <p className="text-sm text-muted-foreground">© 2024 Thaii Express Málaga. Todos los derechos reservados.</p>
+          <p className="text-sm text-muted-foreground">{t('all_rights_reserved')}</p>
         </div>
       </div>
     </footer>;

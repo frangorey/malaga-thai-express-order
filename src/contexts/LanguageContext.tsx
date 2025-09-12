@@ -67,15 +67,38 @@ const translations = {
     'order_online': 'HACER PEDIDO ONLINE',
     'call_us': 'LLAMAR: 951 40 19 37',
     
-    // Categories
-    'rice': 'Arroces',
-    'noodles': 'Fideos',
-    'curries': 'Currys',
-    'salads': 'Ensaladas',
-    'soups': 'Sopas',
-    'desserts': 'Postres',
-    'drinks': 'Bebidas',
-    'extras': 'Extras',
+    // Main Categories
+    'entrantes': 'Entrantes',
+    'arroz': 'Arroz', 
+    'tallarines': 'Tallarines',
+    'sopas': 'Sopas',
+    'pokes': 'Pokes',
+    'postres': 'Postres',
+    'ensaladas': 'Ensaladas',
+    'bebidas': 'Bebidas',
+    
+    // Proteins
+    'chicken': 'Pollo',
+    'beef': 'Ternera', 
+    'pork': 'Cerdo',
+    'shrimp': 'Gambas',
+    'vegetables': 'Verduras',
+    'select_protein': 'Selecciona tu proteína',
+    'protein_tab': 'Proteína',
+    
+    // Sauces
+    'teriyaki': 'Teriyaki',
+    'sweet_sour': 'Agridulce',
+    'curry_sauce': 'Curry',
+    'soy_sauce': 'Soja',
+    'spicy_sauce': 'Picante',
+    'select_sauce': 'Selecciona tu salsa',
+    'sauce_tab': 'Salsa',
+    'spicy_level': 'Nivel de picante',
+    
+    // Rice Customizer
+    'customize_rice': 'Personaliza tu arroz',
+    'selected_items': 'Elementos seleccionados',
     
     // Subcategories
     'classic': 'Classic',
@@ -110,12 +133,13 @@ const translations = {
     'see_full_menu': 'VER MENÚ COMPLETO',
     
     // Footer
-    'follow_us': 'Síguenos',
-    'contact': 'Contacto',
-    'opening_hours': 'Horarios',
-    'monday_friday': 'Lunes - Viernes: 12:00 - 15:30, 19:00 - 23:00',
-    'saturday_sunday': 'Sábados y Domingos: 12:00 - 23:00',
-    'all_rights_reserved': 'Todos los derechos reservados'
+    'restaurant_description': 'Comida asiática auténtica para llevar. Prepáralo al gusto y llévátelo a casa.',
+    'contact_title': 'CONTACTO',
+    'hours_title': 'HORARIOS',
+    'monday_sunday': 'Lunes - Domingo',
+    'hours_time': '12:00 - 23:00',
+    'online_orders_available': 'Pedidos online disponibles durante todo el horario de apertura',
+    'all_rights_reserved': '© 2024 Thaii Express Málaga. Todos los derechos reservados.'
   },
   
   en: {
@@ -132,15 +156,38 @@ const translations = {
     'order_online': 'ORDER ONLINE',
     'call_us': 'CALL: 951 40 19 37',
     
-    // Categories
-    'rice': 'Rice',
-    'noodles': 'Noodles',
-    'curries': 'Curries',
-    'salads': 'Salads',
-    'soups': 'Soups',
-    'desserts': 'Desserts',
-    'drinks': 'Drinks',
-    'extras': 'Extras',
+    // Main Categories
+    'entrantes': 'Starters',
+    'arroz': 'Rice',
+    'tallarines': 'Noodles', 
+    'sopas': 'Soups',
+    'pokes': 'Pokes',
+    'postres': 'Desserts',
+    'ensaladas': 'Salads',
+    'bebidas': 'Drinks',
+    
+    // Proteins
+    'chicken': 'Chicken',
+    'beef': 'Beef',
+    'pork': 'Pork', 
+    'shrimp': 'Shrimp',
+    'vegetables': 'Vegetables',
+    'select_protein': 'Select your protein',
+    'protein_tab': 'Protein',
+    
+    // Sauces
+    'teriyaki': 'Teriyaki',
+    'sweet_sour': 'Sweet & Sour',
+    'curry_sauce': 'Curry',
+    'soy_sauce': 'Soy Sauce',
+    'spicy_sauce': 'Spicy',
+    'select_sauce': 'Select your sauce',
+    'sauce_tab': 'Sauce',
+    'spicy_level': 'Spicy level',
+    
+    // Rice Customizer
+    'customize_rice': 'Customize your rice',
+    'selected_items': 'Selected items',
     
     // Subcategories
     'classic': 'Classic',
@@ -175,12 +222,13 @@ const translations = {
     'see_full_menu': 'SEE FULL MENU',
     
     // Footer
-    'follow_us': 'Follow us',
-    'contact': 'Contact',
-    'opening_hours': 'Opening hours',
-    'monday_friday': 'Monday - Friday: 12:00 - 15:30, 19:00 - 23:00',
-    'saturday_sunday': 'Saturday & Sunday: 12:00 - 23:00',
-    'all_rights_reserved': 'All rights reserved'
+    'restaurant_description': 'Authentic Asian takeaway food. Prepare it to your taste and take it home.',
+    'contact_title': 'CONTACT',
+    'hours_title': 'OPENING HOURS',
+    'monday_sunday': 'Monday - Sunday',
+    'hours_time': '12:00 - 23:00',
+    'online_orders_available': 'Online orders available during all opening hours',
+    'all_rights_reserved': '© 2024 Thaii Express Málaga. All rights reserved.'
   },
   
   fr: {
@@ -197,15 +245,38 @@ const translations = {
     'order_online': 'COMMANDER EN LIGNE',
     'call_us': 'APPELER: 951 40 19 37',
     
-    // Categories
-    'rice': 'Riz',
-    'noodles': 'Nouilles',
-    'curries': 'Currys',
-    'salads': 'Salades',
-    'soups': 'Soupes',
-    'desserts': 'Desserts',
-    'drinks': 'Boissons',
-    'extras': 'Extras',
+    // Main Categories
+    'entrantes': 'Entrées',
+    'arroz': 'Riz',
+    'tallarines': 'Nouilles',
+    'sopas': 'Soupes', 
+    'pokes': 'Pokes',
+    'postres': 'Desserts',
+    'ensaladas': 'Salades',
+    'bebidas': 'Boissons',
+    
+    // Proteins
+    'chicken': 'Poulet',
+    'beef': 'Bœuf',
+    'pork': 'Porc',
+    'shrimp': 'Crevettes', 
+    'vegetables': 'Légumes',
+    'select_protein': 'Sélectionnez votre protéine',
+    'protein_tab': 'Protéine',
+    
+    // Sauces
+    'teriyaki': 'Teriyaki',
+    'sweet_sour': 'Aigre-douce',
+    'curry_sauce': 'Curry',
+    'soy_sauce': 'Sauce soja',
+    'spicy_sauce': 'Épicée',
+    'select_sauce': 'Sélectionnez votre sauce',
+    'sauce_tab': 'Sauce',
+    'spicy_level': 'Niveau épicé',
+    
+    // Rice Customizer
+    'customize_rice': 'Personnalisez votre riz',
+    'selected_items': 'Éléments sélectionnés',
     
     // Subcategories
     'classic': 'Classique',
@@ -240,11 +311,12 @@ const translations = {
     'see_full_menu': 'VOIR LE MENU COMPLET',
     
     // Footer
-    'follow_us': 'Suivez-nous',
-    'contact': 'Contact',
-    'opening_hours': 'Horaires',
-    'monday_friday': 'Lundi - Vendredi: 12:00 - 15:30, 19:00 - 23:00',
-    'saturday_sunday': 'Samedi et Dimanche: 12:00 - 23:00',
-    'all_rights_reserved': 'Tous droits réservés'
+    'restaurant_description': 'Cuisine asiatique authentique à emporter. Préparez-la à votre goût et emportez-la chez vous.',
+    'contact_title': 'CONTACT',
+    'hours_title': 'HORAIRES',
+    'monday_sunday': 'Lundi - Dimanche',
+    'hours_time': '12:00 - 23:00',
+    'online_orders_available': 'Commandes en ligne disponibles pendant toutes les heures d\'ouverture',
+    'all_rights_reserved': '© 2024 Thaii Express Málaga. Tous droits réservés.'
   }
 };

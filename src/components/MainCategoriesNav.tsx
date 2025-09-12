@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MainCategoriesNavProps {
   activeCategory: string;
@@ -17,6 +18,7 @@ const mainCategories = [
 ];
 
 export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCategoriesNavProps) => {
+  const { t } = useLanguage();
   return (
     <nav className="bg-background/95 backdrop-blur-sm border-b border-border py-6">
       <div className="container mx-auto px-4">
@@ -29,7 +31,7 @@ export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCate
               className="h-16 flex flex-col items-center justify-center space-y-1 text-sm hover:scale-105 transition-transform"
             >
               <span className="text-xl">{category.icon}</span>
-              <span className="font-medium">{category.name}</span>
+              <span className="font-medium">{t(category.id)}</span>
             </Button>
           ))}
         </div>

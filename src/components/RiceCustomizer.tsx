@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ChefHat, Flame, FlameKindling } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Protein {
   id: string;
@@ -46,6 +47,7 @@ interface RiceCustomizerProps {
 }
 
 export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
+  const { t } = useLanguage();
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("protein");
@@ -114,19 +116,19 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
             className="w-full max-w-md mx-auto rounded-lg shadow-lg object-contain"
           />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Personaliza tu Arroz Frito</h1>
-        <p className="text-muted-foreground">Elige tu proteína favorita y la salsa perfecta</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t('customize_rice')}</h1>
+        <p className="text-muted-foreground">{t('select_protein')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger value="protein" className="text-lg py-3">
             <ChefHat className="h-5 w-5 mr-2" />
-            1. Proteína
+            1. {t('protein_tab')}
           </TabsTrigger>
           <TabsTrigger value="sauce" className="text-lg py-3">
             <Flame className="h-5 w-5 mr-2" />
-            2. Salsa
+            2. {t('sauce_tab')}
           </TabsTrigger>
         </TabsList>
 
@@ -200,22 +202,22 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
       <div className="mt-8 p-6 bg-card rounded-lg border">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Tu selección:</h3>
+            <h3 className="text-lg font-semibold">{t('selected_items')}:</h3>
             <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
               {selectedProtein && (
                 <Badge variant="outline">
-                  Proteína: {proteins.find(p => p.id === selectedProtein)?.name}
+                  {t('protein_tab')}: {proteins.find(p => p.id === selectedProtein)?.name}
                 </Badge>
               )}
               {selectedSauce && (
                 <Badge variant="outline">
-                  Salsa: {sauces.find(s => s.id === selectedSauce)?.name}
+                  {t('sauce_tab')}: {sauces.find(s => s.id === selectedSauce)?.name}
                 </Badge>
               )}
             </div>
             {selectedProtein && (
               <p className="text-lg font-bold text-primary">
-                Precio: €{getPrice(selectedProtein).toFixed(2)}
+                {t('price')}: €{getPrice(selectedProtein).toFixed(2)}
               </p>
             )}
           </div>
@@ -227,7 +229,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
             size="lg"
             className="w-full md:w-auto"
           >
-            Añadir al Carrito
+            {t('add_to_cart')}
           </Button>
         </div>
       </div>
