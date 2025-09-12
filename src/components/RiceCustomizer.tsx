@@ -154,11 +154,13 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">{protein.description}</p>
-                  {protein.image && (
-                    <div className="mt-3 h-20 w-full bg-muted rounded-md flex items-center justify-center">
-                      <span className="text-2xl">🍖</span>
-                    </div>
-                  )}
+                  <div className="mt-3 h-20 w-full rounded-md overflow-hidden">
+                    <img 
+                      src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg"
+                      alt="Arroz con proteína"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </CardContent>
               </Card>
             ))}
