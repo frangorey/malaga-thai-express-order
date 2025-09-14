@@ -135,11 +135,12 @@ const Index = () => {
 
         {activeCategory === "entrantes" && (
           <div id="category-entrantes" className="py-8">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('entrantes')}</h2>
-              <p className="text-muted-foreground mb-8">{t('starters_description')}</p>
-              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
-            </div>
+            <MenuSection 
+              title={t('entrantes')}
+              description={t('starters_description')}
+              items={getProductsByCategory('Entrantes')}
+              onAddToCart={addToCart}
+            />
           </div>
         )}
 
