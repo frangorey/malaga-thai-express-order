@@ -199,6 +199,53 @@ const translations = {
     'custom_rice_with': 'Arroz frito con',
     'custom_rice_and': 'y',
     'custom_rice_desc': 'Arroz frito personalizado con',
+
+    // Noodle types
+    'noodle_finos': 'Finos (Noodles)',
+    'noodle_anchos': 'Anchos (Pad Thai)',
+    'noodle_glass': 'Glass',
+    'noodle_udon': 'Udon',
+    'noodle_finos_desc': 'Tallarines finos tradicionales',
+    'noodle_anchos_desc': 'Tallarines anchos estilo Pad Thai',
+    'noodle_glass_desc': 'Tallarines transparentes de arroz',
+    'noodle_udon_desc': 'Tallarines gruesos japoneses',
+
+    // Noodle customizer
+    'noodle_customizer_title': 'PERSONALIZA TUS TALLARINES',
+    'noodle_customizer_description': 'Elige el tipo de tallarín, tu proteína favorita y la salsa perfecta',
+    'step_noodle_type': 'Tipo de Tallarín',
+    'step_protein': 'Proteína',
+    'step_sauce': 'Salsa',
+    'noodle_type': 'Tipo de tallarín',
+    'custom_noodles_with': 'Tallarines personalizados con',
+    'custom_noodles_and': 'y',
+    'custom_noodles_desc': 'Tallarines salteados al wok con',
+    'custom_noodles_with_sauce': 'con salsa',
+    'order_summary': 'Resumen del pedido',
+
+    // Enhanced protein translations
+    'protein_chicken': 'Pollo',
+    'protein_beef': 'Ternera',
+    'protein_shrimp': 'Gambas',
+    'protein_chicken_desc': 'Pechuga de pollo fresca y tierna',
+    'protein_beef_desc': 'Tierna ternera de primera calidad',
+    'protein_shrimp_desc': 'Gambas frescas del mar',
+    'protein_chicken_beef': 'Pollo y Ternera',
+    'protein_chicken_shrimp': 'Pollo y Gambas',
+    'protein_beef_shrimp': 'Ternera y Gambas',
+    'protein_chicken_beef_shrimp': 'Pollo, Ternera y Gambas',
+    'protein_chicken_beef_desc': 'Combinación perfecta de pollo y ternera',
+    'protein_chicken_shrimp_desc': 'Deliciosa mezcla de pollo y gambas',
+    'protein_beef_shrimp_desc': 'Exquisita combinación de ternera y gambas',
+    'protein_chicken_beef_shrimp_desc': 'Triple proteína: pollo, ternera y gambas',
+
+    // Enhanced sauce translations
+    'sauce_classic': 'Classic',
+    'sauce_original': 'Original',
+    'sauce_teriyaki': 'Teriyaki',
+    'sauce_classic_desc': 'Salsa soja y ostras',
+    'sauce_original_desc': 'Cilantro, brotes de soja, zanahoria, cacahuete, salsa tamarindo y lima',
+    'sauce_teriyaki_desc': 'Salsa teriyaki tradicional',
     
     // Entrantes translations - Spanish (names and descriptions)
     'panko_chicken': 'Panko pollo (5 unidades)',
@@ -385,6 +432,53 @@ const translations = {
     'custom_rice_with': 'Fried rice with',
     'custom_rice_and': 'and',
     'custom_rice_desc': 'Custom fried rice with',
+
+    // Noodle types
+    'noodle_finos': 'Thin (Noodles)',
+    'noodle_anchos': 'Wide (Pad Thai)',
+    'noodle_glass': 'Glass',
+    'noodle_udon': 'Udon',
+    'noodle_finos_desc': 'Traditional thin noodles',
+    'noodle_anchos_desc': 'Wide Pad Thai style noodles',
+    'noodle_glass_desc': 'Transparent rice noodles',
+    'noodle_udon_desc': 'Thick Japanese noodles',
+
+    // Noodle customizer
+    'noodle_customizer_title': 'CUSTOMIZE YOUR NOODLES',
+    'noodle_customizer_description': 'Choose your noodle type, favorite protein and perfect sauce',
+    'step_noodle_type': 'Noodle Type',
+    'step_protein': 'Protein',
+    'step_sauce': 'Sauce',
+    'noodle_type': 'Noodle type',
+    'custom_noodles_with': 'Custom noodles with',
+    'custom_noodles_and': 'and',
+    'custom_noodles_desc': 'Wok-fried noodles with',
+    'custom_noodles_with_sauce': 'with sauce',
+    'order_summary': 'Order summary',
+
+    // Enhanced protein translations
+    'protein_chicken': 'Chicken',
+    'protein_beef': 'Beef',
+    'protein_shrimp': 'Shrimp',
+    'protein_chicken_desc': 'Fresh and tender chicken breast',
+    'protein_beef_desc': 'Premium tender beef',
+    'protein_shrimp_desc': 'Fresh seafood shrimp',
+    'protein_chicken_beef': 'Chicken & Beef',
+    'protein_chicken_shrimp': 'Chicken & Shrimp',
+    'protein_beef_shrimp': 'Beef & Shrimp',
+    'protein_chicken_beef_shrimp': 'Chicken, Beef & Shrimp',
+    'protein_chicken_beef_desc': 'Perfect combination of chicken and beef',
+    'protein_chicken_shrimp_desc': 'Delicious mix of chicken and shrimp',
+    'protein_beef_shrimp_desc': 'Exquisite combination of beef and shrimp',
+    'protein_chicken_beef_shrimp_desc': 'Triple protein: chicken, beef and shrimp',
+
+    // Enhanced sauce translations
+    'sauce_classic': 'Classic',
+    'sauce_original': 'Original',
+    'sauce_teriyaki': 'Teriyaki',
+    'sauce_classic_desc': 'Soy and oyster sauce',
+    'sauce_original_desc': 'Cilantro, bean sprouts, carrot, peanut, tamarind sauce and lime',
+    'sauce_teriyaki_desc': 'Traditional teriyaki sauce',
     
     // Entrantes translations - English (names and descriptions)
     'panko_chicken': 'Panko chicken (5 pieces)',
@@ -571,6 +665,53 @@ const translations = {
     'custom_rice_with': 'Riz frit avec',
     'custom_rice_and': 'et',
     'custom_rice_desc': 'Riz frit personnalisé avec',
+
+    // Noodle types
+    'noodle_finos': 'Fins (Nouilles)',
+    'noodle_anchos': 'Larges (Pad Thai)',
+    'noodle_glass': 'Vermicelles',
+    'noodle_udon': 'Udon',
+    'noodle_finos_desc': 'Nouilles fines traditionnelles',
+    'noodle_anchos_desc': 'Nouilles larges style Pad Thai',
+    'noodle_glass_desc': 'Nouilles de riz transparentes',
+    'noodle_udon_desc': 'Nouilles japonaises épaisses',
+
+    // Noodle customizer
+    'noodle_customizer_title': 'PERSONNALISEZ VOS NOUILLES',
+    'noodle_customizer_description': 'Choisissez votre type de nouilles, protéine préférée et sauce parfaite',
+    'step_noodle_type': 'Type de Nouilles',
+    'step_protein': 'Protéine',
+    'step_sauce': 'Sauce',
+    'noodle_type': 'Type de nouilles',
+    'custom_noodles_with': 'Nouilles personnalisées avec',
+    'custom_noodles_and': 'et',
+    'custom_noodles_desc': 'Nouilles sautées au wok avec',
+    'custom_noodles_with_sauce': 'avec sauce',
+    'order_summary': 'Résumé de commande',
+
+    // Enhanced protein translations
+    'protein_chicken': 'Poulet',
+    'protein_beef': 'Bœuf',
+    'protein_shrimp': 'Crevettes',
+    'protein_chicken_desc': 'Blanc de poulet frais et tendre',
+    'protein_beef_desc': 'Bœuf tendre de première qualité',
+    'protein_shrimp_desc': 'Crevettes fraîches de mer',
+    'protein_chicken_beef': 'Poulet et Bœuf',
+    'protein_chicken_shrimp': 'Poulet et Crevettes',
+    'protein_beef_shrimp': 'Bœuf et Crevettes',
+    'protein_chicken_beef_shrimp': 'Poulet, Bœuf et Crevettes',
+    'protein_chicken_beef_desc': 'Combinaison parfaite de poulet et bœuf',
+    'protein_chicken_shrimp_desc': 'Délicieux mélange de poulet et crevettes',
+    'protein_beef_shrimp_desc': 'Combinaison exquise de bœuf et crevettes',
+    'protein_chicken_beef_shrimp_desc': 'Triple protéine : poulet, bœuf et crevettes',
+
+    // Enhanced sauce translations
+    'sauce_classic': 'Classique',
+    'sauce_original': 'Original',
+    'sauce_teriyaki': 'Teriyaki',
+    'sauce_classic_desc': 'Sauce soja et huîtres',
+    'sauce_original_desc': 'Coriandre, pousses de soja, carotte, cacahuète, sauce tamarin et citron vert',
+    'sauce_teriyaki_desc': 'Sauce teriyaki traditionnelle',
     
     // Entrantes translations - French (names and descriptions)
     'panko_chicken': 'Panko poulet (5 pièces)',
