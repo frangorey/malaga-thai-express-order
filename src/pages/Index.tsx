@@ -10,8 +10,10 @@ import { useProducts } from "@/hooks/useProducts";
 import { SupabaseProduct } from "@/types/menu";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const { products, categories, loading, error, getProductsByCategory } = useProducts();
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -71,8 +73,8 @@ const Index = () => {
   const handleRiceCustomization = (protein: string, sauce: string, price: number) => {
     const customProduct: SupabaseProduct = {
       id: Date.now(), // temporary ID for custom products
-      name: `Arroz frito con ${protein} y ${sauce}`,
-      description: `Arroz frito personalizado con ${protein} y ${sauce}`,
+      name: `${t('custom_rice_with')} ${protein} ${t('custom_rice_and')} ${sauce}`,
+      description: `${t('custom_rice_desc')} ${protein} ${t('custom_rice_and')} ${sauce}`,
       price,
       image_url: null,
       category: "Arroces",
@@ -91,7 +93,7 @@ const Index = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-lg text-muted-foreground">Cargando productos...</p>
+          <p className="text-lg text-muted-foreground">{t('loading_products')}</p>
         </div>
       </div>
     );
@@ -101,9 +103,9 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-destructive mb-4">Error: {error}</p>
+          <p className="text-lg text-destructive mb-4">{t('error_loading')}: {error}</p>
           <Button onClick={() => window.location.reload()}>
-            Reintentar
+            {t('retry')}
           </Button>
         </div>
       </div>
@@ -134,9 +136,9 @@ const Index = () => {
         {activeCategory === "entrantes" && (
           <div id="category-entrantes" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Entrantes</h2>
-              <p className="text-muted-foreground mb-8">Deliciosos entrantes para comenzar tu experiencia culinaria</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('entrantes')}</h2>
+              <p className="text-muted-foreground mb-8">{t('starters_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -144,9 +146,9 @@ const Index = () => {
         {activeCategory === "tallarines" && (
           <div id="category-tallarines" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Tallarines</h2>
-              <p className="text-muted-foreground mb-8">Tallarines tradicionales asiáticos salteados con verduras frescas</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('tallarines')}</h2>
+              <p className="text-muted-foreground mb-8">{t('noodles_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -154,9 +156,9 @@ const Index = () => {
         {activeCategory === "sopas" && (
           <div id="category-sopas" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Sopas</h2>
-              <p className="text-muted-foreground mb-8">Sopas reconfortantes con sabores auténticos de la cocina asiática</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('sopas')}</h2>
+              <p className="text-muted-foreground mb-8">{t('soups_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -164,9 +166,9 @@ const Index = () => {
         {activeCategory === "pokes" && (
           <div id="category-pokes" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Pokes</h2>
-              <p className="text-muted-foreground mb-8">Pokes frescos y saludables con ingredientes de calidad</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('pokes')}</h2>
+              <p className="text-muted-foreground mb-8">{t('pokes_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -174,9 +176,9 @@ const Index = () => {
         {activeCategory === "postres" && (
           <div id="category-postres" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Postres</h2>
-              <p className="text-muted-foreground mb-8">Deliciosos postres para endulzar tu experiencia</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('postres')}</h2>
+              <p className="text-muted-foreground mb-8">{t('desserts_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -184,9 +186,9 @@ const Index = () => {
         {activeCategory === "ensaladas" && (
           <div id="category-ensaladas" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Ensaladas</h2>
-              <p className="text-muted-foreground mb-8">Ensaladas frescas y nutritivas con ingredientes de temporada</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('ensaladas')}</h2>
+              <p className="text-muted-foreground mb-8">{t('salads_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}
@@ -194,9 +196,9 @@ const Index = () => {
         {activeCategory === "bebidas" && (
           <div id="category-bebidas" className="py-8">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Bebidas</h2>
-              <p className="text-muted-foreground mb-8">Refrescantes bebidas para acompañar tu comida</p>
-              <p className="text-lg text-muted-foreground">Próximamente disponible...</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('bebidas')}</h2>
+              <p className="text-muted-foreground mb-8">{t('drinks_description')}</p>
+              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
             </div>
           </div>
         )}

@@ -23,24 +23,9 @@ interface Sauce {
   image?: string;
 }
 
-const proteins: Protein[] = [
-  { id: "pollo", name: "Pollo", description: "Tierno pollo marinado" },
-  { id: "ternera", name: "Ternera", description: "Jugosa ternera salteada" },
-  { id: "gambas", name: "Gambas", description: "Gambas frescas del mar" },
-  { id: "pollo-ternera", name: "Pollo y Ternera", description: "Combinación de pollo y ternera" },
-  { id: "pollo-gambas", name: "Pollo y Gambas", description: "Pollo con gambas frescas" },
-  { id: "ternera-gambas", name: "Ternera y Gambas", description: "Ternera con gambas del mar" },
-  { id: "mix-3", name: "Pollo, Ternera y Gambas", description: "Combinación completa de proteínas" },
-];
+// Note: We'll use dynamic translation keys, defined in the component itself
 
-const sauces: Sauce[] = [
-  { id: "classic", name: "Salsa Classic", description: "Salsa tradicional asiática", spicyLevel: 0, color: "bg-amber-500" },
-  { id: "original", name: "Salsa Original", description: "Nuestra receta especial", spicyLevel: 0, color: "bg-orange-500" },
-  { id: "teriyaki", name: "Salsa Teriyaki", description: "Dulce y sabrosa salsa japonesa", spicyLevel: 0, color: "bg-brown-600" },
-  { id: "curry-amarillo", name: "Curry Amarillo", description: "Suave curry amarillo", spicyLevel: 0, color: "bg-yellow-500" },
-  { id: "curry-verde", name: "Curry Verde", description: "Curry verde medio picante", spicyLevel: 1, color: "bg-green-500" },
-  { id: "curry-rojo", name: "Curry Rojo", description: "Intenso curry rojo picante", spicyLevel: 2, color: "bg-red-500" },
-];
+// Note: We'll use dynamic translation keys for sauces too
 
 interface RiceCustomizerProps {
   onAddToCart: (protein: string, sauce: string, price: number) => void;
@@ -51,6 +36,25 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("protein");
+
+  const proteins: Protein[] = [
+    { id: "pollo", name: t('chicken_protein'), description: t('chicken_desc') },
+    { id: "ternera", name: t('beef_protein'), description: t('beef_desc') },
+    { id: "gambas", name: t('shrimp_protein'), description: t('shrimp_desc') },
+    { id: "pollo-ternera", name: t('chicken_beef'), description: t('chicken_beef_desc') },
+    { id: "pollo-gambas", name: t('chicken_shrimp'), description: t('chicken_shrimp_desc') },
+    { id: "ternera-gambas", name: t('beef_shrimp'), description: t('beef_shrimp_desc') },
+    { id: "mix-3", name: t('mix_three'), description: t('mix_three_desc') },
+  ];
+
+  const sauces: Sauce[] = [
+    { id: "classic", name: t('classic_sauce'), description: t('classic_sauce_desc'), spicyLevel: 0, color: "bg-amber-500" },
+    { id: "original", name: t('original_sauce'), description: t('original_sauce_desc'), spicyLevel: 0, color: "bg-orange-500" },
+    { id: "teriyaki", name: t('teriyaki_sauce'), description: t('teriyaki_sauce_desc'), spicyLevel: 0, color: "bg-brown-600" },
+    { id: "curry-amarillo", name: t('yellow_curry_sauce'), description: t('yellow_curry_sauce_desc'), spicyLevel: 0, color: "bg-yellow-500" },
+    { id: "curry-verde", name: t('green_curry_sauce'), description: t('green_curry_sauce_desc'), spicyLevel: 1, color: "bg-green-500" },
+    { id: "curry-rojo", name: t('red_curry_sauce'), description: t('red_curry_sauce_desc'), spicyLevel: 2, color: "bg-red-500" },
+  ];
 
   const getPrice = (proteinId: string) => {
     const basePrices: Record<string, number> = {
@@ -190,7 +194,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                   <div className={`h-4 w-full rounded-full ${sauce.color} mb-2`}></div>
                   {sauce.spicyLevel > 0 && (
                     <Badge variant="secondary" className="text-xs">
-                      {sauce.spicyLevel === 1 ? "Medio picante" : "Picante"}
+                      {sauce.spicyLevel === 1 ? t('medium_spicy') : t('spicy_level_high')}
                     </Badge>
                   )}
                 </CardContent>
