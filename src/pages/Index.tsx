@@ -6,6 +6,7 @@ import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { RiceCustomizer } from "@/components/RiceCustomizer";
 import { NoodleCustomizer } from "@/components/NoodleCustomizer";
 import { SoupCustomizer } from "@/components/SoupCustomizer";
+import { PokeCustomizer } from "@/components/PokeCustomizer";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { useProducts } from "@/hooks/useProducts";
@@ -84,6 +85,10 @@ const Index = () => {
     addToCart(product);
   };
 
+  const handlePokeCustomization = (product: SupabaseProduct) => {
+    addToCart(product);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -154,11 +159,7 @@ const Index = () => {
 
         {activeCategory === "pokes" && (
           <div id="category-pokes" className="py-8">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('pokes')}</h2>
-              <p className="text-muted-foreground mb-8">{t('pokes_description')}</p>
-              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
-            </div>
+            <PokeCustomizer onAddToCart={handlePokeCustomization} />
           </div>
         )}
 

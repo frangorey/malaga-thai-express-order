@@ -299,7 +299,29 @@ const translations = {
     'custom_soup_with': 'Sopa personalizada con',
     'custom_soup_desc': 'y tus ingredientes favoritos',
     'prawn': 'Langostino',
-    'veggie': 'Veggie'
+    'veggie': 'Veggie',
+
+    // Poke customizer
+    'poke_customizer_title': 'Personaliza tu Poke',
+    'poke_customizer_description': 'Elige tu poke bowl favorito con ingredientes frescos',
+    'step_poke_type': 'Tipo de Poke',
+    'choose_your_poke': 'Selecciona tu poke preferido',
+    'poke_type': 'Tipo de Poke',
+    'selected': 'Seleccionado',
+
+    // Poke products
+    'poke_korean_name': 'Poke Coreano',
+    'poke_korean_desc': 'Base de arroz japonés avinagrado con salsa soja, Pollo Crispy, Kimchi, Kiwi, Tofu, langostino, alga, cebolla frita, sésamo, salsa soja y salsa kimchi',
+    'poke_japanese_name': 'Poke Japonés', 
+    'poke_japanese_desc': 'Base de arroz japonés avinagrado con salsa soja, Wakame, aguacate, sésamo, Tomates cherry, kiwi, Salmón, gambas, salsa japonesa y salsa soja',
+    'poke_indonesia_name': 'Poke Indonesia',
+    'poke_indonesia_desc': 'Base de arroz japonés avinagrado con salsa soja, Aguacate, sésamo, mango, piña, kiwi, Tomates cherry, pepino, salsa soja y salsa fruta',
+    'poke_thailand_name': 'Poke Thailandia',
+    'poke_thailand_desc': 'Base de arroz japonés avinagrado con salsa soja, Aguacate, piña, kiwi, gambas, sésamo, cebolla frita, pollo, salsa pimienta y salsa de fruta',
+    'poke_basic_name': 'Poke Básico',
+    'poke_basic_desc': 'Elección al gusto, elige 150gr de pollo o 2 pollo Crispy, Sésamo y 3 verduras/frutas a elegir entre (wakame, kimchi, tofu, alga, pepino, aguacate, kiwi, tomates cherry, piña, fresa, mango), además tendrá que elegir una de nuestras salsas (Kimchi, soja, Rosa, fruta, Japonesa, César, agridulce)',
+    'poke_premium_name': 'Poke Premium',
+    'poke_premium_desc': 'Elección al gusto, elige 100gr de Salmón o 150gr de pollo o 2 pollo Crispy, Sésamo y gambas, además deberá elegir 4 verduras/frutas a elegir entre (wakame, kimchi, tofu, alga, pepino, aguacate, kiwi, tomates cherry, piña, fresa, mango), además tendrá que elegir una de nuestras salsas (Kimchi, soja, Rosa, fruta, Japonesa, César, agridulce)'
   },
   
   en: {
@@ -548,7 +570,29 @@ const translations = {
     'custom_soup_with': 'Custom soup with',
     'custom_soup_desc': 'and your favorite ingredients',
     'prawn': 'Prawn',
-    'veggie': 'Veggie'
+    'veggie': 'Veggie',
+
+    // Poke customizer
+    'poke_customizer_title': 'Customize your Poke',
+    'poke_customizer_description': 'Choose your favorite poke bowl with fresh ingredients',
+    'step_poke_type': 'Poke Type',
+    'choose_your_poke': 'Select your preferred poke',
+    'poke_type': 'Poke Type',
+    'selected': 'Selected',
+
+    // Poke products
+    'poke_korean_name': 'Korean Poke',
+    'poke_korean_desc': 'Japanese vinegared rice base with soy sauce, Crispy Chicken, Kimchi, Kiwi, Tofu, prawns, seaweed, fried onion, sesame, soy sauce and kimchi sauce',
+    'poke_japanese_name': 'Japanese Poke',
+    'poke_japanese_desc': 'Japanese vinegared rice base with soy sauce, Wakame, avocado, sesame, Cherry tomatoes, kiwi, Salmon, prawns, Japanese sauce and soy sauce',
+    'poke_indonesia_name': 'Indonesian Poke',
+    'poke_indonesia_desc': 'Japanese vinegared rice base with soy sauce, Avocado, sesame, mango, pineapple, kiwi, Cherry tomatoes, cucumber, soy sauce and fruit sauce',
+    'poke_thailand_name': 'Thailand Poke',
+    'poke_thailand_desc': 'Japanese vinegared rice base with soy sauce, Avocado, pineapple, kiwi, prawns, sesame, fried onion, chicken, pepper sauce and fruit sauce',
+    'poke_basic_name': 'Basic Poke',
+    'poke_basic_desc': 'Choose to taste, select 150gr of chicken or 2 Crispy chicken, Sesame and 3 vegetables/fruits to choose from (wakame, kimchi, tofu, seaweed, cucumber, avocado, kiwi, cherry tomatoes, pineapple, strawberry, mango), plus choose one of our sauces (Kimchi, soy, Pink, fruit, Japanese, Caesar, sweet and sour)',
+    'poke_premium_name': 'Premium Poke',
+    'poke_premium_desc': 'Choose to taste, select 100gr of Salmon or 150gr of chicken or 2 Crispy chicken, Sesame and prawns, plus choose 4 vegetables/fruits from (wakame, kimchi, tofu, seaweed, cucumber, avocado, kiwi, cherry tomatoes, pineapple, strawberry, mango), plus choose one of our sauces (Kimchi, soy, Pink, fruit, Japanese, Caesar, sweet and sour)'
   },
   
   fr: {
@@ -797,6 +841,28 @@ const translations = {
     'custom_soup_with': 'Soupe personnalisée avec',
     'custom_soup_desc': 'et vos ingrédients préférés',
     'prawn': 'Crevette',
-    'veggie': 'Végétarien'
+    'veggie': 'Végétarien',
+
+    // Poke customizer
+    'poke_customizer_title': 'Personnalisez votre Poké',
+    'poke_customizer_description': 'Choisissez votre poke bowl préféré avec des ingrédients frais',
+    'step_poke_type': 'Type de Poké',
+    'choose_your_poke': 'Sélectionnez votre poké préféré',
+    'poke_type': 'Type de Poké',
+    'selected': 'Sélectionné',
+
+    // Poke products
+    'poke_korean_name': 'Poké Coréen',
+    'poke_korean_desc': 'Base de riz japonais vinaigré avec sauce soja, Poulet Crispy, Kimchi, Kiwi, Tofu, crevettes, algue, oignon frit, sésame, sauce soja et sauce kimchi',
+    'poke_japanese_name': 'Poké Japonais',
+    'poke_japanese_desc': 'Base de riz japonais vinaigré avec sauce soja, Wakame, avocat, sésame, Tomates cerises, kiwi, Saumon, crevettes, sauce japonaise et sauce soja',
+    'poke_indonesia_name': 'Poké Indonésien',
+    'poke_indonesia_desc': 'Base de riz japonais vinaigré avec sauce soja, Avocat, sésame, mangue, ananas, kiwi, Tomates cerises, concombre, sauce soja et sauce aux fruits',
+    'poke_thailand_name': 'Poké Thaïlandais',
+    'poke_thailand_desc': 'Base de riz japonais vinaigré avec sauce soja, Avocat, ananas, kiwi, crevettes, sésame, oignon frit, poulet, sauce poivre et sauce aux fruits',
+    'poke_basic_name': 'Poké Basique',
+    'poke_basic_desc': 'Choix au goût, choisissez 150gr de poulet ou 2 poulets Crispy, Sésame et 3 légumes/fruits à choisir parmi (wakame, kimchi, tofu, algue, concombre, avocat, kiwi, tomates cerises, ananas, fraise, mangue), plus choisir une de nos sauces (Kimchi, soja, Rose, fruit, Japonaise, César, aigre-douce)',
+    'poke_premium_name': 'Poké Premium',
+    'poke_premium_desc': 'Choix au goût, choisissez 100gr de Saumon ou 150gr de poulet ou 2 poulets Crispy, Sésame et crevettes, plus choisir 4 légumes/fruits parmi (wakame, kimchi, tofu, algue, concombre, avocat, kiwi, tomates cerises, ananas, fraise, mangue), plus choisir une de nos sauces (Kimchi, soja, Rose, fruit, Japonaise, César, aigre-douce)'
   }
 };
