@@ -285,7 +285,21 @@ const translations = {
     'edamame': 'Edamame',
     'edamame_desc': 'Vainas de soja hervidas con sal marina',
     'edamame_spicy': 'Edamame picante',
-    'edamame_spicy_desc': 'Vainas de soja hervidas con especias picantes'
+    'edamame_spicy_desc': 'Vainas de soja hervidas con especias picantes',
+
+    // Soup Customizer
+    'soup_customizer_title': 'Personaliza tu Sopa',
+    'soup_customizer_description': 'Elige tu tipo de sopa favorita y la proteína que más te guste',
+    'step_soup_type': 'Elige tu tipo de sopa',
+    'soup_type': 'Tipo de sopa',
+    'soup_miso': 'Sopa Miso',
+    'soup_miso_desc': 'Tofu, Wakame, Cebolleta y salsa de mariscos',
+    'soup_tom_yam': 'Sopa Tom Yam',
+    'soup_tom_yam_desc': 'Champiñones, zanahoria, brócoli, tomates cherry, salsa de marisco, medio picante',
+    'custom_soup_with': 'Sopa personalizada con',
+    'custom_soup_desc': 'y tus ingredientes favoritos',
+    'prawn': 'Langostino',
+    'veggie': 'Veggie'
   },
   
   en: {
@@ -520,7 +534,21 @@ const translations = {
     'edamame': 'Edamame',
     'edamame_desc': 'Boiled soybean pods with sea salt',
     'edamame_spicy': 'Spicy edamame',
-    'edamame_spicy_desc': 'Boiled soybean pods with spicy seasoning'
+    'edamame_spicy_desc': 'Boiled soybean pods with spicy seasoning',
+
+    // Soup Customizer
+    'soup_customizer_title': 'Customize your Soup',
+    'soup_customizer_description': 'Choose your favorite soup type and protein',
+    'step_soup_type': 'Choose your soup type',
+    'soup_type': 'Soup type',
+    'soup_miso': 'Miso Soup',
+    'soup_miso_desc': 'Tofu, Wakame, Scallion and seafood sauce',
+    'soup_tom_yam': 'Tom Yam Soup',
+    'soup_tom_yam_desc': 'Mushrooms, carrot, broccoli, cherry tomatoes, seafood sauce, medium spicy',
+    'custom_soup_with': 'Custom soup with',
+    'custom_soup_desc': 'and your favorite ingredients',
+    'prawn': 'Prawn',
+    'veggie': 'Veggie'
   },
   
   fr: {
@@ -755,6 +783,20 @@ const translations = {
     'edamame': 'Edamame',
     'edamame_desc': 'Gousses de soja bouillies au sel marin',
     'edamame_spicy': 'Edamame épicé',
-    'edamame_spicy_desc': 'Gousses de soja bouillies aux épices piquantes'
+    'edamame_spicy_desc': 'Gousses de soja bouillies aux épices piquantes',
+
+    // Soup Customizer
+    'soup_customizer_title': 'Personnalisez votre Soupe',
+    'soup_customizer_description': 'Choisissez votre type de soupe préféré et votre protéine',
+    'step_soup_type': 'Choisissez votre type de soupe',
+    'soup_type': 'Type de soupe',
+    'soup_miso': 'Soupe Miso',
+    'soup_miso_desc': 'Tofu, Wakame, Ciboulette et sauce aux fruits de mer',
+    'soup_tom_yam': 'Soupe Tom Yam',
+    'soup_tom_yam_desc': 'Champignons, carotte, brocoli, tomates cerises, sauce aux fruits de mer, moyennement épicé',
+    'custom_soup_with': 'Soupe personnalisée avec',
+    'custom_soup_desc': 'et vos ingrédients préférés',
+    'prawn': 'Crevette',
+    'veggie': 'Végétarien'
   }
 };
