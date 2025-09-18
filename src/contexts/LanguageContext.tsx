@@ -97,6 +97,8 @@ const translations = {
     'spicy_level': 'Nivel de picante',
     
     // Rice Customizer
+    'rice_customizer_title': 'Personaliza tu Arroz',
+    'rice_customizer_description': 'Selecciona tu proteína y salsa favorita para crear tu plato perfecto',
     'customize_rice': 'Personaliza tu arroz',
     'selected_items': 'Elementos seleccionados',
     
@@ -330,6 +332,8 @@ const translations = {
     'spicy_level': 'Spicy level',
     
     // Rice Customizer
+    'rice_customizer_title': 'Customize your Rice',
+    'rice_customizer_description': 'Select your favorite protein and sauce to create your perfect dish',
     'customize_rice': 'Customize your rice',
     'selected_items': 'Selected items',
     
@@ -563,6 +567,8 @@ const translations = {
     'spicy_level': 'Niveau épicé',
     
     // Rice Customizer
+    'rice_customizer_title': 'Personnalisez votre Riz',
+    'rice_customizer_description': 'Sélectionnez votre protéine et sauce préférées pour créer votre plat parfait',
     'customize_rice': 'Personnalisez votre riz',
     'selected_items': 'Éléments sélectionnés',
     

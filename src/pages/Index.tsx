@@ -71,22 +71,8 @@ const Index = () => {
     scrollToCategory("arroz");
   };
 
-  const handleRiceCustomization = (protein: string, sauce: string, price: number) => {
-    const customProduct: SupabaseProduct = {
-      id: Date.now(), // temporary ID for custom products
-      name: `${t('custom_rice_with')} ${protein} ${t('custom_rice_and')} ${sauce}`,
-      description: `${t('custom_rice_desc')} ${protein} ${t('custom_rice_and')} ${sauce}`,
-      price,
-      image_url: null,
-      category: "Arroces",
-      subcategory: sauce,
-      is_vegetarian: false,
-      is_spicy: sauce.includes("curry"),
-      is_available: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    addToCart(customProduct);
+  const handleRiceCustomization = (product: SupabaseProduct) => {
+    addToCart(product);
   };
 
   const handleNoodleCustomization = (product: SupabaseProduct) => {

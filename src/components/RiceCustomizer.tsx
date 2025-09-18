@@ -1,244 +1,287 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { ChefHat, Flame, FlameKindling } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SupabaseProduct } from "@/types/menu";
 
 interface Protein {
   id: string;
   name: string;
   description: string;
-  image?: string;
+  image: string;
 }
 
 interface Sauce {
   id: string;
   name: string;
   description: string;
-  spicyLevel: 0 | 1 | 2; // 0: no picante, 1: medio picante, 2: picante
+  spicyLevel: number;
   color: string;
-  image?: string;
+  image: string;
 }
 
-// Note: We'll use dynamic translation keys, defined in the component itself
-
-// Note: We'll use dynamic translation keys for sauces too
-
 interface RiceCustomizerProps {
-  onAddToCart: (protein: string, sauce: string, price: number) => void;
+  onAddToCart: (product: SupabaseProduct) => void;
 }
 
 export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   const { t } = useLanguage();
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<string>("protein");
+  const [activeTab, setActiveTab] = useState("protein");
 
   const proteins: Protein[] = [
-    { id: "pollo", name: t('chicken_protein'), description: t('chicken_desc') },
-    { id: "ternera", name: t('beef_protein'), description: t('beef_desc') },
-    { id: "gambas", name: t('shrimp_protein'), description: t('shrimp_desc') },
-    { id: "pollo-ternera", name: t('chicken_beef'), description: t('chicken_beef_desc') },
-    { id: "pollo-gambas", name: t('chicken_shrimp'), description: t('chicken_shrimp_desc') },
-    { id: "ternera-gambas", name: t('beef_shrimp'), description: t('beef_shrimp_desc') },
-    { id: "mix-3", name: t('mix_three'), description: t('mix_three_desc') },
+    {
+      id: "pollo",
+      name: t('protein_chicken'),
+      description: t('protein_chicken_desc'),
+      image: "/assets/protein-chicken.jpg"
+    },
+    {
+      id: "ternera",
+      name: t('protein_beef'),
+      description: t('protein_beef_desc'),
+      image: "/assets/protein-beef.jpg"
+    },
+    {
+      id: "gambas",
+      name: t('protein_shrimp'),
+      description: t('protein_shrimp_desc'),
+      image: "/assets/protein-shrimp.jpg"
+    },
+    {
+      id: "pollo_ternera",
+      name: t('protein_chicken_beef'),
+      description: t('protein_chicken_beef_desc'),
+      image: "/assets/protein-mix.jpg"
+    },
+    {
+      id: "pollo_gambas",
+      name: t('protein_chicken_shrimp'),
+      description: t('protein_chicken_shrimp_desc'),
+      image: "/assets/protein-mix.jpg"
+    },
+    {
+      id: "ternera_gambas",
+      name: t('protein_beef_shrimp'),
+      description: t('protein_beef_shrimp_desc'),
+      image: "/assets/protein-mix.jpg"
+    },
+    {
+      id: "pollo_ternera_gambas",
+      name: t('protein_chicken_beef_shrimp'),
+      description: t('protein_chicken_beef_shrimp_desc'),
+      image: "/assets/protein-mix.jpg"
+    }
   ];
 
   const sauces: Sauce[] = [
-    { id: "classic", name: t('classic_sauce'), description: t('classic_sauce_desc'), spicyLevel: 0, color: "bg-amber-500" },
-    { id: "original", name: t('original_sauce'), description: t('original_sauce_desc'), spicyLevel: 0, color: "bg-orange-500" },
-    { id: "teriyaki", name: t('teriyaki_sauce'), description: t('teriyaki_sauce_desc'), spicyLevel: 0, color: "bg-brown-600" },
-    { id: "curry-amarillo", name: t('yellow_curry_sauce'), description: t('yellow_curry_sauce_desc'), spicyLevel: 0, color: "bg-yellow-500" },
-    { id: "curry-verde", name: t('green_curry_sauce'), description: t('green_curry_sauce_desc'), spicyLevel: 1, color: "bg-green-500" },
-    { id: "curry-rojo", name: t('red_curry_sauce'), description: t('red_curry_sauce_desc'), spicyLevel: 2, color: "bg-red-500" },
+    {
+      id: "classic",
+      name: t('sauce_classic'),
+      description: t('sauce_classic_desc'),
+      spicyLevel: 0,
+      color: "bg-amber-500",
+      image: "/assets/sauce-classic.jpg"
+    },
+    {
+      id: "original",
+      name: t('sauce_original'),
+      description: t('sauce_original_desc'),
+      spicyLevel: 0,
+      color: "bg-green-500",
+      image: "/assets/sauce-original.jpg"
+    },
+    {
+      id: "teriyaki",
+      name: t('sauce_teriyaki'),
+      description: t('sauce_teriyaki_desc'),
+      spicyLevel: 0,
+      color: "bg-orange-600",
+      image: "/assets/sauce-teriyaki.jpg"
+    },
+    {
+      id: "curry-amarillo",
+      name: t('yellow_curry_sauce'),
+      description: t('yellow_curry_sauce_desc'),
+      spicyLevel: 0,
+      color: "bg-yellow-500",
+      image: "/assets/sauce-curry-yellow.jpg"
+    },
+    {
+      id: "curry-verde",
+      name: t('green_curry_sauce'),
+      description: t('green_curry_sauce_desc'),
+      spicyLevel: 1,
+      color: "bg-green-500",
+      image: "/assets/sauce-curry-green.jpg"
+    },
+    {
+      id: "curry-rojo",
+      name: t('red_curry_sauce'),
+      description: t('red_curry_sauce_desc'),
+      spicyLevel: 2,
+      color: "bg-red-500",
+      image: "/assets/sauce-curry-red.jpg"
+    }
   ];
 
-  const getPrice = (proteinId: string) => {
-    const basePrices: Record<string, number> = {
-      "pollo": 10.60,
-      "ternera": 10.80,
-      "gambas": 11.80,
-      "pollo-ternera": 12.90,
-      "pollo-gambas": 12.90,
-      "ternera-gambas": 12.90,
-      "mix-3": 13.30,
-    };
-    return basePrices[proteinId] || 10.60;
-  };
-
-  const getSpicyIcon = (level: number) => {
-    switch (level) {
-      case 1:
-        return <FlameKindling className="h-4 w-4 text-orange-500" />;
-      case 2:
-        return <Flame className="h-4 w-4 text-red-500" />;
+  const getPrice = (proteinId: string): number => {
+    switch (proteinId) {
+      case "pollo":
+        return 10.60;
+      case "ternera":
+        return 10.80;
+      case "gambas":
+        return 11.80;
+      case "pollo_ternera":
+      case "pollo_gambas":
+      case "ternera_gambas":
+        return 12.90;
+      case "pollo_ternera_gambas":
+        return 13.30;
       default:
-        return null;
+        return 10.60;
     }
   };
 
   const handleProteinSelect = (proteinId: string) => {
     setSelectedProtein(proteinId);
-    setActiveTab("sauce"); // Cambiar automáticamente a la pestaña de salsa
+    setActiveTab("sauce");
   };
 
   const handleSauceSelect = (sauceId: string) => {
     setSelectedSauce(sauceId);
-    if (!selectedProtein) {
-      setActiveTab("protein"); // Si no hay proteína seleccionada, cambiar a proteína
-    }
   };
 
   const handleAddToCart = () => {
-    if (selectedProtein && selectedSauce) {
-      const price = getPrice(selectedProtein);
-      onAddToCart(selectedProtein, selectedSauce, price);
-      // Reset selections
-      setSelectedProtein("");
-      setSelectedSauce("");
-      setActiveTab("protein"); // Volver a la primera pestaña
-    }
-  };
+    if (!selectedProtein || !selectedSauce) return;
 
-  // Generar URL de la imagen desde Supabase Storage
-  const getRiceImageUrl = () => {
-    return "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg";
-  };
+    const proteinName = proteins.find(p => p.id === selectedProtein)?.name || "";
+    const sauceName = sauces.find(s => s.id === selectedSauce)?.name || "";
 
-  const canAddToCart = selectedProtein && selectedSauce;
+    const customProduct: SupabaseProduct = {
+      id: Date.now(),
+      name: `${t('custom_rice_with')} ${proteinName} ${sauceName}`,
+      description: `${t('custom_rice_desc')} ${proteinName} ${t('custom_rice_with_sauce')} ${sauceName}`,
+      price: getPrice(selectedProtein),
+      image_url: null,
+      category: "Arroz",
+      subcategory: "rice",
+      is_vegetarian: false,
+      is_spicy: selectedSauce.includes("curry-verde") || selectedSauce.includes("curry-rojo"),
+      is_available: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    onAddToCart(customProduct);
+    
+    // Reset selections
+    setSelectedProtein("");
+    setSelectedSauce("");
+    setActiveTab("protein");
+  };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <div className="mb-6">
-          <img 
-            src={getRiceImageUrl()} 
-            alt="Arroz frito con ternera" 
-            className="w-full max-w-md mx-auto rounded-lg shadow-lg object-contain"
-          />
+    <section className="py-12 px-4">
+      <div className="container mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold mb-4">
+            <span className="neon-text">{t('rice_customizer_title')}</span>
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            {t('rice_customizer_description')}
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">{t('customize_rice')}</h1>
-        <p className="text-muted-foreground">{t('select_protein')}</p>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8">
-          <TabsTrigger value="protein" className="text-lg py-3">
-            <ChefHat className="h-5 w-5 mr-2" />
-            1. {t('protein_tab')}
-          </TabsTrigger>
-          <TabsTrigger value="sauce" className="text-lg py-3">
-            <Flame className="h-5 w-5 mr-2" />
-            2. {t('sauce_tab')}
-          </TabsTrigger>
-        </TabsList>
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <img 
+              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg"
+              alt={t('rice_customizer_title')}
+              className="w-full h-64 object-cover rounded-lg"
+            />
+          </div>
 
-        <TabsContent value="protein" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {proteins.map((protein) => (
-              <Card
-                key={protein.id}
-                className={`cursor-pointer transition-all hover:scale-105 ${
-                  selectedProtein === protein.id
-                    ? "ring-2 ring-primary shadow-lg neon-glow"
-                    : "hover:shadow-md"
-                }`}
-                onClick={() => handleProteinSelect(protein.id)}
-              >
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center justify-between text-lg">
-                    {protein.name}
-                    <Badge variant="outline" className="text-xs">
-                      €{getPrice(protein.id).toFixed(2)}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{protein.description}</p>
-                  <div className="mt-3 h-20 w-full rounded-md overflow-hidden">
-                    <img 
-                      src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Arroz-ternera.jpeg"
-                      alt="Arroz con proteína"
-                      className="w-full h-full object-cover"
-                    />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="protein">{t('step_protein')}</TabsTrigger>
+              <TabsTrigger value="sauce" disabled={!selectedProtein}>
+                {t('step_sauce')}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="protein" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {proteins.map((protein) => (
+                  <Card
+                    key={protein.id}
+                    className={`cursor-pointer transition-all duration-300 hover:neon-border ${
+                      selectedProtein === protein.id ? 'neon-border' : ''
+                    }`}
+                    onClick={() => handleProteinSelect(protein.id)}
+                  >
+                    <CardHeader className="text-center">
+                      <CardTitle className="text-lg">{protein.name}</CardTitle>
+                      <CardDescription className="text-sm">
+                        {protein.description}
+                      </CardDescription>
+                      <div className="text-xl font-bold text-primary mt-2">
+                        {getPrice(protein.id).toFixed(2)}€
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="sauce" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                {sauces.map((sauce) => (
+                  <Card
+                    key={sauce.id}
+                    className={`cursor-pointer transition-all duration-300 hover:neon-border ${
+                      selectedSauce === sauce.id ? 'neon-border' : ''
+                    }`}
+                    onClick={() => handleSauceSelect(sauce.id)}
+                  >
+                    <CardHeader className="text-center">
+                      <div className={`w-16 h-16 rounded-full ${sauce.color} mx-auto mb-4`}></div>
+                      <CardTitle className="text-lg">{sauce.name}</CardTitle>
+                      <CardDescription className="text-sm">
+                        {sauce.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+
+              {selectedProtein && selectedSauce && (
+                <div className="text-center bg-card/50 backdrop-blur-sm p-6 rounded-lg border">
+                  <h3 className="text-xl font-bold mb-4">{t('order_summary')}</h3>
+                  <div className="space-y-2 mb-4">
+                    <p><strong>{t('protein')}:</strong> {proteins.find(p => p.id === selectedProtein)?.name}</p>
+                    <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
+                    <p className="text-xl font-bold neon-text">
+                      <strong>{t('total')}:</strong> {getPrice(selectedProtein).toFixed(2)}€
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="sauce" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sauces.map((sauce) => (
-              <Card
-                key={sauce.id}
-                className={`cursor-pointer transition-all hover:scale-105 ${
-                  selectedSauce === sauce.id
-                    ? "ring-2 ring-primary shadow-lg neon-glow"
-                    : "hover:shadow-md"
-                }`}
-                onClick={() => handleSauceSelect(sauce.id)}
-              >
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center justify-between text-lg">
-                    {sauce.name}
-                    {getSpicyIcon(sauce.spicyLevel)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">{sauce.description}</p>
-                  <div className={`h-4 w-full rounded-full ${sauce.color} mb-2`}></div>
-                  {sauce.spicyLevel > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {sauce.spicyLevel === 1 ? t('medium_spicy') : t('spicy_level_high')}
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Summary and Add to Cart */}
-      <div className="mt-8 p-6 bg-card rounded-lg border">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">{t('selected_items')}:</h3>
-            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-              {selectedProtein && (
-                <Badge variant="outline">
-                  {t('protein_tab')}: {proteins.find(p => p.id === selectedProtein)?.name}
-                </Badge>
+                  <Button
+                    variant="neon"
+                    size="lg"
+                    onClick={handleAddToCart}
+                    className="w-full md:w-auto"
+                  >
+                    {t('add_to_cart')}
+                  </Button>
+                </div>
               )}
-              {selectedSauce && (
-                <Badge variant="outline">
-                  {t('sauce_tab')}: {sauces.find(s => s.id === selectedSauce)?.name}
-                </Badge>
-              )}
-            </div>
-            {selectedProtein && (
-              <p className="text-lg font-bold text-primary">
-                {t('price')}: €{getPrice(selectedProtein).toFixed(2)}
-              </p>
-            )}
-          </div>
-          
-          <Button
-            onClick={handleAddToCart}
-            disabled={!canAddToCart}
-            variant="neon"
-            size="lg"
-            className="w-full md:w-auto"
-          >
-            {t('add_to_cart')}
-          </Button>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
