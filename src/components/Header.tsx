@@ -1,7 +1,9 @@
-import { ShoppingCart, Phone, MapPin } from "lucide-react";
+import { ShoppingCart, Phone, MapPin, LogIn, UserPlus, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { AuthDialog } from "@/components/AuthDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
@@ -11,6 +13,7 @@ export const Header = ({
   onCartClick
 }: HeaderProps) => {
   const { t } = useLanguage();
+  const { user, signOut } = useAuth();
   
   return <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -40,8 +43,39 @@ export const Header = ({
             </div>
           </div>
 
-          {/* Language Selector and Cart */}
+          {/* Auth Buttons, Language Selector and Cart */}
           <div className="flex items-center space-x-3">
+            {user ? (
+              <Button 
+                variant="outline" 
+                onClick={signOut}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('logout')}</span>
+              </Button>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <AuthDialog>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('login')}</span>
+                  </Button>
+                </AuthDialog>
+                <AuthDialog>
+                  <Button 
+                    variant="neon" 
+                    className="flex items-center gap-2"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('signup')}</span>
+                  </Button>
+                </AuthDialog>
+              </div>
+            )}
             <LanguageSelector />
             <Button variant="cart" onClick={onCartClick} className="relative">
               <ShoppingCart className="w-5 h-5" />

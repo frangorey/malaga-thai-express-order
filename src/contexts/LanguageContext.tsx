@@ -65,9 +65,21 @@ const translations = {
     'choose_what_you_like': 'Escoge lo que más te guste y...',
     'take_it_home': '¡llévátelo a casa!',
     'order_online': 'HACER PEDIDO ONLINE',
-    'call_us': 'LLAMAR: 951 40 19 37',
-    
-    // Main Categories
+     'call_us': 'LLAMAR: 951 40 19 37',
+     
+     // Auth
+     'auth_title': 'Iniciar Sesión en Thaii Express',
+     'login': 'Iniciar Sesión',
+     'signup': 'Registrarse',
+     'email': 'Correo Electrónico',
+     'password': 'Contraseña',
+     'loading': 'Cargando...',
+     'login_success': '¡Inicio de Sesión Exitoso!',
+     'signup_success': '¡Cuenta Creada!',
+     'check_email_confirmation': 'Por favor revisa tu correo para confirmar tu cuenta.',
+     'logout': 'Cerrar Sesión',
+     
+     // Main Categories
     'entrantes': 'Entrantes',
     'arroz': 'Arroz', 
     'tallarines': 'Tallarines',
@@ -336,9 +348,21 @@ const translations = {
     'choose_what_you_like': 'Choose what you like most and...',
     'take_it_home': 'take it home!',
     'order_online': 'ORDER ONLINE',
-    'call_us': 'CALL: 951 40 19 37',
-    
-    // Main Categories
+     'call_us': 'CALL: 951 40 19 37',
+     
+     // Auth
+     'auth_title': 'Sign In to Thaii Express',
+     'login': 'Login',
+     'signup': 'Sign Up',
+     'email': 'Email',
+     'password': 'Password',
+     'loading': 'Loading...',
+     'login_success': 'Login Successful!',
+     'signup_success': 'Account Created!',
+     'check_email_confirmation': 'Please check your email to confirm your account.',
+     'logout': 'Logout',
+     
+     // Main Categories
     'entrantes': 'Starters',
     'arroz': 'Rice',
     'tallarines': 'Noodles', 
