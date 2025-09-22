@@ -50,10 +50,10 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
     <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        className="absolute inset-0 bg-cover bg-top bg-no-repeat"
+        style={{ backgroundImage: `url(${heroImage})`, backgroundPosition: 'center top' }}
       >
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
       {/* Decorative Neon Lines */}
