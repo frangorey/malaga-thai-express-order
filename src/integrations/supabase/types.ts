@@ -299,6 +299,17 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_safe_profile: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          updated_at: string
+        }[]
+      }
       update_user_profile: {
         Args: { new_avatar_url?: string; new_display_name?: string }
         Returns: {
