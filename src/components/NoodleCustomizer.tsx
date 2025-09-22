@@ -56,7 +56,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
     {
       id: "glass",
       name: t('noodle_glass'),
-      description: t('noodle_glass_desc'),
+      description: "Tallarines transparentes de habas",
       image: "/assets/noodles-glass.jpg"
     },
     {
