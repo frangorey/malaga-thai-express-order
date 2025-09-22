@@ -8,23 +8,23 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 5%;
-    --foreground: 120 100% 95%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 120 100% 95%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 120 100% 95%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 95%;
 
     --primary: 85 55% 62%;
     --primary-foreground: 0 0% 5%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 85 55% 95%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 85 20% 65%;
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 70%;
 
     --accent: 85 55% 50%;
     --accent-foreground: 0 0% 5%;
@@ -32,37 +32,34 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 15%;
+    --border: 0 0% 30%;
+    --input: 0 0% 20%;
     --ring: 85 55% 62%;
 
     --neon-green: 85 55% 62%;
     --neon-green-glow: 85 55% 45%;
-    --dark-surface: 0 0% 8%;
-    --darker-surface: 0 0% 5%;
+    --dark-surface: 0 0% 15%;
+    --darker-surface: 0 0% 10%;
+    --light-surface: 0 0% 95%;
+    --white-pure: 0 0% 100%;
     
     --gradient-neon: linear-gradient(135deg, hsl(85 55% 62% / 0.2), hsl(85 55% 45% / 0.1));
+    --gradient-light: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 95% / 0.05));
     --glow-neon: 0 0 20px hsl(85 55% 62% / 0.5);
     --glow-subtle: 0 0 40px hsl(85 55% 62% / 0.2);
+    --glow-white: 0 0 30px hsl(0 0% 100% / 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -130,8 +127,26 @@ All colors MUST be HSL.
     box-shadow: var(--glow-neon);
   }
   
+  .white-glow {
+    box-shadow: var(--glow-white);
+  }
+  
   .gradient-neon {
     background: var(--gradient-neon);
+  }
+  
+  .gradient-light {
+    background: var(--gradient-light);
+  }
+  
+  .light-surface {
+    background: hsl(var(--light-surface));
+    color: hsl(var(--darker-surface));
+  }
+  
+  .white-surface {
+    background: hsl(var(--white-pure));
+    color: hsl(var(--darker-surface));
   }
   
   .animate-pulse-soft {

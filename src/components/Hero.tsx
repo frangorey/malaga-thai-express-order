@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
 
-const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/imagen-hero.jpeg";
+const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/quiero-que-en-base-a-esta-foto--utilices-el-logo-d.png";
 const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-sinfondonueva";
 
 const topSalesImages = [
