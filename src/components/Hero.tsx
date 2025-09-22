@@ -112,7 +112,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="neon-text">{t('prepare_to_taste')}</span>
+          <span className="neon-text">Tus Noodles</span>
           <br />
           <span className="text-foreground">{t('to_your_liking')}</span>
         </h1>
