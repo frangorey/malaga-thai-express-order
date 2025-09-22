@@ -259,10 +259,56 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      safe_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_profile: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          updated_at: string
+        }[]
+      }
+      update_user_profile: {
+        Args: { new_avatar_url?: string; new_display_name?: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          email: string
+          id: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
