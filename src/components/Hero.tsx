@@ -114,7 +114,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="neon-text">Tus Noodles</span>
           <br />
-          <span className="text-foreground">{t('to_your_liking')}</span>
+          <span className="text-foreground">de Málaga</span>
         </h1>
         
         {/* Eslogan */}
