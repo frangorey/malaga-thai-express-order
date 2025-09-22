@@ -121,7 +121,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
         </div>
 
         {/* Carrusel de Top Ventas */}
-        <div className="mb-8 max-w-2xl mx-auto">
+        <div className="mb-8 max-w-6xl mx-auto">
           <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
             {t('top_sales')}
           </h3>
@@ -133,18 +133,20 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
               loop: true,
             }}
           >
-            <CarouselContent className="-ml-1">
+            <CarouselContent className="-ml-2">
               {topSalesImages.map((image, index) => (
-                <CarouselItem key={index} className="pl-1">
-                  <div className="relative h-48 md:h-64 rounded-lg overflow-hidden shadow-2xl">
+                <CarouselItem key={index} className="pl-2 md:basis-1/2 lg:basis-1/3">
+                  <div className="relative h-80 md:h-96 rounded-lg overflow-hidden shadow-2xl group cursor-pointer">
                     <img
                       src={image.src}
                       alt={image.alt}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      <h4 className="text-white font-semibold text-lg">{image.title}</h4>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      <h4 className="text-white font-bold text-xl mb-2 drop-shadow-lg">{image.title}</h4>
+                      <div className="w-12 h-1 bg-primary rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                     </div>
                   </div>
                 </CarouselItem>

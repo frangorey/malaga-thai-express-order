@@ -93,25 +93,26 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {items.map((item) => {
             const translatedProduct = getTranslatedProduct(item);
             return (
-            <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm">
-              <div className="relative overflow-hidden">
+            <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden">
+              <div className="relative overflow-hidden aspect-[4/5]">
                 <img 
                   src={item.image_url || '/placeholder.svg'} 
                   alt={translatedProduct.name}
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute top-2 right-2 flex gap-1">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute top-3 right-3 flex gap-2">
                   {item.is_vegetarian && (
-                    <div className="bg-green-500 rounded-full p-1">
+                    <div className="bg-green-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                       <Leaf className="w-4 h-4 text-white" />
                     </div>
                   )}
                   {item.is_spicy && (
-                    <div className="bg-red-500 rounded-full p-1">
+                    <div className="bg-red-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                       <Flame className="w-4 h-4 text-white" />
                     </div>
                   )}
