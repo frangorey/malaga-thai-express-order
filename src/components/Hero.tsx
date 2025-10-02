@@ -83,7 +83,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
                 />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md z-[9999] fixed">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-center">{t('doubts_about_dishes')}</DialogTitle>
               </DialogHeader>
