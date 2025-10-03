@@ -6,7 +6,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
 
 const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/premium_photo-1697729549014-2faefb25efba.jpg";
-const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-sinfondonueva";
+const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-sinfondonueva.jpeg";
 
 const topSalesImages = [
   {
