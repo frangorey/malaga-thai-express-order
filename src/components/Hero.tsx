@@ -74,7 +74,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
             <DialogTrigger asChild>
               <Button 
                 variant="ghost" 
-                className="relative bg-black/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-black/90 transition-all duration-300 hover:scale-105"
+                className="relative bg-transparent backdrop-blur-sm rounded-full p-2 border-0 hover:bg-white/5 transition-all duration-300 hover:scale-110 hover:drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]"
               >
                 <img 
                   src={khopiImage} 
