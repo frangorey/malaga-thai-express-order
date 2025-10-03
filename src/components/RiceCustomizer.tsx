@@ -21,6 +21,12 @@ interface Sauce {
   image: string;
 }
 
+interface Vegetable {
+  id: string;
+  name: string;
+  price: number;
+}
+
 interface RiceCustomizerProps {
   onAddToCart: (product: SupabaseProduct) => void;
 }
@@ -29,6 +35,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   const { t } = useLanguage();
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
+  const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("protein");
 
   const proteins: Protein[] = [
@@ -127,6 +134,22 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
     }
   ];
 
+  const vegetables: Vegetable[] = [
+    { id: "huevo", name: "Huevo", price: 1.40 },
+    { id: "cilantro", name: "Cilantro", price: 1.40 },
+    { id: "albahaca", name: "Albahaca", price: 1.40 },
+    { id: "brotes-soja", name: "Brotes de Soja", price: 1.40 },
+    { id: "cebolla-roja", name: "Cebolla roja", price: 1.40 },
+    { id: "maiz", name: "Maíz", price: 1.40 },
+    { id: "judia-verde", name: "Judía Verde", price: 1.40 },
+    { id: "zanahoria", name: "Zanahoria", price: 1.40 },
+    { id: "cacahuete", name: "Cacahuete", price: 1.40 },
+    { id: "brocoli", name: "Brócoli", price: 1.90 },
+    { id: "cebolleta", name: "Cebolleta", price: 1.90 },
+    { id: "champinones", name: "Champiñones", price: 1.90 },
+    { id: "pimiento", name: "Pimiento", price: 1.90 }
+  ];
+
   const getPrice = (proteinId: string): number => {
     switch (proteinId) {
       case "pollo":
@@ -153,6 +176,24 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
 
   const handleSauceSelect = (sauceId: string) => {
     setSelectedSauce(sauceId);
+    setActiveTab("vegetables");
+  };
+
+  const handleVegetableToggle = (vegetableId: string) => {
+    setSelectedVegetables(prev => 
+      prev.includes(vegetableId) 
+        ? prev.filter(id => id !== vegetableId)
+        : [...prev, vegetableId]
+    );
+  };
+
+  const getTotalPrice = (): number => {
+    const basePrice = getPrice(selectedProtein);
+    const vegetablesPrice = selectedVegetables.reduce((sum, vegId) => {
+      const veg = vegetables.find(v => v.id === vegId);
+      return sum + (veg?.price || 0);
+    }, 0);
+    return basePrice + vegetablesPrice;
   };
 
   const handleAddToCart = () => {
@@ -160,12 +201,16 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
 
     const proteinName = proteins.find(p => p.id === selectedProtein)?.name || "";
     const sauceName = sauces.find(s => s.id === selectedSauce)?.name || "";
+    const vegetablesNames = selectedVegetables
+      .map(id => vegetables.find(v => v.id === id)?.name)
+      .filter(Boolean)
+      .join(", ");
 
     const customProduct: SupabaseProduct = {
       id: Date.now(),
-      name: `${t('custom_rice_with')} ${proteinName} ${sauceName}`,
-      description: `${t('custom_rice_desc')} ${proteinName} ${t('custom_rice_with_sauce')} ${sauceName}`,
-      price: getPrice(selectedProtein),
+      name: `${t('custom_rice_with')} ${proteinName} ${sauceName}${vegetablesNames ? ` + ${vegetablesNames}` : ''}`,
+      description: `${t('custom_rice_desc')} ${proteinName} ${t('custom_rice_with_sauce')} ${sauceName}${vegetablesNames ? `. Verduras extra: ${vegetablesNames}` : ''}`,
+      price: getTotalPrice(),
       image_url: null,
       category: "Arroz",
       subcategory: "rice",
@@ -181,6 +226,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
     // Reset selections
     setSelectedProtein("");
     setSelectedSauce("");
+    setSelectedVegetables([]);
     setActiveTab("protein");
   };
 
@@ -206,10 +252,13 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="protein">{t('step_protein')}</TabsTrigger>
               <TabsTrigger value="sauce" disabled={!selectedProtein}>
                 {t('step_sauce')}
+              </TabsTrigger>
+              <TabsTrigger value="vegetables" disabled={!selectedSauce}>
+                Verduras Extra
               </TabsTrigger>
             </TabsList>
 
@@ -257,6 +306,32 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+
+            <TabsContent value="vegetables" className="mt-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Verduras Adicionales (Opcional)</h3>
+                <p className="text-sm text-muted-foreground mb-4">Selecciona las verduras extra que desees añadir a tu plato</p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
+                {vegetables.map((vegetable) => (
+                  <Card
+                    key={vegetable.id}
+                    className={`cursor-pointer transition-all duration-300 hover:neon-border ${
+                      selectedVegetables.includes(vegetable.id) ? 'neon-border bg-primary/10' : ''
+                    }`}
+                    onClick={() => handleVegetableToggle(vegetable.id)}
+                  >
+                    <CardHeader className="text-center p-4">
+                      <CardTitle className="text-sm">{vegetable.name}</CardTitle>
+                      <CardDescription className="text-sm font-bold text-primary">
+                        +{vegetable.price.toFixed(2)}€
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
 
               {selectedProtein && selectedSauce && (
                 <div className="text-center bg-card/50 backdrop-blur-sm p-6 rounded-lg border">
@@ -264,8 +339,11 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                   <div className="space-y-2 mb-4">
                     <p><strong>{t('protein')}:</strong> {proteins.find(p => p.id === selectedProtein)?.name}</p>
                     <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
+                    {selectedVegetables.length > 0 && (
+                      <p><strong>Verduras extra:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
+                    )}
                     <p className="text-xl font-bold neon-text">
-                      <strong>{t('total')}:</strong> {getPrice(selectedProtein).toFixed(2)}€
+                      <strong>{t('total')}:</strong> {getTotalPrice().toFixed(2)}€
                     </p>
                   </div>
                   <Button
