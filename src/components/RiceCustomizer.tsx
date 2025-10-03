@@ -135,19 +135,19 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   ];
 
   const vegetables: Vegetable[] = [
-    { id: "huevo", name: "Huevo", price: 1.40 },
-    { id: "cilantro", name: "Cilantro", price: 1.40 },
-    { id: "albahaca", name: "Albahaca", price: 1.40 },
-    { id: "brotes-soja", name: "Brotes de Soja", price: 1.40 },
-    { id: "cebolla-roja", name: "Cebolla roja", price: 1.40 },
-    { id: "maiz", name: "Maíz", price: 1.40 },
-    { id: "judia-verde", name: "Judía Verde", price: 1.40 },
-    { id: "zanahoria", name: "Zanahoria", price: 1.40 },
-    { id: "cacahuete", name: "Cacahuete", price: 1.40 },
-    { id: "brocoli", name: "Brócoli", price: 1.90 },
-    { id: "cebolleta", name: "Cebolleta", price: 1.90 },
-    { id: "champinones", name: "Champiñones", price: 1.90 },
-    { id: "pimiento", name: "Pimiento", price: 1.90 }
+    { id: "huevo", name: t('veg_egg'), price: 1.40 },
+    { id: "cilantro", name: t('veg_cilantro'), price: 1.40 },
+    { id: "albahaca", name: t('veg_basil'), price: 1.40 },
+    { id: "brotes-soja", name: t('veg_bean_sprouts'), price: 1.40 },
+    { id: "cebolla-roja", name: t('veg_red_onion'), price: 1.40 },
+    { id: "maiz", name: t('veg_corn'), price: 1.40 },
+    { id: "judia-verde", name: t('veg_green_beans'), price: 1.40 },
+    { id: "zanahoria", name: t('veg_carrot'), price: 1.40 },
+    { id: "cacahuete", name: t('veg_peanut'), price: 1.40 },
+    { id: "brocoli", name: t('veg_broccoli'), price: 1.90 },
+    { id: "cebolleta", name: t('veg_scallion'), price: 1.90 },
+    { id: "champinones", name: t('veg_mushroom'), price: 1.90 },
+    { id: "pimiento", name: t('veg_pepper'), price: 1.90 }
   ];
 
   const getPrice = (proteinId: string): number => {

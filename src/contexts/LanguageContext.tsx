@@ -245,6 +245,21 @@ const translations = {
     'extra_vegetables_desc': 'Selecciona las verduras extra que desees añadir a tu plato',
     'extra_vegetables_label': 'Verduras extra',
     'step_vegetables': 'Verduras Extra',
+    
+    // Vegetable names
+    'veg_egg': 'Huevo',
+    'veg_cilantro': 'Cilantro',
+    'veg_basil': 'Albahaca',
+    'veg_bean_sprouts': 'Brotes de Soja',
+    'veg_red_onion': 'Cebolla roja',
+    'veg_corn': 'Maíz',
+    'veg_green_beans': 'Judía Verde',
+    'veg_carrot': 'Zanahoria',
+    'veg_peanut': 'Cacahuete',
+    'veg_broccoli': 'Brócoli',
+    'veg_scallion': 'Cebolleta',
+    'veg_mushroom': 'Champiñones',
+    'veg_pepper': 'Pimiento',
 
     // Enhanced protein translations
     'protein_chicken': 'Pollo',
@@ -537,6 +552,21 @@ const translations = {
     'extra_vegetables_desc': 'Select the extra vegetables you want to add to your dish',
     'extra_vegetables_label': 'Extra vegetables',
     'step_vegetables': 'Extra Vegetables',
+    
+    // Vegetable names
+    'veg_egg': 'Egg',
+    'veg_cilantro': 'Cilantro',
+    'veg_basil': 'Basil',
+    'veg_bean_sprouts': 'Bean Sprouts',
+    'veg_red_onion': 'Red Onion',
+    'veg_corn': 'Corn',
+    'veg_green_beans': 'Green Beans',
+    'veg_carrot': 'Carrot',
+    'veg_peanut': 'Peanut',
+    'veg_broccoli': 'Broccoli',
+    'veg_scallion': 'Scallion',
+    'veg_mushroom': 'Mushrooms',
+    'veg_pepper': 'Pepper',
 
     // Enhanced protein translations
     'protein_chicken': 'Chicken',
@@ -817,6 +847,21 @@ const translations = {
     'extra_vegetables_desc': 'Sélectionnez les légumes supplémentaires que vous souhaitez ajouter à votre plat',
     'extra_vegetables_label': 'Légumes supplémentaires',
     'step_vegetables': 'Légumes Supplémentaires',
+    
+    // Vegetable names
+    'veg_egg': 'Œuf',
+    'veg_cilantro': 'Coriandre',
+    'veg_basil': 'Basilic',
+    'veg_bean_sprouts': 'Pousses de Soja',
+    'veg_red_onion': 'Oignon rouge',
+    'veg_corn': 'Maïs',
+    'veg_green_beans': 'Haricots verts',
+    'veg_carrot': 'Carotte',
+    'veg_peanut': 'Cacahuète',
+    'veg_broccoli': 'Brocoli',
+    'veg_scallion': 'Ciboulette',
+    'veg_mushroom': 'Champignons',
+    'veg_pepper': 'Poivron',
 
     // Enhanced protein translations
     'protein_chicken': 'Poulet',
