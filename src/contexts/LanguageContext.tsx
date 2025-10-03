@@ -236,6 +236,15 @@ const translations = {
     'custom_noodles_desc': 'Tallarines salteados al wok con',
     'custom_noodles_with_sauce': 'con salsa',
     'order_summary': 'Resumen del pedido',
+    'protein': 'Proteína',
+    'sauce': 'Salsa',
+    
+    // Extra vegetables
+    'extra_vegetables': 'Verduras Adicionales',
+    'extra_vegetables_optional': 'Verduras Adicionales (Opcional)',
+    'extra_vegetables_desc': 'Selecciona las verduras extra que desees añadir a tu plato',
+    'extra_vegetables_label': 'Verduras extra',
+    'step_vegetables': 'Verduras Extra',
 
     // Enhanced protein translations
     'protein_chicken': 'Pollo',
@@ -519,6 +528,15 @@ const translations = {
     'custom_noodles_desc': 'Wok-fried noodles with',
     'custom_noodles_with_sauce': 'with sauce',
     'order_summary': 'Order summary',
+    'protein': 'Protein',
+    'sauce': 'Sauce',
+    
+    // Extra vegetables
+    'extra_vegetables': 'Additional Vegetables',
+    'extra_vegetables_optional': 'Additional Vegetables (Optional)',
+    'extra_vegetables_desc': 'Select the extra vegetables you want to add to your dish',
+    'extra_vegetables_label': 'Extra vegetables',
+    'step_vegetables': 'Extra Vegetables',
 
     // Enhanced protein translations
     'protein_chicken': 'Chicken',
@@ -790,6 +808,15 @@ const translations = {
     'custom_noodles_desc': 'Nouilles sautées au wok avec',
     'custom_noodles_with_sauce': 'avec sauce',
     'order_summary': 'Résumé de commande',
+    'protein': 'Protéine',
+    'sauce': 'Sauce',
+    
+    // Extra vegetables
+    'extra_vegetables': 'Légumes Supplémentaires',
+    'extra_vegetables_optional': 'Légumes Supplémentaires (Optionnel)',
+    'extra_vegetables_desc': 'Sélectionnez les légumes supplémentaires que vous souhaitez ajouter à votre plat',
+    'extra_vegetables_label': 'Légumes supplémentaires',
+    'step_vegetables': 'Légumes Supplémentaires',
 
     // Enhanced protein translations
     'protein_chicken': 'Poulet',

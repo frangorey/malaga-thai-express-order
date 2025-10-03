@@ -280,7 +280,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
                 {t('step_sauce')}
               </TabsTrigger>
               <TabsTrigger value="vegetables" disabled={!selectedSauce}>
-                Verduras Extra
+                {t('step_vegetables')}
               </TabsTrigger>
             </TabsList>
 
@@ -353,8 +353,8 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
 
             <TabsContent value="vegetables" className="mt-6">
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Verduras Adicionales (Opcional)</h3>
-                <p className="text-sm text-muted-foreground mb-4">Selecciona las verduras extra que desees añadir a tu plato</p>
+                <h3 className="text-lg font-semibold mb-2">{t('extra_vegetables_optional')}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{t('extra_vegetables_desc')}</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
@@ -384,7 +384,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
                     <p><strong>{t('protein')}:</strong> {proteins.find(p => p.id === selectedProtein)?.name}</p>
                     <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
                     {selectedVegetables.length > 0 && (
-                      <p><strong>Verduras extra:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
+                      <p><strong>{t('extra_vegetables_label')}:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
                     )}
                     <p className="text-xl font-bold neon-text">
                       <strong>{t('total')}:</strong> {getTotalPrice().toFixed(2)}€
