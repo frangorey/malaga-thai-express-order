@@ -43,7 +43,7 @@ serve(async (req) => {
     // Initialize Stripe with secret key
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
-      throw new Error("STRIPE_SECRET_KEY not configured");
+      throw new Error("CONFIG_ERROR");
     }
     
     const stripe = new Stripe(stripeKey, { 
@@ -51,17 +51,64 @@ serve(async (req) => {
     });
     logStep("Stripe initialized");
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error("CONFIG_ERROR");
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     // Parse request body
     const { items, customerInfo, deliveryFee }: PaymentRequest = await req.json();
     logStep("Request parsed", { itemCount: items.length, deliveryFee });
 
     // Validate request data
     if (!items || items.length === 0) {
-      throw new Error("No items in cart");
+      throw new Error("INVALID_CART");
     }
     if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
-      throw new Error("Customer information incomplete");
+      throw new Error("INVALID_CUSTOMER_INFO");
     }
+
+    // Security: Fetch actual prices from database
+    const productIds = items.map(item => item.id);
+    const { data: products, error: dbError } = await supabase
+      .from('products')
+      .select('id, price, name, is_available')
+      .in('id', productIds);
+
+    if (dbError) {
+      logStep("Database error", { error: dbError });
+      throw new Error("DB_ERROR");
+    }
+
+    if (!products || products.length === 0) {
+      throw new Error("INVALID_PRODUCTS");
+    }
+
+    // Validate prices against database and availability
+    const validatedItems = items.map(item => {
+      const dbProduct = products.find(p => p.id === item.id);
+      if (!dbProduct) {
+        logStep("Product not found", { productId: item.id });
+        throw new Error("INVALID_PRODUCT");
+      }
+      if (!dbProduct.is_available) {
+        logStep("Product not available", { productId: item.id, name: dbProduct.name });
+        throw new Error("PRODUCT_UNAVAILABLE");
+      }
+      
+      // Use database price, ignore client-provided price
+      return {
+        ...item,
+        price: Number(dbProduct.price),
+        name: dbProduct.name
+      };
+    });
+
+    logStep("Prices validated against database", { validatedCount: validatedItems.length });
 
     // Create Stripe customer (for guest checkout)
     const customer = await stripe.customers.create({
@@ -77,8 +124,8 @@ serve(async (req) => {
     });
     logStep("Stripe customer created", { customerId: customer.id });
 
-    // Prepare line items for checkout
-    const lineItems = items.map(item => {
+    // Prepare line items for checkout using validated prices
+    const lineItems = validatedItems.map(item => {
       const unitAmount = Math.round(item.price * 100); // Convert to cents
       const customizationText = item.customizations?.length 
         ? ` (${item.customizations.join(', ')})` 
@@ -147,11 +194,30 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in create-payment", { message: errorMessage });
     
+    // Map internal errors to user-friendly messages
+    let userMessage = "Error procesando el pago. Por favor, inténtalo de nuevo.";
+    let statusCode = 500;
+    
+    if (errorMessage === "INVALID_CART") {
+      userMessage = "El carrito está vacío.";
+      statusCode = 400;
+    } else if (errorMessage === "INVALID_CUSTOMER_INFO") {
+      userMessage = "Por favor, completa todos los datos de entrega.";
+      statusCode = 400;
+    } else if (errorMessage === "INVALID_PRODUCTS" || errorMessage === "INVALID_PRODUCT") {
+      userMessage = "Algunos productos ya no están disponibles.";
+      statusCode = 400;
+    } else if (errorMessage === "PRODUCT_UNAVAILABLE") {
+      userMessage = "Algunos productos no están disponibles actualmente.";
+      statusCode = 400;
+    }
+    
     return new Response(JSON.stringify({ 
-      error: errorMessage 
+      error: userMessage,
+      code: "PAYMENT_ERROR"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: statusCode,
     });
   }
 });
