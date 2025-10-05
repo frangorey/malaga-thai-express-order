@@ -152,7 +152,19 @@ TOTAL: ${finalTotal.toFixed(2)}€
     `;
 
     const whatsappMessage = encodeURIComponent(orderDetails.trim());
-    window.open(`https://wa.me/34951401937?text=${whatsappMessage}`, '_blank');
+    const fullUrl = `https://wa.me/34951401937?text=${whatsappMessage}`;
+    
+    // Validate URL length to prevent truncation (browsers have ~2000-8000 char limits)
+    if (fullUrl.length > 2000) {
+      toast({
+        title: "Pedido muy grande",
+        description: "Tu pedido es demasiado grande para WhatsApp. Por favor, usa el pago con tarjeta o reduce el número de productos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    window.open(fullUrl, '_blank');
     
     // Limpiar formulario después de enviar
     setCustomerInfo({
