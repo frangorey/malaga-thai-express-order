@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import { z } from 'zod';
 
 /**
  * Sanitizes user input to prevent XSS attacks
@@ -16,53 +17,69 @@ export function sanitizeInput(input: string): string {
 }
 
 /**
- * Validates phone number format
+ * Customer information validation schema using zod
+ * Provides type-safe validation with comprehensive rules
  */
-export function validatePhoneNumber(phone: string): boolean {
-  if (!phone) return false;
-  
-  // Remove all non-digit characters
-  const cleaned = phone.replace(/\D/g, '');
-  
-  // Check if it's a valid length (typically 10-15 digits)
-  return cleaned.length >= 10 && cleaned.length <= 15;
-}
+export const customerInfoSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre debe tener menos de 100 caracteres')
+    .refine((val) => sanitizeInput(val).length >= 2, {
+      message: 'El nombre contiene caracteres no válidos'
+    }),
+  phone: z.string()
+    .trim()
+    .regex(/^\+?[0-9\s\-()]{10,20}$/, 'Por favor, introduce un número de teléfono válido')
+    .refine((val) => {
+      const cleaned = val.replace(/\D/g, '');
+      return cleaned.length >= 10 && cleaned.length <= 15;
+    }, {
+      message: 'El teléfono debe tener entre 10 y 15 dígitos'
+    }),
+  address: z.string()
+    .trim()
+    .min(10, 'La dirección debe tener al menos 10 caracteres')
+    .max(500, 'La dirección es demasiado larga')
+    .refine((val) => sanitizeInput(val).length >= 10, {
+      message: 'La dirección contiene caracteres no válidos'
+    }),
+  notes: z.string()
+    .max(500, 'Las notas deben tener menos de 500 caracteres')
+    .optional()
+    .default('')
+});
+
+export type CustomerInfo = z.infer<typeof customerInfoSchema>;
 
 /**
- * Validates customer information for security
+ * Validates customer information using zod schema
+ * Returns sanitized data or validation errors
  */
 export function validateCustomerInfo(info: {
   name: string;
   phone: string;
   address: string;
   notes?: string;
-}): { isValid: boolean; errors: string[] } {
-  const errors: string[] = [];
+}): { isValid: boolean; errors: string[]; data?: CustomerInfo } {
+  const result = customerInfoSchema.safeParse(info);
   
-  // Sanitize and validate name
-  const sanitizedName = sanitizeInput(info.name);
-  if (!sanitizedName || sanitizedName.length < 2) {
-    errors.push('Name must be at least 2 characters long');
-  }
-  
-  // Validate phone
-  if (!validatePhoneNumber(info.phone)) {
-    errors.push('Please enter a valid phone number');
-  }
-  
-  // Sanitize and validate address
-  const sanitizedAddress = sanitizeInput(info.address);
-  if (!sanitizedAddress || sanitizedAddress.length < 10) {
-    errors.push('Address must be at least 10 characters long');
-  }
-  
-  // Validate notes length if provided
-  if (info.notes && info.notes.length > 500) {
-    errors.push('Notes must be less than 500 characters');
+  if (result.success) {
+    // Apply additional sanitization to the validated data
+    return {
+      isValid: true,
+      errors: [],
+      data: {
+        name: sanitizeInput(result.data.name),
+        phone: result.data.phone.trim(),
+        address: sanitizeInput(result.data.address),
+        notes: result.data.notes ? sanitizeInput(result.data.notes) : ''
+      }
+    };
   }
   
   return {
-    isValid: errors.length === 0,
-    errors
+    isValid: false,
+    errors: result.error.errors.map(err => err.message)
   };
 }

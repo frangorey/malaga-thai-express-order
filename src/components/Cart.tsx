@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CartItem, SupabaseProduct } from "@/types/menu";
-import { sanitizeInput, validateCustomerInfo } from "@/lib/security";
+import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,13 +39,13 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const finalTotal = total + deliveryFee;
 
   const handleStripePayment = async () => {
-    // Validate and sanitize customer information
+    // Validate and sanitize customer information using zod schema
     const validation = validateCustomerInfo(customerInfo);
     
     if (!validation.isValid) {
       toast({
         title: "Error",
-        description: `Por favor, corrige los siguientes errores:\n${validation.errors.join('\n')}`,
+        description: validation.errors[0], // Show first error for better UX
         variant: "destructive",
       });
       return;
@@ -63,13 +63,8 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     setIsProcessingPayment(true);
 
     try {
-      // Sanitize all inputs before sending
-      const sanitizedInfo = {
-        name: sanitizeInput(customerInfo.name),
-        phone: sanitizeInput(customerInfo.phone),
-        address: sanitizeInput(customerInfo.address),
-        notes: sanitizeInput(customerInfo.notes)
-      };
+      // Use the sanitized and validated data from validation result
+      const sanitizedInfo = validation.data!;
 
       // Preparar items para Stripe
       const cartItems = items.map(item => ({
@@ -113,25 +108,20 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   };
 
   const handleWhatsAppOrder = () => {
-    // Validate and sanitize customer information
+    // Validate and sanitize customer information using zod schema
     const validation = validateCustomerInfo(customerInfo);
     
     if (!validation.isValid) {
       toast({
         title: "Error",
-        description: `Por favor, corrige los siguientes errores:\n${validation.errors.join('\n')}`,
+        description: validation.errors[0], // Show first error for better UX
         variant: "destructive",
       });
       return;
     }
 
-    // Sanitize all inputs before sending
-    const sanitizedInfo = {
-      name: sanitizeInput(customerInfo.name),
-      phone: sanitizeInput(customerInfo.phone),
-      address: sanitizeInput(customerInfo.address),
-      notes: sanitizeInput(customerInfo.notes)
-    };
+    // Use the sanitized and validated data from validation result
+    const sanitizedInfo = validation.data!;
 
     const orderDetails = `
 NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
