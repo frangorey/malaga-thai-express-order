@@ -7,6 +7,7 @@ import { RiceCustomizer } from "@/components/RiceCustomizer";
 import { NoodleCustomizer } from "@/components/NoodleCustomizer";
 import { SoupCustomizer } from "@/components/SoupCustomizer";
 import { PokeCustomizer } from "@/components/PokeCustomizer";
+import { SaladCustomizer } from "@/components/SaladCustomizer";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { useProducts } from "@/hooks/useProducts";
@@ -86,6 +87,10 @@ const Index = () => {
   };
 
   const handlePokeCustomization = (product: SupabaseProduct) => {
+    addToCart(product);
+  };
+
+  const handleSaladCustomization = (product: SupabaseProduct) => {
     addToCart(product);
   };
 
@@ -175,11 +180,7 @@ const Index = () => {
 
         {activeCategory === "ensaladas" && (
           <div id="category-ensaladas" className="py-8">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('ensaladas')}</h2>
-              <p className="text-muted-foreground mb-8">{t('salads_description')}</p>
-              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
-            </div>
+            <SaladCustomizer onAddToCart={handleSaladCustomization} />
           </div>
         )}
 

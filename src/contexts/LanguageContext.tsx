@@ -357,7 +357,41 @@ const translations = {
     'poke_basic_name': 'Poke Básico',
     'poke_basic_desc': 'Elección al gusto, elige 150gr de pollo o 2 pollo Crispy, Sésamo y 3 verduras/frutas a elegir entre (wakame, kimchi, tofu, alga, pepino, aguacate, kiwi, tomates cherry, piña, fresa, mango), además tendrá que elegir una de nuestras salsas (Kimchi, soja, Rosa, fruta, Japonesa, César, agridulce)',
     'poke_premium_name': 'Poke Premium',
-    'poke_premium_desc': 'Elección al gusto, elige 100gr de Salmón o 150gr de pollo o 2 pollo Crispy, Sésamo y gambas, además deberá elegir 4 verduras/frutas a elegir entre (wakame, kimchi, tofu, alga, pepino, aguacate, kiwi, tomates cherry, piña, fresa, mango), además tendrá que elegir una de nuestras salsas (Kimchi, soja, Rosa, fruta, Japonesa, César, agridulce)'
+    'poke_premium_desc': 'Elección al gusto, elige 100gr de Salmón o 150gr de pollo o 2 pollo Crispy, Sésamo y gambas, además deberá elegir 4 verduras/frutas a elegir entre (wakame, kimchi, tofu, alga, pepino, aguacate, kiwi, tomates cherry, piña, fresa, mango), además tendrá que elegir una de nuestras salsas (Kimchi, soja, Rosa, fruta, Japonesa, César, agridulce)',
+    
+    // Salad Customizer
+    'salad_customizer_title': 'PERSONALIZA TU ENSALADA',
+    'salad_customizer_description': 'Elige tu ensalada favorita y la proteína que prefieras',
+    'step_salad_type': 'Tipo de Ensalada',
+    'salad_type': 'Tipo de ensalada',
+    
+    // Salad types
+    'salad_cesar': 'Ensalada César',
+    'salad_cesar_ingredients': 'Lechuga, Parmesano, Aguacate, Tomates cherry, picatostes, salsa vinagreta y salsa césar',
+    'salad_classic_name': 'Ensalada Classic',
+    'salad_classic_ingredients': 'Lechuga, Parmesano, Aguacate, Tomates cherry, pepino, cebolla roja, picatostes, salsa vinagreta y salsa césar',
+    'salad_malaysia': 'Ensalada Malaysia',
+    'salad_malaysia_ingredients': 'Lechuga, pepino, picatostes, tomate cherry, nueces, verduras al wok, salsa vinagreta y salsa césar',
+    'salad_singapore': 'Ensalada Singapur',
+    'salad_singapore_ingredients': 'Lechuga, Cacahuete, Chili, pepino, tomates cherry, menta, albahaca, ternera al wok, salsa vinagreta y salsa césar',
+    'salad_thai': 'Ensalada Tailandesa',
+    'salad_thai_ingredients': 'Lechuga, Cacahuete, Chili, pepino, tomates cherry, menta, albahaca, ternera al wok, salsa vinagreta y salsa césar',
+    'salad_noodles': 'Ensalada Noodles',
+    'salad_noodles_ingredients': 'Lechuga, cacahuete, lima, noodles al wok con zanahoria, sésamo, salsa vinagreta y salsa césar',
+    'salad_crispy': 'Ensalada Crispy',
+    'salad_crispy_ingredients': 'Lechuga, Zanahoria, brotes de soja, tomate cherry, salsa vinagreta, salsa césar y panko a elegir (de pollo o de langostinos)',
+    'salad_fruit': 'Ensalada de Fruta',
+    'salad_fruit_ingredients': 'Lechuga, aguacate, tomate cherry, mango, kiwi, fresa y salsa fruta',
+    
+    // Salad protein options
+    'salad_protein_none': 'Sin Proteína',
+    'salad_protein_none_desc': 'Solo ingredientes de la ensalada',
+    'salad_protein_chicken': 'Añadir Pollo',
+    'salad_protein_chicken_desc': 'Ensalada con pollo tierno',
+    'salad_protein_shrimp': 'Añadir Langostinos',
+    'salad_protein_shrimp_desc': 'Ensalada con langostinos frescos',
+    'salad_protein_both': 'Pollo y Langostinos',
+    'salad_protein_both_desc': 'Ensalada con pollo y langostinos'
   },
   
   en: {
