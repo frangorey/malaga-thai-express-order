@@ -16,8 +16,11 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState(title);
   
-  // Check if this is the drinks section
-  const isDrinksSection = title.toLowerCase().includes('bebida') || title.toLowerCase() === 'drinks';
+  // Check if this is the drinks section (robust: based on product category)
+  const isDrinksSection = items.length > 0 && (
+    items[0].category?.toLowerCase() === 'bebidas' ||
+    items.every((it) => it.category?.toLowerCase() === 'bebidas')
+  );
 
   // Function to get translated product name and description
   const getTranslatedProduct = (product: SupabaseProduct) => {
