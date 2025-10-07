@@ -68,49 +68,6 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        {/* Khopi Mascot Button */}
-        <div className="mb-8 flex justify-center">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="relative bg-transparent backdrop-blur-sm rounded-full p-2 border-0 hover:bg-white/5 transition-all duration-300 hover:scale-110 hover:drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]"
-              >
-                <img 
-                  src={khopiImage} 
-                  alt="Khopi - Mascota de Thai Express" 
-                  className="h-20 md:h-28 lg:h-36 w-auto drop-shadow-2xl"
-                />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="text-center">{t('doubts_about_dishes')}</DialogTitle>
-              </DialogHeader>
-              <div className="text-center space-y-4 py-4">
-                <img 
-                  src={khopiImage} 
-                  alt="Khopi" 
-                  className="h-32 w-auto mx-auto rounded-lg"
-                />
-                <p className="text-muted-foreground">
-                  {t('khopi_greeting')}
-                </p>
-                <div className="flex flex-col gap-3">
-                  <Button variant="neon" asChild>
-                    <a href="tel:951401937" className="text-center">
-                      {t('call_us')}
-                    </a>
-                  </Button>
-                  <Button variant="outline" onClick={onOrderClick}>
-                    {t('see_full_menu')}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-        
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="neon-text">Tus Noodles</span>
           <br />
