@@ -15,6 +15,9 @@ interface MenuSectionProps {
 export const MenuSection = ({ title, description, items, onAddToCart }: MenuSectionProps) => {
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState(title);
+  
+  // Check if this is the drinks section
+  const isDrinksSection = title.toLowerCase().includes('bebida') || title.toLowerCase() === 'drinks';
 
   // Function to get translated product name and description
   const getTranslatedProduct = (product: SupabaseProduct) => {
@@ -93,31 +96,43 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
           </p>
         </div>
 
+        {isDrinksSection && (
+          <div className="mb-8 max-w-4xl mx-auto">
+            <img 
+              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/bebidas.jpeg" 
+              alt={title}
+              className="w-full h-64 object-cover rounded-lg"
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {items.map((item) => {
             const translatedProduct = getTranslatedProduct(item);
             return (
             <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden">
-              <div className="relative overflow-hidden aspect-[4/5]">
-                <img 
-                  src={item.image_url || '/placeholder.svg'} 
-                  alt={translatedProduct.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute top-3 right-3 flex gap-2">
-                  {item.is_vegetarian && (
-                    <div className="bg-green-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                      <Leaf className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                  {item.is_spicy && (
-                    <div className="bg-red-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                      <Flame className="w-4 h-4 text-white" />
-                    </div>
-                  )}
+              {!isDrinksSection && (
+                <div className="relative overflow-hidden aspect-[4/5]">
+                  <img 
+                    src={item.image_url || '/placeholder.svg'} 
+                    alt={translatedProduct.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    {item.is_vegetarian && (
+                      <div className="bg-green-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                        <Leaf className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                    {item.is_spicy && (
+                      <div className="bg-red-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                        <Flame className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
               
               <CardHeader>
                 <CardTitle className="flex justify-between items-start">
