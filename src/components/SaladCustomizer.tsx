@@ -157,7 +157,7 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <img 
-              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/ensalada.jpeg" 
+              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Ensalada-Noodles.jpeg" 
               alt={t('salad_customizer_title')}
               className="w-full h-64 object-cover rounded-lg"
             />
