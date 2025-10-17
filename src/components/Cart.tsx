@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle, Store, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,10 +25,12 @@ interface CartProps {
 }
 
 export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) => {
+  const [orderType, setOrderType] = useState<'pickup' | 'delivery' | null>(null);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phone: "",
     address: "",
+    email: "",
     notes: ""
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -39,13 +41,26 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const finalTotal = total + deliveryFee;
 
   const handleStripePayment = async () => {
-    // Validate and sanitize customer information using zod schema
-    const validation = validateCustomerInfo(customerInfo);
+    if (!orderType) {
+      toast({
+        title: "Error",
+        description: "Por favor, selecciona si es para recoger o para domicilio",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate customer info based on order type
+    const infoToValidate = orderType === 'pickup' 
+      ? { ...customerInfo, address: 'N/A' } // Don't require address for pickup
+      : customerInfo;
+
+    const validation = validateCustomerInfo(infoToValidate);
     
     if (!validation.isValid) {
       toast({
         title: "Error",
-        description: validation.errors[0], // Show first error for better UX
+        description: validation.errors[0],
         variant: "destructive",
       });
       return;
@@ -108,13 +123,26 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   };
 
   const handleWhatsAppOrder = () => {
-    // Validate and sanitize customer information using zod schema
-    const validation = validateCustomerInfo(customerInfo);
+    if (!orderType) {
+      toast({
+        title: "Error",
+        description: "Por favor, selecciona si es para recoger o para domicilio",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate customer info based on order type
+    const infoToValidate = orderType === 'pickup' 
+      ? { ...customerInfo, address: 'N/A' } // Don't require address for pickup
+      : customerInfo;
+
+    const validation = validateCustomerInfo(infoToValidate);
     
     if (!validation.isValid) {
       toast({
         title: "Error",
-        description: validation.errors[0], // Show first error for better UX
+        description: validation.errors[0],
         variant: "destructive",
       });
       return;
@@ -125,11 +153,13 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
     const orderDetails = `
 NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
+TIPO: ${orderType === 'pickup' ? '🏪 RECOGER EN RESTAURANTE' : '🚚 DOMICILIO'}
 
 Cliente: ${sanitizedInfo.name}
 Teléfono: ${sanitizedInfo.phone}
-Dirección: ${sanitizedInfo.address}
-${sanitizedInfo.notes ? `Notas: ${sanitizedInfo.notes}` : ''}
+${sanitizedInfo.email ? `Email: ${sanitizedInfo.email}` : ''}
+${orderType === 'delivery' ? `Dirección: ${sanitizedInfo.address}` : ''}
+${sanitizedInfo.notes ? `Observaciones: ${sanitizedInfo.notes}` : ''}
 
 PEDIDO:
 ${items.map(item => `${item.quantity}x ${item.name} - ${(item.price * item.quantity).toFixed(2)}€`).join('\n')}
@@ -157,10 +187,12 @@ TOTAL: ${finalTotal.toFixed(2)}€
     window.open(fullUrl, '_blank');
     
     // Limpiar formulario después de enviar
+    setOrderType(null);
     setCustomerInfo({
       name: "",
       phone: "",
       address: "",
+      email: "",
       notes: ""
     });
   };
@@ -265,55 +297,99 @@ TOTAL: ${finalTotal.toFixed(2)}€
                 </CardContent>
               </Card>
 
-              {/* Customer Info Form */}
+              {/* Order Type Selection */}
               <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle className="text-lg">Datos de Entrega</CardTitle>
+                  <CardTitle className="text-lg">Tipo de Pedido</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nombre *</Label>
-                    <Input
-                      id="name"
-                      value={customerInfo.name}
-                      onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                      placeholder="Tu nombre completo"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone">Teléfono *</Label>
-                    <Input
-                      id="phone"
-                      value={customerInfo.phone}
-                      onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                      placeholder="Tu número de teléfono"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="address">Dirección de entrega *</Label>
-                    <Textarea
-                      id="address"
-                      value={customerInfo.address}
-                      onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
-                      placeholder="Calle, número, piso, código postal..."
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="notes">Notas adicionales</Label>
-                    <Textarea
-                      id="notes"
-                      value={customerInfo.notes}
-                      onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
-                      placeholder="Sin cebolla, extra picante, etc..."
-                      rows={2}
-                    />
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant={orderType === 'pickup' ? 'default' : 'outline'}
+                      className="h-auto py-6 flex flex-col gap-2"
+                      onClick={() => setOrderType('pickup')}
+                    >
+                      <Store className="w-6 h-6" />
+                      <span className="font-semibold">Recoger</span>
+                      <span className="text-xs opacity-80">En restaurante</span>
+                    </Button>
+                    <Button
+                      variant={orderType === 'delivery' ? 'default' : 'outline'}
+                      className="h-auto py-6 flex flex-col gap-2"
+                      onClick={() => setOrderType('delivery')}
+                    >
+                      <Truck className="w-6 h-6" />
+                      <span className="font-semibold">Domicilio</span>
+                      <span className="text-xs opacity-80">A tu dirección</span>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Customer Info Form */}
+              {orderType && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Tus Datos</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Nombre *</Label>
+                      <Input
+                        id="name"
+                        value={customerInfo.name}
+                        onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                        placeholder="Tu nombre completo"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="phone">Teléfono de contacto *</Label>
+                      <Input
+                        id="phone"
+                        value={customerInfo.phone}
+                        onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                        placeholder="Tu número de teléfono"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email">Email (opcional)</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={customerInfo.email}
+                        onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                        placeholder="tu@email.com"
+                      />
+                    </div>
+                    
+                    {orderType === 'delivery' && (
+                      <div>
+                        <Label htmlFor="address">Dirección de entrega *</Label>
+                        <Textarea
+                          id="address"
+                          value={customerInfo.address}
+                          onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                          placeholder="Calle, número, piso, código postal..."
+                          rows={3}
+                        />
+                      </div>
+                    )}
+                    
+                    <div>
+                      <Label htmlFor="notes">Observaciones</Label>
+                      <Textarea
+                        id="notes"
+                        value={customerInfo.notes}
+                        onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
+                        placeholder="Sin cebolla, extra picante, etc..."
+                        rows={2}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Payment Options */}
               <div className="space-y-3">

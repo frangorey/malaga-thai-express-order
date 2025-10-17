@@ -44,6 +44,12 @@ export const customerInfoSchema = z.object({
     .refine((val) => sanitizeInput(val).length >= 10, {
       message: 'La dirección contiene caracteres no válidos'
     }),
+  email: z.string()
+    .trim()
+    .email('Por favor, introduce un email válido')
+    .max(255, 'El email es demasiado largo')
+    .optional()
+    .or(z.literal('')),
   notes: z.string()
     .max(500, 'Las notas deben tener menos de 500 caracteres')
     .optional()
@@ -60,6 +66,7 @@ export function validateCustomerInfo(info: {
   name: string;
   phone: string;
   address: string;
+  email?: string;
   notes?: string;
 }): { isValid: boolean; errors: string[]; data?: CustomerInfo } {
   const result = customerInfoSchema.safeParse(info);
@@ -73,6 +80,7 @@ export function validateCustomerInfo(info: {
         name: sanitizeInput(result.data.name),
         phone: result.data.phone.trim(),
         address: sanitizeInput(result.data.address),
+        email: result.data.email ? result.data.email.trim() : '',
         notes: result.data.notes ? sanitizeInput(result.data.notes) : ''
       }
     };
