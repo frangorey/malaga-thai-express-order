@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CartItem, SupabaseProduct } from "@/types/menu";
 import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const [orderType, setOrderType] = useState<'pickup' | 'delivery' | null>(null);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
+    phonePrefix: "",
     phone: "",
     address: "",
     email: "",
@@ -156,7 +158,7 @@ NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
 TIPO: ${orderType === 'pickup' ? '🏪 RECOGER EN RESTAURANTE' : '🚚 DOMICILIO'}
 
 Cliente: ${sanitizedInfo.name}
-Teléfono: ${sanitizedInfo.phone}
+Teléfono: ${sanitizedInfo.phonePrefix} ${sanitizedInfo.phone}
 ${sanitizedInfo.email ? `Email: ${sanitizedInfo.email}` : ''}
 ${orderType === 'delivery' ? `Dirección: ${sanitizedInfo.address}` : ''}
 ${sanitizedInfo.notes ? `Observaciones: ${sanitizedInfo.notes}` : ''}
@@ -190,6 +192,7 @@ TOTAL: ${finalTotal.toFixed(2)}€
     setOrderType(null);
     setCustomerInfo({
       name: "",
+      phonePrefix: "",
       phone: "",
       address: "",
       email: "",
@@ -345,12 +348,70 @@ TOTAL: ${finalTotal.toFixed(2)}€
                     
                     <div>
                       <Label htmlFor="phone">Teléfono de contacto *</Label>
-                      <Input
-                        id="phone"
-                        value={customerInfo.phone}
-                        onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                        placeholder="Tu número de teléfono"
-                      />
+                      <div className="flex gap-2">
+                        <Select 
+                          value={customerInfo.phonePrefix} 
+                          onValueChange={(value) => setCustomerInfo({...customerInfo, phonePrefix: value})}
+                        >
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="Prefijo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="+34">🇪🇸 +34</SelectItem>
+                            <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                            <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                            <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                            <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                            <SelectItem value="+39">🇮🇹 +39</SelectItem>
+                            <SelectItem value="+351">🇵🇹 +351</SelectItem>
+                            <SelectItem value="+31">🇳🇱 +31</SelectItem>
+                            <SelectItem value="+32">🇧🇪 +32</SelectItem>
+                            <SelectItem value="+41">🇨🇭 +41</SelectItem>
+                            <SelectItem value="+43">🇦🇹 +43</SelectItem>
+                            <SelectItem value="+45">🇩🇰 +45</SelectItem>
+                            <SelectItem value="+46">🇸🇪 +46</SelectItem>
+                            <SelectItem value="+47">🇳🇴 +47</SelectItem>
+                            <SelectItem value="+358">🇫🇮 +358</SelectItem>
+                            <SelectItem value="+30">🇬🇷 +30</SelectItem>
+                            <SelectItem value="+48">🇵🇱 +48</SelectItem>
+                            <SelectItem value="+420">🇨🇿 +420</SelectItem>
+                            <SelectItem value="+36">🇭🇺 +36</SelectItem>
+                            <SelectItem value="+40">🇷🇴 +40</SelectItem>
+                            <SelectItem value="+353">🇮🇪 +353</SelectItem>
+                            <SelectItem value="+52">🇲🇽 +52</SelectItem>
+                            <SelectItem value="+54">🇦🇷 +54</SelectItem>
+                            <SelectItem value="+55">🇧🇷 +55</SelectItem>
+                            <SelectItem value="+56">🇨🇱 +56</SelectItem>
+                            <SelectItem value="+57">🇨🇴 +57</SelectItem>
+                            <SelectItem value="+51">🇵🇪 +51</SelectItem>
+                            <SelectItem value="+86">🇨🇳 +86</SelectItem>
+                            <SelectItem value="+81">🇯🇵 +81</SelectItem>
+                            <SelectItem value="+82">🇰🇷 +82</SelectItem>
+                            <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                            <SelectItem value="+61">🇦🇺 +61</SelectItem>
+                            <SelectItem value="+64">🇳🇿 +64</SelectItem>
+                            <SelectItem value="+27">🇿🇦 +27</SelectItem>
+                            <SelectItem value="+20">🇪🇬 +20</SelectItem>
+                            <SelectItem value="+234">🇳🇬 +234</SelectItem>
+                            <SelectItem value="+90">🇹🇷 +90</SelectItem>
+                            <SelectItem value="+971">🇦🇪 +971</SelectItem>
+                            <SelectItem value="+966">🇸🇦 +966</SelectItem>
+                            <SelectItem value="+60">🇲🇾 +60</SelectItem>
+                            <SelectItem value="+65">🇸🇬 +65</SelectItem>
+                            <SelectItem value="+66">🇹🇭 +66</SelectItem>
+                            <SelectItem value="+84">🇻🇳 +84</SelectItem>
+                            <SelectItem value="+62">🇮🇩 +62</SelectItem>
+                            <SelectItem value="+63">🇵🇭 +63</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          id="phone"
+                          className="flex-1"
+                          value={customerInfo.phone}
+                          onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                          placeholder="Número de teléfono"
+                        />
+                      </div>
                     </div>
 
                     <div>

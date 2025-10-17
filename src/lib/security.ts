@@ -28,14 +28,16 @@ export const customerInfoSchema = z.object({
     .refine((val) => sanitizeInput(val).length >= 2, {
       message: 'El nombre contiene caracteres no válidos'
     }),
+  phonePrefix: z.string()
+    .min(1, 'Debes seleccionar un prefijo de país'),
   phone: z.string()
     .trim()
-    .regex(/^\+?[0-9\s\-()]{10,20}$/, 'Por favor, introduce un número de teléfono válido')
+    .regex(/^[0-9\s\-()]{6,15}$/, 'Por favor, introduce un número de teléfono válido')
     .refine((val) => {
       const cleaned = val.replace(/\D/g, '');
-      return cleaned.length >= 10 && cleaned.length <= 15;
+      return cleaned.length >= 6 && cleaned.length <= 15;
     }, {
-      message: 'El teléfono debe tener entre 10 y 15 dígitos'
+      message: 'El teléfono debe tener entre 6 y 15 dígitos'
     }),
   address: z.string()
     .trim()
@@ -64,6 +66,7 @@ export type CustomerInfo = z.infer<typeof customerInfoSchema>;
  */
 export function validateCustomerInfo(info: {
   name: string;
+  phonePrefix: string;
   phone: string;
   address: string;
   email?: string;
@@ -78,6 +81,7 @@ export function validateCustomerInfo(info: {
       errors: [],
       data: {
         name: sanitizeInput(result.data.name),
+        phonePrefix: result.data.phonePrefix.trim(),
         phone: result.data.phone.trim(),
         address: sanitizeInput(result.data.address),
         email: result.data.email ? result.data.email.trim() : '',
