@@ -7,6 +7,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiting (resets on function restart)
+// For production, consider using Upstash Redis or similar persistent storage
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 5; // 5 orders per hour for guest checkout
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record || now > record.resetTime) {
+    // First request or window expired - create new record
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    // Rate limit exceeded
+    const retryAfter = Math.ceil((record.resetTime - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+  
+  // Increment counter
+  record.count++;
+  return { allowed: true };
+}
+
 interface CartItem {
   id: number;
   name: string;
@@ -39,6 +66,32 @@ serve(async (req) => {
 
   try {
     logStep("Payment request started");
+
+    // Rate limiting: Extract client IP from headers
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0].trim() 
+                   || req.headers.get("x-real-ip") 
+                   || "unknown";
+    
+    logStep("Client IP identified", { ip: clientIP });
+
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit(clientIP);
+    if (!rateLimitCheck.allowed) {
+      logStep("Rate limit exceeded", { ip: clientIP, retryAfter: rateLimitCheck.retryAfter });
+      return new Response(JSON.stringify({ 
+        error: "Demasiadas solicitudes. Por favor, inténtalo más tarde.",
+        code: "RATE_LIMIT_EXCEEDED"
+      }), {
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json",
+          "Retry-After": rateLimitCheck.retryAfter?.toString() || "3600"
+        },
+        status: 429,
+      });
+    }
+    
+    logStep("Rate limit check passed", { ip: clientIP });
 
     // Initialize Stripe with secret key
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
