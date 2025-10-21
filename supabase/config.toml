@@ -2,3 +2,6 @@ project_id = "xqqffccvnpnmdoqowdlc"
 
 [functions.create-payment]
 verify_jwt = false
+
+[functions.send-to-relevance]
+verify_jwt = false

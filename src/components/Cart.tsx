@@ -92,6 +92,28 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         customizations: item.customizations || []
       }));
 
+      // Enviar datos al agente de Relevance AI
+      try {
+        const orderData = {
+          items: cartItems,
+          customerInfo: sanitizedInfo,
+          orderType: orderType,
+          total: total,
+          deliveryFee: deliveryFee,
+          finalTotal: finalTotal
+        };
+
+        const { error: relevanceError } = await supabase.functions.invoke('send-to-relevance', {
+          body: orderData
+        });
+
+        if (relevanceError) {
+          console.error('Error enviando a Relevance AI:', relevanceError);
+        }
+      } catch (error) {
+        console.error('Error al enviar a Relevance AI:', error);
+      }
+
       // Llamar al edge function para crear el pago
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
@@ -124,7 +146,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     }
   };
 
-  const handleWhatsAppOrder = () => {
+  const handleWhatsAppOrder = async () => {
     if (!orderType) {
       toast({
         title: "Error",
@@ -152,6 +174,34 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
     // Use the sanitized and validated data from validation result
     const sanitizedInfo = validation.data!;
+
+    // Enviar datos al agente de Relevance AI
+    try {
+      const orderData = {
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          customizations: item.customizations || []
+        })),
+        customerInfo: sanitizedInfo,
+        orderType: orderType,
+        total: total,
+        deliveryFee: deliveryFee,
+        finalTotal: finalTotal
+      };
+
+      const { error: relevanceError } = await supabase.functions.invoke('send-to-relevance', {
+        body: orderData
+      });
+
+      if (relevanceError) {
+        console.error('Error enviando a Relevance AI:', relevanceError);
+      }
+    } catch (error) {
+      console.error('Error al enviar a Relevance AI:', error);
+    }
 
     const orderDetails = `
 NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
