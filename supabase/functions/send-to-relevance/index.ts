@@ -62,7 +62,7 @@ TOTAL: ${orderData.finalTotal.toFixed(2)}€
 
     console.log("Enviando pedido a Relevance AI:", orderSummary);
 
-    // Enviar al webhook de Relevance AI
+    // Enviar al webhook de Relevance AI con formato simplificado
     const relevanceResponse = await fetch(
       "https://api-d7b62b.stack.tryrelevance.com/latest/agents/hooks/custom-trigger/abb98214-e292-4708-8d0f-0a7fd2b6ceea/be093897-52b1-4578-bd6c-c37b2a13273e",
       {
@@ -71,18 +71,16 @@ TOTAL: ${orderData.finalTotal.toFixed(2)}€
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: orderSummary,
-          customerData: {
-            name: orderData.customerInfo.name,
-            phone: `${orderData.customerInfo.phonePrefix} ${orderData.customerInfo.phone}`,
-            email: orderData.customerInfo.email || "",
-            address: orderData.customerInfo.address || "",
-            orderType: orderData.orderType
-          },
-          orderDetails: {
-            items: orderData.items,
-            total: orderData.finalTotal
-          }
+          // Campos simples que el agente puede mapear
+          order_summary: orderSummary,
+          customer_name: orderData.customerInfo.name,
+          customer_phone: `${orderData.customerInfo.phonePrefix} ${orderData.customerInfo.phone}`,
+          customer_email: orderData.customerInfo.email || "",
+          customer_address: orderData.customerInfo.address || "",
+          order_type: orderData.orderType === 'pickup' ? 'Recoger en restaurante' : 'Entrega a domicilio',
+          total_amount: orderData.finalTotal,
+          items_json: JSON.stringify(orderData.items),
+          notes: orderData.customerInfo.notes || ""
         }),
       }
     );
