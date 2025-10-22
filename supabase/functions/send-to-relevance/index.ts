@@ -60,8 +60,6 @@ Gastos de envío: ${orderData.deliveryFee === 0 ? 'GRATIS' : `${orderData.delive
 TOTAL: ${orderData.finalTotal.toFixed(2)}€
     `.trim();
 
-    console.log("Enviando pedido a Relevance AI:", orderSummary);
-
     // Enviar al webhook de Relevance AI con formato simplificado
     const relevanceResponse = await fetch(
       "https://api-d7b62b.stack.tryrelevance.com/latest/agents/hooks/custom-trigger/abb98214-e292-4708-8d0f-0a7fd2b6ceea/be093897-52b1-4578-bd6c-c37b2a13273e",
@@ -87,18 +85,13 @@ TOTAL: ${orderData.finalTotal.toFixed(2)}€
 
     if (!relevanceResponse.ok) {
       const errorText = await relevanceResponse.text();
-      console.error("Error from Relevance AI:", errorText);
       throw new Error(`Relevance AI error: ${relevanceResponse.status}`);
     }
-
-    const relevanceData = await relevanceResponse.json();
-    console.log("Respuesta de Relevance AI:", relevanceData);
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: "Pedido enviado al agente IA correctamente",
-        relevanceResponse: relevanceData
+        message: "Pedido enviado al agente IA correctamente"
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -107,7 +100,6 @@ TOTAL: ${orderData.finalTotal.toFixed(2)}€
     );
 
   } catch (error) {
-    console.error("Error en send-to-relevance:", error);
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : "Error desconocido",

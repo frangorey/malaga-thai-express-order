@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 // Simple in-memory rate limiting (resets on function restart)
-// For production, consider using Upstash Redis or similar persistent storage
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAX_REQUESTS_PER_WINDOW = 5; // 5 orders per hour for guest checkout
@@ -18,18 +17,15 @@ function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
   const record = rateLimitMap.get(ip);
   
   if (!record || now > record.resetTime) {
-    // First request or window expired - create new record
     rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return { allowed: true };
   }
   
   if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-    // Rate limit exceeded
     const retryAfter = Math.ceil((record.resetTime - now) / 1000);
     return { allowed: false, retryAfter };
   }
   
-  // Increment counter
   record.count++;
   return { allowed: true };
 }
@@ -46,17 +42,15 @@ interface PaymentRequest {
   items: CartItem[];
   customerInfo: {
     name: string;
+    phonePrefix?: string;
     phone: string;
     address: string;
+    email?: string;
     notes?: string;
   };
   deliveryFee: number;
+  orderType: 'pickup' | 'delivery';
 }
-
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CREATE-PAYMENT] ${step}${detailsStr}`);
-};
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -65,19 +59,14 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Payment request started");
-
-    // Rate limiting: Extract client IP from headers
+    // Rate limiting: Extract client IP
     const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0].trim() 
                    || req.headers.get("x-real-ip") 
                    || "unknown";
-    
-    logStep("Client IP identified", { ip: clientIP });
 
     // Check rate limit
     const rateLimitCheck = checkRateLimit(clientIP);
     if (!rateLimitCheck.allowed) {
-      logStep("Rate limit exceeded", { ip: clientIP, retryAfter: rateLimitCheck.retryAfter });
       return new Response(JSON.stringify({ 
         error: "Demasiadas solicitudes. Por favor, inténtalo más tarde.",
         code: "RATE_LIMIT_EXCEEDED"
@@ -90,10 +79,8 @@ serve(async (req) => {
         status: 429,
       });
     }
-    
-    logStep("Rate limit check passed", { ip: clientIP });
 
-    // Initialize Stripe with secret key
+    // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       throw new Error("CONFIG_ERROR");
@@ -102,11 +89,10 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { 
       apiVersion: "2025-08-27.basil" 
     });
-    logStep("Stripe initialized");
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"); // Use service role for admin access
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("CONFIG_ERROR");
     }
@@ -114,14 +100,13 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse request body
-    const { items, customerInfo, deliveryFee }: PaymentRequest = await req.json();
-    logStep("Request parsed", { itemCount: items.length, deliveryFee });
+    const { items, customerInfo, deliveryFee, orderType }: PaymentRequest = await req.json();
 
     // Validate request data
     if (!items || items.length === 0) {
       throw new Error("INVALID_CART");
     }
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) {
+    if (!customerInfo.name || !customerInfo.phone) {
       throw new Error("INVALID_CUSTOMER_INFO");
     }
 
@@ -133,7 +118,6 @@ serve(async (req) => {
       .in('id', productIds);
 
     if (dbError) {
-      logStep("Database error", { error: dbError });
       throw new Error("DB_ERROR");
     }
 
@@ -141,19 +125,16 @@ serve(async (req) => {
       throw new Error("INVALID_PRODUCTS");
     }
 
-    // Validate prices against database and availability
+    // Validate prices and availability
     const validatedItems = items.map(item => {
       const dbProduct = products.find(p => p.id === item.id);
       if (!dbProduct) {
-        logStep("Product not found", { productId: item.id });
         throw new Error("INVALID_PRODUCT");
       }
       if (!dbProduct.is_available) {
-        logStep("Product not available", { productId: item.id, name: dbProduct.name });
         throw new Error("PRODUCT_UNAVAILABLE");
       }
       
-      // Use database price, ignore client-provided price
       return {
         ...item,
         price: Number(dbProduct.price),
@@ -161,7 +142,45 @@ serve(async (req) => {
       };
     });
 
-    logStep("Prices validated against database", { validatedCount: validatedItems.length });
+    // Calculate total amount
+    const totalAmount = validatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) + deliveryFee;
+
+    // Get current user (if authenticated)
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id || null;
+    }
+
+    // Save order to database
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: userId,
+        customer_name: customerInfo.name,
+        customer_phone: customerInfo.phonePrefix 
+          ? `${customerInfo.phonePrefix} ${customerInfo.phone}` 
+          : customerInfo.phone,
+        customer_email: customerInfo.email || null,
+        delivery_address: orderType === 'delivery' ? customerInfo.address : null,
+        order_type: orderType,
+        items: validatedItems,
+        total_amount: totalAmount,
+        delivery_fee: deliveryFee,
+        payment_method: 'stripe',
+        payment_status: 'pending',
+        order_status: 'received',
+        notes: customerInfo.notes || null
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      throw new Error("DB_INSERT_ERROR");
+    }
 
     // Create Stripe customer (for guest checkout)
     const customer = await stripe.customers.create({
@@ -169,17 +188,17 @@ serve(async (req) => {
       phone: customerInfo.phone,
       address: {
         line1: customerInfo.address,
-        country: 'ES', // Spain
+        country: 'ES',
       },
       metadata: {
         notes: customerInfo.notes || '',
+        order_id: orderData.id
       }
     });
-    logStep("Stripe customer created", { customerId: customer.id });
 
-    // Prepare line items for checkout using validated prices
+    // Prepare line items for checkout
     const lineItems = validatedItems.map(item => {
-      const unitAmount = Math.round(item.price * 100); // Convert to cents
+      const unitAmount = Math.round(item.price * 100);
       const customizationText = item.customizations?.length 
         ? ` (${item.customizations.join(', ')})` 
         : '';
@@ -214,8 +233,6 @@ serve(async (req) => {
       });
     }
 
-    logStep("Line items prepared", { count: lineItems.length });
-
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
@@ -226,6 +243,7 @@ serve(async (req) => {
       payment_method_types: ['card'],
       billing_address_collection: 'auto',
       metadata: {
+        order_id: orderData.id,
         customer_name: customerInfo.name,
         customer_phone: customerInfo.phone,
         customer_address: customerInfo.address,
@@ -233,7 +251,33 @@ serve(async (req) => {
       }
     });
 
-    logStep("Checkout session created", { sessionId: session.id });
+    // Update order with Stripe session ID
+    await supabase
+      .from('orders')
+      .update({ stripe_session_id: session.id })
+      .eq('id', orderData.id);
+
+    // Send order to Relevance AI (don't block on this)
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/send-to-relevance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`
+        },
+        body: JSON.stringify({
+          items: validatedItems,
+          customerInfo: customerInfo,
+          orderType: orderType,
+          total: totalAmount - deliveryFee,
+          deliveryFee: deliveryFee,
+          finalTotal: totalAmount
+        })
+      });
+    } catch (error) {
+      // Log error but don't fail the payment
+      console.error("Failed to send to Relevance AI:", error);
+    }
 
     return new Response(JSON.stringify({ 
       url: session.url,
@@ -245,7 +289,6 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-payment", { message: errorMessage });
     
     // Map internal errors to user-friendly messages
     let userMessage = "Error procesando el pago. Por favor, inténtalo de nuevo.";
@@ -263,6 +306,9 @@ serve(async (req) => {
     } else if (errorMessage === "PRODUCT_UNAVAILABLE") {
       userMessage = "Algunos productos no están disponibles actualmente.";
       statusCode = 400;
+    } else if (errorMessage === "DB_INSERT_ERROR") {
+      userMessage = "No se pudo guardar el pedido. Por favor, inténtalo de nuevo.";
+      statusCode = 500;
     }
     
     return new Response(JSON.stringify({ 

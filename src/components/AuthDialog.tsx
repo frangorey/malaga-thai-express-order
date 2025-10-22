@@ -8,6 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LogIn, UserPlus } from "lucide-react";
+import { z } from "zod";
+
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .max(72, "Password must be less than 72 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
 interface AuthDialogProps {
   children: React.ReactNode;
@@ -26,6 +35,18 @@ export const AuthDialog = ({ children }: AuthDialogProps) => {
     setIsLoading(true);
 
     try {
+      // Validate password strength
+      const passwordValidation = passwordSchema.safeParse(password);
+      if (!passwordValidation.success) {
+        toast({
+          title: "Password too weak",
+          description: passwordValidation.error.errors[0].message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
@@ -173,7 +194,8 @@ export const AuthDialog = ({ children }: AuthDialogProps) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={6}
+                  minLength={8}
+                  placeholder="Min. 8 chars, with uppercase, number & symbol"
                 />
               </div>
               <Button 

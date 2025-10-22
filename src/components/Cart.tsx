@@ -92,34 +92,23 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         customizations: item.customizations || []
       }));
 
-      // Enviar datos al agente de Relevance AI
-      try {
-        const orderData = {
-          items: cartItems,
-          customerInfo: sanitizedInfo,
-          orderType: orderType,
-          total: total,
-          deliveryFee: deliveryFee,
-          finalTotal: finalTotal
-        };
+      // Enviar datos al agente de Relevance AI (only via create-payment edge function)
+      const orderData = {
+        items: cartItems,
+        customerInfo: sanitizedInfo,
+        orderType: orderType,
+        total: total,
+        deliveryFee: deliveryFee,
+        finalTotal: finalTotal
+      };
 
-        const { error: relevanceError } = await supabase.functions.invoke('send-to-relevance', {
-          body: orderData
-        });
-
-        if (relevanceError) {
-          console.error('Error enviando a Relevance AI:', relevanceError);
-        }
-      } catch (error) {
-        console.error('Error al enviar a Relevance AI:', error);
-      }
-
-      // Llamar al edge function para crear el pago
+      // Llamar al edge function para crear el pago (this will handle sending to Relevance AI)
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           items: cartItems,
           customerInfo: sanitizedInfo,
-          deliveryFee: deliveryFee
+          deliveryFee: deliveryFee,
+          orderType: orderType
         }
       });
 
@@ -135,7 +124,6 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       }
 
     } catch (error) {
-      console.error('Error processing payment:', error);
       toast({
         title: "Error en el pago",
         description: "Hubo un problema al procesar tu pago. Por favor, inténtalo de nuevo.",
@@ -175,7 +163,43 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     // Use the sanitized and validated data from validation result
     const sanitizedInfo = validation.data!;
 
-    // Enviar datos al agente de Relevance AI
+    // Save order to database before sending to WhatsApp
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error: dbError } = await supabase.from('orders').insert({
+        user_id: user?.id || null,
+        customer_name: sanitizedInfo.name,
+        customer_phone: `${sanitizedInfo.phonePrefix} ${sanitizedInfo.phone}`,
+        customer_email: sanitizedInfo.email || null,
+        delivery_address: orderType === 'delivery' ? sanitizedInfo.address : null,
+        order_type: orderType,
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          customizations: item.customizations || []
+        })),
+        total_amount: finalTotal,
+        delivery_fee: deliveryFee,
+        payment_method: 'cash',
+        payment_status: 'pending',
+        order_status: 'received',
+        notes: sanitizedInfo.notes || null
+      });
+
+      if (dbError) throw dbError;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo guardar el pedido. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Send to Relevance AI
     try {
       const orderData = {
         items: items.map(item => ({
@@ -192,15 +216,11 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         finalTotal: finalTotal
       };
 
-      const { error: relevanceError } = await supabase.functions.invoke('send-to-relevance', {
+      await supabase.functions.invoke('send-to-relevance', {
         body: orderData
       });
-
-      if (relevanceError) {
-        console.error('Error enviando a Relevance AI:', relevanceError);
-      }
     } catch (error) {
-      console.error('Error al enviar a Relevance AI:', error);
+      // Continue even if Relevance AI fails - order is already saved
     }
 
     const orderDetails = `
