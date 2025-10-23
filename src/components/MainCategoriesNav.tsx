@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Utensils, Wheat, Coffee, Fish, IceCream, Leaf, CupSoda, type LucideIcon } from "lucide-react";
+import { Utensils, Wheat, Soup, Coffee, Salad, Cake, Leaf, Wine, LucideIcon } from "lucide-react";
 
 interface MainCategoriesNavProps {
   activeCategory: string;
@@ -10,12 +10,12 @@ interface MainCategoriesNavProps {
 const mainCategories: { id: string; name: string; icon: LucideIcon }[] = [
   { id: "entrantes", name: "Entrantes", icon: Utensils },
   { id: "arroz", name: "Arroz", icon: Wheat },
-  { id: "tallarines", name: "Tallarines", icon: Utensils },
+  { id: "tallarines", name: "Tallarines", icon: Soup },
   { id: "sopas", name: "Sopas", icon: Coffee },
-  { id: "pokes", name: "Pokes", icon: Fish },
-  { id: "postres", name: "Postres", icon: IceCream },
+  { id: "pokes", name: "Pokes", icon: Salad },
+  { id: "postres", name: "Postres", icon: Cake },
   { id: "ensaladas", name: "Ensaladas", icon: Leaf },
-  { id: "bebidas", name: "Bebidas", icon: CupSoda },
+  { id: "bebidas", name: "Bebidas", icon: Wine },
 ];
 
 export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCategoriesNavProps) => {
