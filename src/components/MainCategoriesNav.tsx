@@ -1,20 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Utensils, Wheat, Soup, Coffee, Salad, Cake, Leaf, Wine, LucideIcon } from "lucide-react";
 
 interface MainCategoriesNavProps {
   activeCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
-const mainCategories = [
-  { id: "entrantes", name: "Entrantes", icon: "🥟" },
-  { id: "arroz", name: "Arroz", icon: "🍚" },
-  { id: "tallarines", name: "Tallarines", icon: "🍜" },
-  { id: "sopas", name: "Sopas", icon: "🥣" },
-  { id: "pokes", name: "Pokes", icon: "🥗" },
-  { id: "postres", name: "Postres", icon: "🍮" },
-  { id: "ensaladas", name: "Ensaladas", icon: "🥬" },
-  { id: "bebidas", name: "Bebidas", icon: "🥤" },
+const mainCategories: { id: string; name: string; icon: LucideIcon }[] = [
+  { id: "entrantes", name: "Entrantes", icon: Utensils },
+  { id: "arroz", name: "Arroz", icon: Wheat },
+  { id: "tallarines", name: "Tallarines", icon: Soup },
+  { id: "sopas", name: "Sopas", icon: Coffee },
+  { id: "pokes", name: "Pokes", icon: Salad },
+  { id: "postres", name: "Postres", icon: Cake },
+  { id: "ensaladas", name: "Ensaladas", icon: Leaf },
+  { id: "bebidas", name: "Bebidas", icon: Wine },
 ];
 
 export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCategoriesNavProps) => {
@@ -23,17 +24,20 @@ export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCate
     <nav className="bg-background/95 backdrop-blur-sm border-b border-border py-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-          {mainCategories.map((category) => (
-            <Button
-              key={category.id}
-              variant={activeCategory === category.id ? "neon" : "outline"}
-              onClick={() => onCategoryChange(category.id)}
-              className="h-16 flex flex-col items-center justify-center space-y-1 text-sm hover:scale-105 transition-transform"
-            >
-              <span className="text-xl">{category.icon}</span>
-              <span className="font-medium">{t(category.id)}</span>
-            </Button>
-          ))}
+          {mainCategories.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <Button
+                key={category.id}
+                variant={activeCategory === category.id ? "neon" : "outline"}
+                onClick={() => onCategoryChange(category.id)}
+                className="h-16 flex flex-col items-center justify-center space-y-1 text-sm hover:scale-105 transition-transform"
+              >
+                <IconComponent className="h-6 w-6" />
+                <span className="font-medium">{t(category.id)}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </nav>
