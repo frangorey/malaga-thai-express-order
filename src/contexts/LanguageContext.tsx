@@ -379,7 +379,7 @@ const translations = {
     'salad_noodles': 'Ensalada Noodles',
     'salad_noodles_ingredients': 'Lechuga, cacahuete, lima, noodles al wok con zanahoria, sésamo, salsa vinagreta y salsa césar',
     'salad_crispy': 'Ensalada Crispy',
-    'salad_crispy_ingredients': 'Lechuga, Zanahoria, brotes de soja, tomate cherry, salsa vinagreta, salsa césar y panko a elegir (de pollo o de langostinos)',
+    'salad_crispy_ingredients': 'Lechuga, Zanahoria, brotes de soja, tomate cherry, cebolla roja, salsa vinagreta, salsa rosa (picante) y panko a elegir (de pollo o de langostinos)',
     'salad_fruit': 'Ensalada de Fruta',
     'salad_fruit_ingredients': 'Lechuga, aguacate, tomate cherry, mango, kiwi, fresa y salsa fruta',
     
@@ -774,7 +774,7 @@ const translations = {
     'salad_noodles': 'Noodles Salad',
     'salad_noodles_ingredients': 'Lettuce, peanut, lime, wok noodles with carrot, sesame, vinaigrette and caesar sauce',
     'salad_crispy': 'Crispy Salad',
-    'salad_crispy_ingredients': 'Lettuce, Carrot, bean sprouts, cherry tomatoes, vinaigrette, caesar sauce and choice of panko (chicken or shrimp)',
+    'salad_crispy_ingredients': 'Lettuce, Carrot, bean sprouts, cherry tomatoes, red onion, vinaigrette, pink sauce (spicy) and choice of panko (chicken or shrimp)',
     'salad_fruit': 'Fruit Salad',
     'salad_fruit_ingredients': 'Lettuce, avocado, cherry tomatoes, mango, kiwi, strawberry and fruit sauce',
     
@@ -1157,7 +1157,7 @@ const translations = {
     'salad_noodles': 'Salade Noodles',
     'salad_noodles_ingredients': 'Laitue, cacahuète, citron vert, nouilles au wok avec carotte, sésame, vinaigrette et sauce césar',
     'salad_crispy': 'Salade Crispy',
-    'salad_crispy_ingredients': 'Laitue, Carotte, germes de soja, tomates cerises, vinaigrette, sauce césar et panko au choix (poulet ou crevettes)',
+    'salad_crispy_ingredients': 'Laitue, Carotte, germes de soja, tomates cerises, oignon rouge, vinaigrette, sauce rose (épicée) et panko au choix (poulet ou crevettes)',
     'salad_fruit': 'Salade de Fruits',
     'salad_fruit_ingredients': 'Laitue, avocat, tomates cerises, mangue, kiwi, fraise et sauce aux fruits',
     
