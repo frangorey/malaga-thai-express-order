@@ -55,11 +55,6 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
       ingredients: t('salad_thai_ingredients')
     },
     {
-      id: "noodles",
-      name: t('salad_noodles'),
-      ingredients: t('salad_noodles_ingredients')
-    },
-    {
       id: "crispy",
       name: t('salad_crispy'),
       ingredients: t('salad_crispy_ingredients')
