@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
+import { useProducts } from "@/hooks/useProducts";
+import { useToast } from "@/hooks/use-toast";
 
 interface Protein {
   id: string;
@@ -33,6 +35,8 @@ interface RiceCustomizerProps {
 
 export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
   const { t } = useLanguage();
+  const { products } = useProducts();
+  const { toast } = useToast();
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
@@ -196,29 +200,73 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
     return basePrice + vegetablesPrice;
   };
 
+  const findMatchingProduct = (): SupabaseProduct | null => {
+    if (!selectedProtein || !selectedSauce) return null;
+
+    // Map sauce IDs to DB subcategories
+    const sauceMap: Record<string, string> = {
+      "classic": "Classic",
+      "curry-amarillo": "Curry Amarillo",
+      "curry-verde": "Curry Verde",
+      "curry-rojo": "Curry Rojo",
+      "original": "Classic",
+      "teriyaki": "Teriyaki"
+    };
+
+    // Map protein IDs to search patterns
+    const proteinMap: Record<string, string> = {
+      "pollo": "pollo",
+      "ternera": "ternera",
+      "gambas": "gambas",
+      "pollo_ternera": "Mix 2 con pollo y ternera",
+      "pollo_gambas": "Mix 2 con pollo y gambas",
+      "ternera_gambas": "Mix 2 con ternera y gambas",
+      "pollo_ternera_gambas": "Mix 3 con pollo, ternera y gambas"
+    };
+
+    const subcategory = sauceMap[selectedSauce] || "Classic";
+    const proteinPattern = proteinMap[selectedProtein] || "";
+
+    // Find matching product in DB
+    const matchingProduct = products.find(p => 
+      p.category === "Arroces" && 
+      p.subcategory === subcategory &&
+      p.name.toLowerCase().includes(proteinPattern.toLowerCase())
+    );
+
+    return matchingProduct || null;
+  };
+
   const handleAddToCart = () => {
     if (!selectedProtein || !selectedSauce) return;
 
-    const proteinName = proteins.find(p => p.id === selectedProtein)?.name || "";
-    const sauceName = sauces.find(s => s.id === selectedSauce)?.name || "";
+    const baseProduct = findMatchingProduct();
+    
+    if (!baseProduct) {
+      toast({
+        title: "Error",
+        description: "No se pudo encontrar el producto en la base de datos. Por favor, inténtalo de nuevo.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const vegetablesNames = selectedVegetables
       .map(id => vegetables.find(v => v.id === id)?.name)
-      .filter(Boolean)
-      .join(", ");
+      .filter(Boolean);
+
+    const vegetablesPrice = selectedVegetables.reduce((sum, vegId) => {
+      const veg = vegetables.find(v => v.id === vegId);
+      return sum + (veg?.price || 0);
+    }, 0);
 
     const customProduct: SupabaseProduct = {
-      id: Date.now(),
-      name: `${t('custom_rice_with')} ${proteinName} ${sauceName}${vegetablesNames ? ` + ${vegetablesNames}` : ''}`,
-      description: `${t('custom_rice_desc')} ${proteinName} ${t('custom_rice_with_sauce')} ${sauceName}${vegetablesNames ? `. Verduras extra: ${vegetablesNames}` : ''}`,
-      price: getTotalPrice(),
-      image_url: null,
-      category: "Arroz",
-      subcategory: "rice",
-      is_vegetarian: false,
-      is_spicy: selectedSauce.includes("curry-verde") || selectedSauce.includes("curry-rojo"),
-      is_available: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      ...baseProduct,
+      name: vegetablesNames.length > 0 
+        ? `${baseProduct.name} + ${vegetablesNames.join(", ")}`
+        : baseProduct.name,
+      price: baseProduct.price + vegetablesPrice,
+      customizations: vegetablesNames
     };
 
     onAddToCart(customProduct);
