@@ -88,38 +88,41 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
   };
 
   return (
-    <section className="py-12 px-4">
+    <section className="py-8 sm:py-12 px-3 sm:px-4">
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="font-bold mb-3 sm:mb-4">
             <span className="neon-text">{title.toUpperCase()}</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
             {description}
           </p>
         </div>
 
         {isDrinksSection && (
-          <div className="mb-8 max-w-4xl mx-auto">
+          <div className="mb-6 sm:mb-8 max-w-4xl mx-auto px-2">
             <img 
               src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/bebidas.jpeg" 
               alt={title}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full h-48 sm:h-56 md:h-64 object-cover rounded-lg"
+              loading="lazy"
             />
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {items.map((item) => {
             const translatedProduct = getTranslatedProduct(item);
             return (
-            <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden">
+            <Card key={item.id} className="group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm overflow-hidden flex flex-col">
               {!isDrinksSection && (
-                <div className="relative overflow-hidden aspect-[4/5]">
+                <div className="relative overflow-hidden aspect-[4/5] w-full">
                   <img 
                     src={item.image_url || '/placeholder.svg'} 
                     alt={translatedProduct.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-3 right-3 flex gap-2">
@@ -137,23 +140,23 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
                 </div>
               )}
               
-              <CardHeader>
-                <CardTitle className="flex justify-between items-start">
-                  <span className="text-lg">{translatedProduct.name}</span>
-                  <span className="neon-text font-bold text-xl">{item.price.toFixed(2)}€</span>
+              <CardHeader className="flex-grow">
+                <CardTitle className="flex justify-between items-start gap-2">
+                  <span className="text-base sm:text-lg line-clamp-2">{translatedProduct.name}</span>
+                  <span className="neon-text font-bold text-lg sm:text-xl whitespace-nowrap flex-shrink-0">{item.price.toFixed(2)}€</span>
                 </CardTitle>
-                <CardDescription className="text-sm">
+                <CardDescription className="text-xs sm:text-sm line-clamp-3">
                   {translatedProduct.description}
                 </CardDescription>
               </CardHeader>
               
-              <CardContent>
+              <CardContent className="pt-0">
                 <Button 
                   variant="neon" 
-                  className="w-full"
+                  className="w-full text-sm sm:text-base h-9 sm:h-10"
                   onClick={() => onAddToCart(item)}
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                   {t('add_to_cart')}
                 </Button>
               </CardContent>
