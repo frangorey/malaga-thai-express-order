@@ -223,4 +223,15 @@ All colors MUST be HSL.
       opacity: 0.8;
     }
   }
+
+  /* Relevance AI Chat Bubble - Override z-index to appear above all content */
+  iframe[src*="relevanceai.com"],
+  div[id*="relevance"],
+  div[class*="relevance"],
+  #relevance-chat-bubble,
+  #relevance-chat-bubble-wrapper,
+  #relevance-ai-chat-bubble,
+  [data-relevanceai-share-id] {
+    z-index: 10000 !important;
+  }
 }
