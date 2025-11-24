@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
 import noodlesHero from "@/assets/noodles-hero.jpg";
+import { useProducts } from "@/hooks/useProducts";
+import { useToast } from "@/hooks/use-toast";
 
 interface NoodleType {
   id: string;
@@ -41,6 +43,8 @@ interface NoodleCustomizerProps {
 
 export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
   const { t } = useLanguage();
+  const { products } = useProducts();
+  const { toast } = useToast();
   const [selectedNoodleType, setSelectedNoodleType] = useState<string>("");
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
@@ -213,30 +217,80 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
     return basePrice + vegetablesPrice;
   };
 
+  const findMatchingProduct = (): SupabaseProduct | null => {
+    if (!selectedNoodleType || !selectedProtein || !selectedSauce) return null;
+
+    // Map noodle type IDs to DB subcategories
+    const noodleTypeMap: Record<string, string> = {
+      "finos": "Finos",
+      "gruesos": "Gruesos", 
+      "arroz": "Arroz",
+      "trigo": "Trigo"
+    };
+
+    // Map sauce IDs to DB subcategories
+    const sauceMap: Record<string, string> = {
+      "classic": "Classic",
+      "original": "Original",
+      "teriyaki": "Teriyaki"
+    };
+
+    // Map protein IDs to search patterns
+    const proteinMap: Record<string, string> = {
+      "pollo": "pollo",
+      "ternera": "ternera",
+      "gambas": "gambas",
+      "pollo_ternera": "mix 2 con pollo y ternera",
+      "pollo_gambas": "mix 2 con pollo y gambas",
+      "ternera_gambas": "mix 2 con ternera y gambas",
+      "pollo_ternera_gambas": "mix 3 con pollo, ternera y gambas"
+    };
+
+    const noodleType = noodleTypeMap[selectedNoodleType] || "Finos";
+    const sauce = sauceMap[selectedSauce] || "Classic";
+    const proteinPattern = proteinMap[selectedProtein] || "";
+
+    // Find matching product in DB
+    const matchingProduct = products.find(p => 
+      p.category === "Tallarines" && 
+      p.subcategory?.toLowerCase().includes(noodleType.toLowerCase()) &&
+      p.subcategory?.toLowerCase().includes(sauce.toLowerCase()) &&
+      p.name.toLowerCase().includes(proteinPattern.toLowerCase())
+    );
+
+    return matchingProduct || null;
+  };
+
   const handleAddToCart = () => {
     if (!selectedNoodleType || !selectedProtein || !selectedSauce) return;
 
-    const noodleTypeName = noodleTypes.find(n => n.id === selectedNoodleType)?.name || "";
-    const proteinName = proteins.find(p => p.id === selectedProtein)?.name || "";
-    const sauceName = sauces.find(s => s.id === selectedSauce)?.name || "";
+    const baseProduct = findMatchingProduct();
+    
+    if (!baseProduct) {
+      toast({
+        title: "Error",
+        description: "No se pudo encontrar el producto en la base de datos. Por favor, inténtalo de nuevo.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const vegetablesNames = selectedVegetables
       .map(id => vegetables.find(v => v.id === id)?.name)
-      .filter(Boolean)
-      .join(", ");
+      .filter(Boolean);
+
+    const vegetablesPrice = selectedVegetables.reduce((sum, vegId) => {
+      const veg = vegetables.find(v => v.id === vegId);
+      return sum + (veg?.price || 0);
+    }, 0);
 
     const customProduct: SupabaseProduct = {
-      id: Date.now(),
-      name: `${t('custom_noodles_with')} ${noodleTypeName} ${t('custom_noodles_and')} ${proteinName} ${sauceName}${vegetablesNames ? ` + ${vegetablesNames}` : ''}`,
-      description: `${t('custom_noodles_desc')} ${noodleTypeName} ${t('custom_noodles_and')} ${proteinName} ${t('custom_noodles_with_sauce')} ${sauceName}${vegetablesNames ? `. Verduras extra: ${vegetablesNames}` : ''}`,
-      price: getTotalPrice(),
-      image_url: null,
-      category: "Tallarines",
-      subcategory: selectedNoodleType,
-      is_vegetarian: false,
-      is_spicy: selectedSauce.includes("spicy"),
-      is_available: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      ...baseProduct,
+      name: vegetablesNames.length > 0 
+        ? `${baseProduct.name} + ${vegetablesNames.join(", ")}`
+        : baseProduct.name,
+      price: baseProduct.price + vegetablesPrice,
+      customizations: vegetablesNames
     };
 
     onAddToCart(customProduct);

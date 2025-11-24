@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
+import { useProducts } from "@/hooks/useProducts";
+import { useToast } from "@/hooks/use-toast";
 
 interface SaladType {
   id: string;
@@ -24,6 +26,8 @@ interface SaladCustomizerProps {
 
 export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
   const { t } = useLanguage();
+  const { products } = useProducts();
+  const { toast } = useToast();
   const [selectedSalad, setSelectedSalad] = useState<string>("");
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [activeTab, setActiveTab] = useState("salad");
@@ -107,26 +111,52 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
     return protein?.price || 0;
   };
 
+  const findMatchingProduct = (): SupabaseProduct | null => {
+    if (!selectedSalad || !selectedProtein) return null;
+
+    // Map salad and protein to DB products
+    const saladMap: Record<string, string> = {
+      "crispy": "Crispy",
+      "noodles": "Noodles",
+      "thai": "Thai"
+    };
+
+    const proteinMap: Record<string, string> = {
+      "pollo": "pollo",
+      "langostino": "langostino",
+      "salmon": "salmón",
+      "none": ""
+    };
+
+    const saladName = saladMap[selectedSalad] || "";
+    const proteinName = proteinMap[selectedProtein] || "";
+
+    // Find matching product in DB
+    const matchingProduct = products.find(p => 
+      p.category === "Ensaladas" && 
+      p.name.toLowerCase().includes(saladName.toLowerCase()) &&
+      (proteinName === "" || p.name.toLowerCase().includes(proteinName.toLowerCase()))
+    );
+
+    return matchingProduct || null;
+  };
+
   const handleAddToCart = () => {
     if (!selectedSalad || !selectedProtein) return;
 
-    const saladName = saladTypes.find(s => s.id === selectedSalad)?.name || "";
-    const saladIngredients = saladTypes.find(s => s.id === selectedSalad)?.ingredients || "";
-    const proteinName = proteinOptions.find(p => p.id === selectedProtein)?.name || "";
+    const baseProduct = findMatchingProduct();
+    
+    if (!baseProduct) {
+      toast({
+        title: "Error",
+        description: "No se pudo encontrar el producto en la base de datos. Por favor, inténtalo de nuevo.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const customProduct: SupabaseProduct = {
-      id: Date.now(),
-      name: `${saladName} - ${proteinName}`,
-      description: saladIngredients,
-      price: getTotalPrice(),
-      image_url: null,
-      category: "Ensaladas",
-      subcategory: selectedSalad,
-      is_vegetarian: selectedProtein === "none",
-      is_spicy: false,
-      is_available: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      ...baseProduct
     };
 
     onAddToCart(customProduct);

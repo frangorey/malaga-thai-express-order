@@ -52,6 +52,64 @@ interface PaymentRequest {
   orderType: 'pickup' | 'delivery';
 }
 
+// Prices for vegetables extras (in euros)
+const VEGETABLE_PRICES: Record<string, number> = {
+  "Huevo": 1.40,
+  "Cilantro": 1.40,
+  "Albahaca": 1.40,
+  "Brotes de soja": 1.40,
+  "Cebolla roja": 1.40,
+  "Maíz": 1.40,
+  "Judía verde": 1.40,
+  "Zanahoria": 1.40,
+  "Cacahuete": 1.40,
+  "Brócoli": 1.90,
+  "Cebolleta": 1.90,
+  "Champiñones": 1.90,
+  "Pimiento": 1.90,
+  // English versions
+  "Egg": 1.40,
+  "Cilantro": 1.40,
+  "Basil": 1.40,
+  "Bean sprouts": 1.40,
+  "Red onion": 1.40,
+  "Corn": 1.40,
+  "Green beans": 1.40,
+  "Carrot": 1.40,
+  "Peanut": 1.40,
+  "Broccoli": 1.90,
+  "Scallion": 1.90,
+  "Mushrooms": 1.90,
+  "Pepper": 1.90,
+  // French versions
+  "Oeuf": 1.40,
+  "Coriandre": 1.40,
+  "Basilic": 1.40,
+  "Pousses de soja": 1.40,
+  "Oignon rouge": 1.40,
+  "Maïs": 1.40,
+  "Haricots verts": 1.40,
+  "Carotte": 1.40,
+  "Cacahuète": 1.40,
+  "Brocoli": 1.90,
+  "Ciboule": 1.90,
+  "Champignons": 1.90,
+  "Poivron": 1.90,
+};
+
+function calculateCustomizationsPrice(customizations?: string[]): number {
+  if (!customizations || customizations.length === 0) return 0;
+  
+  return customizations.reduce((sum, item) => {
+    // Try to find exact match or partial match in prices
+    const price = VEGETABLE_PRICES[item] || 
+                  Object.entries(VEGETABLE_PRICES).find(([key]) => 
+                    item.toLowerCase().includes(key.toLowerCase())
+                  )?.[1] || 0;
+    return sum + price;
+  }, 0);
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -135,10 +193,18 @@ serve(async (req) => {
         throw new Error("PRODUCT_UNAVAILABLE");
       }
       
+      // Calculate total price: base product + customizations
+      const basePrice = Number(dbProduct.price);
+      const customizationsPrice = calculateCustomizationsPrice(item.customizations);
+      const totalPrice = basePrice + customizationsPrice;
+      
       return {
         ...item,
-        price: Number(dbProduct.price),
-        name: dbProduct.name
+        price: totalPrice,
+        name: item.customizations && item.customizations.length > 0
+          ? `${dbProduct.name} + ${item.customizations.join(", ")}`
+          : dbProduct.name,
+        baseProductName: dbProduct.name
       };
     });
 

@@ -24,6 +24,7 @@ export interface SupabaseProduct {
   is_available: boolean;
   created_at: string;
   updated_at: string;
+  customizations?: string[];
 }
 
 export interface CartItem extends MenuItem {
