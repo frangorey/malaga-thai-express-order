@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getOptimizedImageUrl } from "@/lib/imageOptimization";
 import Autoplay from "embla-carousel-autoplay";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
-const heroImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/premium_photo-1697729549014-2faefb25efba.jpg";
-const khopiImage = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Khopi-sinfondonueva.jpeg";
+// Use WebP-optimized URLs
+const heroImage = getOptimizedImageUrl(
+  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/premium_photo-1697729549014-2faefb25efba.jpg",
+  1920,
+  75
+);
 
 const topSalesImages = [
   {
@@ -45,16 +49,27 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
   const plugin = useRef(
     Autoplay({ delay: 8000, stopOnInteraction: false })
   );
+
+  // Preload hero image for better LCP
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = heroImage;
+    document.head.appendChild(link);
+  }, []);
   
   return (
     <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image - Responsive */}
+      {/* Background Image - Optimized WebP */}
       <div className="absolute inset-0">
         <img 
           src={heroImage}
           alt="Thaii Express Hero Background"
           className="w-full h-full object-cover"
           loading="eager"
+          decoding="async"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-black/40"></div>
       </div>
@@ -97,7 +112,9 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
                 <CarouselItem key={index} className="pl-2 basis-full sm:basis-1/2 lg:basis-1/3">
                   <div className="relative h-64 sm:h-80 lg:h-96 rounded-lg overflow-hidden shadow-2xl group cursor-pointer">
                     <img
-                      src={image.src}
+                      src={getOptimizedImageUrl(image.src, 640)}
+                      srcSet={`${getOptimizedImageUrl(image.src, 400)} 400w, ${getOptimizedImageUrl(image.src, 640)} 640w, ${getOptimizedImageUrl(image.src, 800)} 800w`}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       alt={image.alt}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy"
