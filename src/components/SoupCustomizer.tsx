@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import { Flame, Leaf } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
@@ -94,12 +95,11 @@ export const SoupCustomizer = ({ onAddToCart }: SoupCustomizerProps) => {
 
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <img 
+          <ResponsiveImage 
             src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/sopa-miso-2.jpg"
             alt={t('soup_customizer_title')}
             className="w-full h-[400px] object-cover rounded-lg"
             style={{ objectPosition: 'center 60%' }}
-            loading="lazy"
           />
         </div>
 

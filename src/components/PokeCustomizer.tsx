@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import { Leaf, Plus } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -79,12 +80,11 @@ export const PokeCustomizer = ({ onAddToCart }: PokeCustomizerProps) => {
 
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <img 
+          <ResponsiveImage 
             src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Poke-Coreano.jpeg"
             alt={t('poke_customizer_title')}
             className="w-full h-[400px] object-cover rounded-lg"
             style={{ objectPosition: 'center 60%' }}
-            loading="lazy"
           />
         </div>
 
