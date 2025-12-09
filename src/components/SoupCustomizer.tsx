@@ -92,7 +92,17 @@ export const SoupCustomizer = ({ onAddToCart }: SoupCustomizerProps) => {
         <p className="text-muted-foreground max-w-2xl mx-auto">{t('soup_customizer_description')}</p>
       </div>
 
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <img 
+            src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/sopa-miso-2.jpg"
+            alt={t('soup_customizer_title')}
+            className="w-full h-[400px] object-cover rounded-lg"
+            style={{ objectPosition: 'center 60%' }}
+          />
+        </div>
+
+        <div className="space-y-8">
         {/* Step 1: Soup Type Selection */}
         <Card>
           <CardHeader>
@@ -201,6 +211,7 @@ export const SoupCustomizer = ({ onAddToCart }: SoupCustomizerProps) => {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </div>
   );
