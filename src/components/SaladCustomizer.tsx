@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
 import { useProducts } from "@/hooks/useProducts";
@@ -181,11 +182,10 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
 
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <img 
+            <ResponsiveImage 
               src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Ensalada-Noodles.jpeg" 
               alt={t('salad_customizer_title')}
               className="w-full h-64 object-cover rounded-lg"
-              loading="lazy"
             />
           </div>
 
