@@ -84,6 +84,7 @@ export const PokeCustomizer = ({ onAddToCart }: PokeCustomizerProps) => {
             alt={t('poke_customizer_title')}
             className="w-full h-[400px] object-cover rounded-lg"
             style={{ objectPosition: 'center 60%' }}
+            loading="lazy"
           />
         </div>
 
