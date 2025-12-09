@@ -99,27 +99,19 @@ export function supportsWebP(): boolean {
 }
 
 /**
- * Get optimized Supabase storage URL with WebP and size parameters
+ * Get optimized Supabase storage URL
+ * Note: Image transformation API requires Supabase Pro plan
+ * Falls back to original URL for free tier
  */
 export function getOptimizedImageUrl(
   url: string,
   width: number = 800,
   quality: number = 80
 ): string {
-  // Check if it's a Supabase storage URL
-  if (!url.includes('supabase.co/storage/v1/object/public/')) {
-    return url;
-  }
-
-  // Transform to render endpoint for optimization
-  const transformedUrl = url.replace(
-    '/storage/v1/object/public/',
-    '/storage/v1/render/image/public/'
-  );
-
-  const separator = transformedUrl.includes('?') ? '&' : '?';
-  return `${transformedUrl}${separator}width=${width}&quality=${quality}&format=webp`;
+  // Return original URL - Supabase image transformation requires Pro plan
+  return url;
 }
+
 
 /**
  * Preload critical images for better LCP
@@ -134,12 +126,12 @@ export function preloadImage(src: string): void {
 
 /**
  * Generate srcset for responsive images
+ * Returns empty string since transformation requires Pro plan
  */
 export function generateSrcSet(
   url: string,
   widths: number[] = [400, 640, 800, 1024, 1280]
 ): string {
-  return widths
-    .map((w) => `${getOptimizedImageUrl(url, w)} ${w}w`)
-    .join(', ');
+  // Supabase image transformation requires Pro plan - return empty srcset
+  return '';
 }
