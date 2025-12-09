@@ -295,7 +295,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
             <img 
               src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-mix2-recortada.jpeg"
               alt={t('rice_customizer_title')}
-              className="w-full max-h-48 object-contain rounded-lg"
+              className="w-full max-h-56 object-contain rounded-lg"
             />
           </div>
 
