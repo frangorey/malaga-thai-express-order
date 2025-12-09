@@ -160,114 +160,80 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       return;
     }
 
-    // Use the sanitized and validated data from validation result
-    const sanitizedInfo = validation.data!;
+    if (items.length === 0) {
+      toast({
+        title: "Error",
+        description: "El carrito está vacío",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Save order to database before sending to WhatsApp
+    setIsProcessingPayment(true);
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error: dbError } = await supabase.from('orders').insert({
-        user_id: user?.id || null,
-        customer_name: sanitizedInfo.name,
-        customer_phone: `${sanitizedInfo.phonePrefix} ${sanitizedInfo.phone}`,
-        customer_email: sanitizedInfo.email || null,
-        delivery_address: orderType === 'delivery' ? sanitizedInfo.address : null,
-        order_type: orderType,
-        items: items.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          customizations: item.customizations || []
-        })),
-        total_amount: finalTotal,
-        delivery_fee: deliveryFee,
-        payment_method: 'cash',
-        payment_status: 'pending',
-        order_status: 'received',
-        notes: sanitizedInfo.notes || null
+      // Use the sanitized and validated data from validation result
+      const sanitizedInfo = validation.data!;
+
+      // Preparar items para el pedido
+      const cartItems = items.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        customizations: item.customizations || []
+      }));
+
+      // Call secure edge function (handles DB save + Relevance AI internally)
+      const { data, error } = await supabase.functions.invoke('create-whatsapp-order', {
+        body: {
+          items: cartItems,
+          customerInfo: sanitizedInfo,
+          orderType: orderType,
+          deliveryFee: deliveryFee
+        }
       });
 
-      if (dbError) throw dbError;
+      if (error) {
+        throw error;
+      }
+
+      if (data?.whatsappUrl) {
+        // Validate URL length
+        if (data.whatsappUrl.length > 2000) {
+          toast({
+            title: "Pedido muy grande",
+            description: "Tu pedido es demasiado grande para WhatsApp. Por favor, usa el pago con tarjeta o reduce el número de productos.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        window.open(data.whatsappUrl, '_blank');
+        
+        // Clear form after successful order
+        setOrderType(null);
+        setCustomerInfo({
+          name: "",
+          phonePrefix: "",
+          phone: "",
+          address: "",
+          email: "",
+          notes: ""
+        });
+      } else {
+        throw new Error('No se recibió URL de WhatsApp');
+      }
+
     } catch (error) {
       toast({
         title: "Error",
-        description: "No se pudo guardar el pedido. Por favor, inténtalo de nuevo.",
+        description: "Hubo un problema al procesar tu pedido. Por favor, inténtalo de nuevo.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsProcessingPayment(false);
     }
-
-    // Send to Relevance AI
-    try {
-      const orderData = {
-        items: items.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          customizations: item.customizations || []
-        })),
-        customerInfo: sanitizedInfo,
-        orderType: orderType,
-        total: total,
-        deliveryFee: deliveryFee,
-        finalTotal: finalTotal
-      };
-
-      await supabase.functions.invoke('send-to-relevance', {
-        body: orderData
-      });
-    } catch (error) {
-      // Continue even if Relevance AI fails - order is already saved
-    }
-
-    const orderDetails = `
-NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
-TIPO: ${orderType === 'pickup' ? '🏪 RECOGER EN RESTAURANTE' : '🚚 DOMICILIO'}
-
-Cliente: ${sanitizedInfo.name}
-Teléfono: ${sanitizedInfo.phonePrefix} ${sanitizedInfo.phone}
-${sanitizedInfo.email ? `Email: ${sanitizedInfo.email}` : ''}
-${orderType === 'delivery' ? `Dirección: ${sanitizedInfo.address}` : ''}
-${sanitizedInfo.notes ? `Observaciones: ${sanitizedInfo.notes}` : ''}
-
-PEDIDO:
-${items.map(item => `${item.quantity}x ${item.name} - ${(item.price * item.quantity).toFixed(2)}€`).join('\n')}
-
-Subtotal: ${total.toFixed(2)}€
-${deliveryFee > 0 ? `Gastos de envío: ${deliveryFee.toFixed(2)}€` : 'Envío GRATIS (pedido > 15€)'}
-TOTAL: ${finalTotal.toFixed(2)}€
-
-💳 FORMA DE PAGO: Contra reembolso (efectivo)
-    `;
-
-    const whatsappMessage = encodeURIComponent(orderDetails.trim());
-    const fullUrl = `https://wa.me/34951401937?text=${whatsappMessage}`;
-    
-    // Validate URL length to prevent truncation (browsers have ~2000-8000 char limits)
-    if (fullUrl.length > 2000) {
-      toast({
-        title: "Pedido muy grande",
-        description: "Tu pedido es demasiado grande para WhatsApp. Por favor, usa el pago con tarjeta o reduce el número de productos.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    window.open(fullUrl, '_blank');
-    
-    // Limpiar formulario después de enviar
-    setOrderType(null);
-    setCustomerInfo({
-      name: "",
-      phonePrefix: "",
-      phone: "",
-      address: "",
-      email: "",
-      notes: ""
-    });
   };
 
   if (!isOpen) return null;
