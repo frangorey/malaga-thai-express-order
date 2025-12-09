@@ -1,7 +1,20 @@
 project_id = "xqqffccvnpnmdoqowdlc"
 
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
 [functions.create-payment]
 verify_jwt = false
 
+[functions.create-whatsapp-order]
+verify_jwt = false
+
 [functions.send-to-relevance]
+verify_jwt = true
+
+[functions.security-headers]
 verify_jwt = false
