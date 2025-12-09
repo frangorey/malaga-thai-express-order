@@ -293,10 +293,9 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <img 
-              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-mix2.jpg"
+              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-mix2-recortada.jpeg"
               alt={t('rice_customizer_title')}
               className="w-full h-64 object-cover rounded-lg"
-              style={{ objectPosition: 'center 40%' }}
             />
           </div>
 
