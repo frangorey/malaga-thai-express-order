@@ -320,7 +320,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
             <img 
               src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Finos-classic-pollogambas.jpeg" 
               alt={t('noodle_customizer_title')}
-              className="w-full max-h-[300px] object-contain rounded-lg"
+              className="w-full max-h-[500px] object-contain rounded-lg"
             />
           </div>
 
