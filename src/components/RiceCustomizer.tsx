@@ -292,11 +292,12 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
 
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <img 
-              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-mix2-recortada.jpeg"
-              alt={t('rice_customizer_title')}
-              className="w-full max-h-[400px] object-contain rounded-lg"
-            />
+          <img 
+            src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-mix2-recortada.jpeg"
+            alt={t('rice_customizer_title')}
+            className="w-full max-h-[400px] object-contain rounded-lg"
+            loading="lazy"
+          />
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
