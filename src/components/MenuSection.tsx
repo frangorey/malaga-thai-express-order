@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Plus, Leaf, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MenuItem, SupabaseProduct } from "@/types/menu";
+import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
-
+import { getOptimizedImageUrl, generateSrcSet } from "@/lib/imageOptimization";
 interface MenuSectionProps {
   title: string;
   description: string;
@@ -102,10 +102,13 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
         {isDrinksSection && (
           <div className="mb-6 sm:mb-8 max-w-4xl mx-auto px-2">
             <img 
-              src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/bebidas.jpeg" 
+              src={getOptimizedImageUrl("https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/bebidas.jpeg", 800)}
+              srcSet={generateSrcSet("https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/bebidas.jpeg")}
+              sizes="(max-width: 1024px) 100vw, 800px"
               alt={title}
               className="w-full h-48 sm:h-56 md:h-64 object-cover rounded-lg"
               loading="lazy"
+              decoding="async"
             />
           </div>
         )}
@@ -118,7 +121,9 @@ export const MenuSection = ({ title, description, items, onAddToCart }: MenuSect
               {!isDrinksSection && (
                 <div className="relative overflow-hidden aspect-[4/5] w-full">
                   <img 
-                    src={item.image_url || '/placeholder.svg'} 
+                    src={item.image_url ? getOptimizedImageUrl(item.image_url, 400) : '/placeholder.svg'}
+                    srcSet={item.image_url ? generateSrcSet(item.image_url, [300, 400, 500]) : undefined}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     alt={translatedProduct.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
