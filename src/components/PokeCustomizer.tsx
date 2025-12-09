@@ -78,6 +78,15 @@ export const PokeCustomizer = ({ onAddToCart }: PokeCustomizerProps) => {
       </div>
 
       <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <img 
+            src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/Poke-Coreano.jpeg"
+            alt={t('poke_customizer_title')}
+            className="w-full h-[400px] object-cover rounded-lg"
+            style={{ objectPosition: 'center 60%' }}
+          />
+        </div>
+
         {/* Step 1: Choose Poke Type */}
         <Card className="mb-8">
           <CardHeader>
