@@ -243,7 +243,8 @@ TOTAL: ${finalTotal.toFixed(2)}€
       JSON.stringify({ 
         success: true,
         whatsappUrl,
-        orderId: order.id
+        orderId: order.id,
+        orderNumber: order.order_number
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
