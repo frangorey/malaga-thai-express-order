@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
 import OrderHistory from "./pages/OrderHistory";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -24,8 +25,9 @@ const App = () => (
           <OrderStatusTracker />
           <BrowserRouter>
             <Routes>
-            <Route path="/" element={<Index />} />
+              <Route path="/" element={<Index />} />
               <Route path="/orders" element={<OrderHistory />} />
+              <Route path="/admin" element={<AdminPanel />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-cancelled" element={<PaymentCancelled />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
