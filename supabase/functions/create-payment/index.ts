@@ -347,7 +347,8 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ 
       url: session.url,
-      sessionId: session.id 
+      sessionId: session.id,
+      orderNumber: orderData.order_number
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

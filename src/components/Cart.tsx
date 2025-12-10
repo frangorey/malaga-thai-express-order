@@ -10,6 +10,7 @@ import { CartItem, SupabaseProduct } from "@/types/menu";
 import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { trackOrder } from "@/hooks/useOrderRealtime";
 
 // Nuevo tipo para el carrito con productos de Supabase
 export interface SupabaseCartItem extends SupabaseProduct {
@@ -117,6 +118,10 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       }
 
       if (data?.url) {
+        // Track order for realtime updates
+        if (data.orderNumber) {
+          trackOrder(data.orderNumber);
+        }
         // Redirigir a Stripe Checkout
         window.location.href = data.url;
       } else {
@@ -207,6 +212,11 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
             variant: "destructive",
           });
           return;
+        }
+        
+        // Track order for realtime updates
+        if (data.orderNumber) {
+          trackOrder(data.orderNumber);
         }
         
         window.open(data.whatsappUrl, '_blank');
