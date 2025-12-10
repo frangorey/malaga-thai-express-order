@@ -1,4 +1,5 @@
-import { ShoppingCart, Phone, MapPin, LogIn, UserPlus, LogOut } from "lucide-react";
+import { ShoppingCart, Phone, MapPin, LogIn, UserPlus, LogOut, ClipboardList } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -47,14 +48,25 @@ export const Header = ({
           {/* Auth Buttons, Language Selector and Cart - Mobile Optimized */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
             {user ? (
-              <Button 
-                variant="outline" 
-                onClick={signOut}
-                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 h-9 sm:h-10"
-              >
-                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden md:inline text-sm">{t('logout')}</span>
-              </Button>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link to="/orders">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 h-9 sm:h-10"
+                  >
+                    <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="hidden md:inline text-sm">{t('myOrders')}</span>
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={signOut}
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 h-9 sm:h-10"
+                >
+                  <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden md:inline text-sm">{t('logout')}</span>
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <AuthDialog>

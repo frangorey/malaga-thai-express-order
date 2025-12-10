@@ -78,6 +78,7 @@ const translations = {
      'signup_success': '¡Cuenta Creada!',
      'check_email_confirmation': 'Por favor revisa tu correo para confirmar tu cuenta.',
      'logout': 'Cerrar Sesión',
+     'myOrders': 'Mis Pedidos',
      
      // Main Categories
     'entrantes': 'Entrantes',
@@ -473,6 +474,7 @@ const translations = {
      'signup_success': 'Account Created!',
      'check_email_confirmation': 'Please check your email to confirm your account.',
      'logout': 'Logout',
+     'myOrders': 'My Orders',
      
      // Main Categories
     'entrantes': 'Starters',
@@ -856,6 +858,19 @@ const translations = {
     'take_it_home': 'emportez-le chez vous!',
     'order_online': 'COMMANDER EN LIGNE',
     'call_us': 'APPELER: 951 40 19 37',
+    
+    // Auth
+    'auth_title': 'Connexion à Thaii Express',
+    'login': 'Connexion',
+    'signup': 'S\'inscrire',
+    'email': 'Email',
+    'password': 'Mot de passe',
+    'loading': 'Chargement...',
+    'login_success': 'Connexion réussie!',
+    'signup_success': 'Compte créé!',
+    'check_email_confirmation': 'Veuillez vérifier votre email pour confirmer votre compte.',
+    'logout': 'Déconnexion',
+    'myOrders': 'Mes Commandes',
     
     // Main Categories
     'entrantes': 'Entrées',
