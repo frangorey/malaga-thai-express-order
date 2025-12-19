@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -156,7 +157,7 @@ serve(async (req) => {
       delivery_fee: deliveryFee,
       payment_method: 'cash',
       payment_status: 'pending',
-      order_status: 'received',
+      order_status: 'preparing', // Set to preparing since order is confirmed
       notes: customerInfo.notes || null
     }).select().single();
 
@@ -169,6 +170,83 @@ serve(async (req) => {
     }
 
     console.log('Order saved:', order.id);
+
+    // Send email notification to restaurant
+    try {
+      const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+      
+      const itemsHtml = items.map(item => 
+        `<tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.quantity}x</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${(item.price * item.quantity).toFixed(2)}€</td>
+        </tr>`
+      ).join('');
+
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Nuevo Pedido - Thai Express</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+          <div style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="color: #e11d48; margin-bottom: 20px; text-align: center;">🍜 NUEVO PEDIDO - THAI EXPRESS</h1>
+            
+            <div style="background-color: #fef2f2; border-left: 4px solid #e11d48; padding: 15px; margin-bottom: 20px;">
+              <strong>Nº Pedido:</strong> ${order.order_number}<br>
+              <strong>Tipo:</strong> ${orderType === 'pickup' ? '🏪 Recoger en restaurante' : '🚚 Entrega a domicilio'}<br>
+              <strong>Pago:</strong> Contra reembolso (efectivo)
+            </div>
+
+            <h2 style="color: #333; border-bottom: 2px solid #e11d48; padding-bottom: 10px;">👤 Datos del Cliente</h2>
+            <table style="width: 100%; margin-bottom: 20px;">
+              <tr><td style="padding: 5px 0;"><strong>Nombre:</strong></td><td>${customerInfo.name}</td></tr>
+              <tr><td style="padding: 5px 0;"><strong>Teléfono:</strong></td><td>${customerInfo.phonePrefix} ${customerInfo.phone}</td></tr>
+              ${customerInfo.email ? `<tr><td style="padding: 5px 0;"><strong>Email:</strong></td><td>${customerInfo.email}</td></tr>` : ''}
+              ${orderType === 'delivery' && customerInfo.address ? `<tr><td style="padding: 5px 0;"><strong>Dirección:</strong></td><td>${customerInfo.address}</td></tr>` : ''}
+              ${customerInfo.notes ? `<tr><td style="padding: 5px 0;"><strong>Notas:</strong></td><td>${customerInfo.notes}</td></tr>` : ''}
+            </table>
+
+            <h2 style="color: #333; border-bottom: 2px solid #e11d48; padding-bottom: 10px;">🛒 Detalle del Pedido</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <thead>
+                <tr style="background-color: #f8f8f8;">
+                  <th style="padding: 10px; text-align: left;">Cant.</th>
+                  <th style="padding: 10px; text-align: left;">Producto</th>
+                  <th style="padding: 10px; text-align: right;">Precio</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+
+            <div style="background-color: #f0fdf4; border-radius: 8px; padding: 15px; text-align: right;">
+              <p style="margin: 5px 0; font-size: 18px;"><strong>TOTAL: ${finalTotal.toFixed(2)}€</strong></p>
+            </div>
+
+            <p style="color: #666; font-size: 12px; text-align: center; margin-top: 30px;">
+              Este email fue generado automáticamente por el sistema de pedidos de Thai Express.
+            </p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const emailResponse = await resend.emails.send({
+        from: "Thai Express <onboarding@resend.dev>",
+        to: ["f.gonzalez@aientik.es"],
+        subject: `🍜 Nuevo Pedido #${order.order_number} - Thai Express`,
+        html: emailHtml,
+      });
+
+      console.log("Email sent successfully:", emailResponse);
+    } catch (emailError) {
+      // Log but don't fail - order is already saved
+      console.error("Email error (non-fatal):", emailError);
+    }
 
     // Send to Relevance AI (server-to-server, internal call)
     try {
@@ -186,8 +264,6 @@ ${customerInfo.notes ? `Notas: ${customerInfo.notes}` : ''}
 PEDIDO:
 ${items.map(item => `${item.quantity}x ${item.name} - ${(item.price * item.quantity).toFixed(2)}€`).join('\n')}
 
-Subtotal: ${total.toFixed(2)}€
-Gastos de envío: ${deliveryFee === 0 ? 'GRATIS' : `${deliveryFee.toFixed(2)}€`}
 TOTAL: ${finalTotal.toFixed(2)}€
       `.trim();
 
@@ -215,34 +291,9 @@ TOTAL: ${finalTotal.toFixed(2)}€
       console.error('Relevance AI error (non-fatal):', relevanceError);
     }
 
-    // Build WhatsApp URL
-    const orderDetails = `
-NUEVO PEDIDO THAI EXPRESS - PAGO CONTRA REEMBOLSO
-TIPO: ${orderType === 'pickup' ? '🏪 RECOGER EN RESTAURANTE' : '🚚 DOMICILIO'}
-
-Cliente: ${customerInfo.name}
-Teléfono: ${customerInfo.phonePrefix} ${customerInfo.phone}
-${customerInfo.email ? `Email: ${customerInfo.email}` : ''}
-${orderType === 'delivery' ? `Dirección: ${customerInfo.address}` : ''}
-${customerInfo.notes ? `Observaciones: ${customerInfo.notes}` : ''}
-
-PEDIDO:
-${items.map(item => `${item.quantity}x ${item.name} - ${(item.price * item.quantity).toFixed(2)}€`).join('\n')}
-
-Subtotal: ${total.toFixed(2)}€
-${deliveryFee > 0 ? `Gastos de envío: ${deliveryFee.toFixed(2)}€` : 'Envío GRATIS (pedido > 15€)'}
-TOTAL: ${finalTotal.toFixed(2)}€
-
-💳 FORMA DE PAGO: Contra reembolso (efectivo)
-    `.trim();
-
-    const whatsappMessage = encodeURIComponent(orderDetails);
-    const whatsappUrl = `https://wa.me/34951401937?text=${whatsappMessage}`;
-
     return new Response(
       JSON.stringify({ 
         success: true,
-        whatsappUrl,
         orderId: order.id,
         orderNumber: order.order_number
       }),

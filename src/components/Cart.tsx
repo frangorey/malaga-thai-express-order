@@ -40,8 +40,8 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const { toast } = useToast();
 
   const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = total > 15 ? 0 : 2.50;
-  const finalTotal = total + deliveryFee;
+  const deliveryFee = 0; // Solo recogida en restaurante, sin gastos de envío
+  const finalTotal = total;
 
   const handleStripePayment = async () => {
     if (!orderType) {
@@ -203,23 +203,17 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         throw error;
       }
 
-      if (data?.whatsappUrl) {
-        // Validate URL length
-        if (data.whatsappUrl.length > 2000) {
-          toast({
-            title: "Pedido muy grande",
-            description: "Tu pedido es demasiado grande para WhatsApp. Por favor, usa el pago con tarjeta o reduce el número de productos.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
+      if (data?.success) {
         // Track order for realtime updates
         if (data.orderNumber) {
           trackOrder(data.orderNumber);
         }
         
-        window.open(data.whatsappUrl, '_blank');
+        // Show success message to customer
+        toast({
+          title: "¡Pedido tramitado!",
+          description: "Tu pedido ha sido recibido y está siendo preparado en cocina. Te avisaremos cuando esté listo para recoger.",
+        });
         
         // Clear form after successful order
         setOrderType(null);
@@ -231,8 +225,14 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
           email: "",
           notes: ""
         });
+        
+        // Clear cart items
+        items.forEach(item => onRemoveItem(item.id));
+        
+        // Close cart
+        onClose();
       } else {
-        throw new Error('No se recibió URL de WhatsApp');
+        throw new Error(data?.error || 'Error al procesar el pedido');
       }
 
     } catch (error) {
@@ -321,26 +321,9 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
               <Card className="mb-6 neon-border">
                 <CardContent className="p-4">
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Subtotal:</span>
+                    <div className="flex justify-between font-bold text-lg neon-text">
+                      <span>TOTAL:</span>
                       <span>{total.toFixed(2)}€</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Gastos de envío:</span>
-                      <span className={deliveryFee === 0 ? "text-green-500 font-bold" : ""}>
-                        {deliveryFee === 0 ? "GRATIS" : `${deliveryFee.toFixed(2)}€`}
-                      </span>
-                    </div>
-                    {deliveryFee > 0 && (
-                      <p className="text-xs text-muted-foreground">
-                        Envío gratis en pedidos superiores a 15€
-                      </p>
-                    )}
-                    <div className="border-t pt-2">
-                      <div className="flex justify-between font-bold text-lg neon-text">
-                        <span>TOTAL:</span>
-                        <span>{finalTotal.toFixed(2)}€</span>
-                      </div>
                     </div>
                   </div>
                 </CardContent>
