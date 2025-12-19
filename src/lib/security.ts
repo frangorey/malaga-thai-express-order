@@ -41,9 +41,10 @@ export const customerInfoSchema = z.object({
     }),
   address: z.string()
     .trim()
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(500, 'La dirección es demasiado larga')
-    .refine((val) => sanitizeInput(val).length >= 10, {
+    .refine((val) => val === 'N/A' || (val.length >= 10 && val.length <= 500), {
+      message: 'La dirección debe tener al menos 10 caracteres'
+    })
+    .refine((val) => val === 'N/A' || sanitizeInput(val).length >= 10, {
       message: 'La dirección contiene caracteres no válidos'
     }),
   email: z.string()
