@@ -223,39 +223,47 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
     // Map noodle type IDs to DB subcategories
     const noodleTypeMap: Record<string, string> = {
       "finos": "Finos",
-      "gruesos": "Gruesos", 
-      "arroz": "Arroz",
-      "trigo": "Trigo"
+      "anchos": "Anchos", 
+      "glass": "Glass",
+      "udon": "Udon"
     };
 
-    // Map sauce IDs to DB subcategories
-    const sauceMap: Record<string, string> = {
-      "classic": "Classic",
-      "original": "Original",
-      "teriyaki": "Teriyaki"
-    };
-
-    // Map protein IDs to search patterns
-    const proteinMap: Record<string, string> = {
-      "pollo": "pollo",
-      "ternera": "ternera",
-      "gambas": "gambas",
-      "pollo_ternera": "mix 2 con pollo y ternera",
-      "pollo_gambas": "mix 2 con pollo y gambas",
-      "ternera_gambas": "mix 2 con ternera y gambas",
-      "pollo_ternera_gambas": "mix 3 con pollo, ternera y gambas"
+    // Map protein IDs to search patterns in product name
+    const proteinMap: Record<string, string[]> = {
+      "pollo": ["con pollo classic", "con pollo original", "con pollo teriyaki"],
+      "ternera": ["con ternera classic", "con ternera original", "con ternera teriyaki"],
+      "gambas": ["con gambas classic", "con gambas original", "con gambas teriyaki"],
+      "pollo_ternera": ["mix 2 con pollo y ternera"],
+      "pollo_gambas": ["mix 2 con pollo y gambas"],
+      "ternera_gambas": ["mix 2 con ternera y gambas"],
+      "pollo_ternera_gambas": ["mix 3 con pollo, ternera y gambas"]
     };
 
     const noodleType = noodleTypeMap[selectedNoodleType] || "Finos";
-    const sauce = sauceMap[selectedSauce] || "Classic";
-    const proteinPattern = proteinMap[selectedProtein] || "";
+    const proteinPatterns = proteinMap[selectedProtein] || [];
+
+    // Build the expected product name pattern
+    // Product names are like: "Tallarines Finos con pollo classic"
+    // or "Tallarines Finos MIX 2 con pollo y ternera classic"
+    
+    // For single proteins, include the sauce in the pattern
+    let searchPattern = "";
+    if (["pollo", "ternera", "gambas"].includes(selectedProtein)) {
+      // Single protein - sauce is at the end of the name
+      const proteinName = selectedProtein === "pollo" ? "pollo" : 
+                          selectedProtein === "ternera" ? "ternera" : "gambas";
+      searchPattern = `con ${proteinName} ${selectedSauce}`;
+    } else {
+      // Mix proteins - sauce is at the end after the protein combo
+      const proteinCombo = proteinPatterns[0] || "";
+      searchPattern = `${proteinCombo} ${selectedSauce}`;
+    }
 
     // Find matching product in DB
     const matchingProduct = products.find(p => 
       p.category === "Tallarines" && 
-      p.subcategory?.toLowerCase().includes(noodleType.toLowerCase()) &&
-      p.subcategory?.toLowerCase().includes(sauce.toLowerCase()) &&
-      p.name.toLowerCase().includes(proteinPattern.toLowerCase())
+      p.subcategory?.toLowerCase() === noodleType.toLowerCase() &&
+      p.name.toLowerCase().includes(searchPattern.toLowerCase())
     );
 
     return matchingProduct || null;
