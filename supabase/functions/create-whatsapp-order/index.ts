@@ -236,8 +236,8 @@ serve(async (req) => {
       `;
 
       const emailResponse = await resend.emails.send({
-        from: "Panda Poke <pedidos@aientik.es>",
-        to: ["f.gonzalez@aientik.es"],
+        from: "Thai Express <pedidos@aientik.es>",
+        to: ["recoger@thaiiexpress.es"],
         subject: `🍜 Nuevo Pedido #${order.order_number} - Thai Express`,
         html: emailHtml,
       });
