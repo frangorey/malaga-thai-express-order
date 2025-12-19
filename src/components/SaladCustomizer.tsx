@@ -50,14 +50,19 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
       ingredients: t('salad_malaysia_ingredients')
     },
     {
-      id: "singapore",
+      id: "singapur",
       name: t('salad_singapore'),
       ingredients: t('salad_singapore_ingredients')
     },
     {
-      id: "thai",
+      id: "thailandia",
       name: t('salad_thai'),
       ingredients: t('salad_thai_ingredients')
+    },
+    {
+      id: "noodles",
+      name: t('salad_noodles'),
+      ingredients: t('salad_noodles_ingredients')
     },
     {
       id: "crispy",
@@ -65,7 +70,7 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
       ingredients: t('salad_crispy_ingredients')
     },
     {
-      id: "fruit",
+      id: "fruta",
       name: t('salad_fruit'),
       ingredients: t('salad_fruit_ingredients')
     }
@@ -115,28 +120,34 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedSalad || !selectedProtein) return null;
 
-    // Map salad and protein to DB products
-    const saladMap: Record<string, string> = {
-      "crispy": "Crispy",
+    // Map salad IDs to DB subcategories
+    const saladSubcategoryMap: Record<string, string> = {
+      "cesar": "Cesar",
+      "classic": "Classic",
+      "malaysia": "Malaysia",
+      "singapur": "Singapur",
+      "thailandia": "Thailandia",
       "noodles": "Noodles",
-      "thai": "Thai"
+      "crispy": "Crispy",
+      "fruta": "Fruta"
     };
 
-    const proteinMap: Record<string, string> = {
-      "pollo": "pollo",
-      "langostino": "langostino",
-      "salmon": "salmón",
-      "none": ""
+    // Map protein IDs to name patterns
+    const proteinNameMap: Record<string, string> = {
+      "none": "normal",
+      "chicken": "con pollo",
+      "shrimp": "con langostino",
+      "both": "Mixta con pollo y langostino"
     };
 
-    const saladName = saladMap[selectedSalad] || "";
-    const proteinName = proteinMap[selectedProtein] || "";
+    const subcategory = saladSubcategoryMap[selectedSalad] || "";
+    const proteinPattern = proteinNameMap[selectedProtein] || "";
 
-    // Find matching product in DB
+    // Find matching product in DB by subcategory and name pattern
     const matchingProduct = products.find(p => 
       p.category === "Ensaladas" && 
-      p.name.toLowerCase().includes(saladName.toLowerCase()) &&
-      (proteinName === "" || p.name.toLowerCase().includes(proteinName.toLowerCase()))
+      p.subcategory?.toLowerCase() === subcategory.toLowerCase() &&
+      p.name.toLowerCase().includes(proteinPattern.toLowerCase())
     );
 
     return matchingProduct || null;
