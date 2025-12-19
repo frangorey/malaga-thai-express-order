@@ -363,13 +363,19 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                       <span className="text-xs opacity-80">En restaurante</span>
                     </Button>
                     <Button
-                      variant={orderType === 'delivery' ? 'default' : 'outline'}
-                      className="h-auto py-6 flex flex-col gap-2"
-                      onClick={() => setOrderType('delivery')}
+                      variant="outline"
+                      className="h-auto py-6 flex flex-col gap-2 opacity-60"
+                      onClick={() => {
+                        toast({
+                          title: "Servicio no disponible",
+                          description: "Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante",
+                          variant: "destructive",
+                        });
+                      }}
                     >
                       <Truck className="w-6 h-6" />
                       <span className="font-semibold">Domicilio</span>
-                      <span className="text-xs opacity-80">A tu dirección</span>
+                      <span className="text-xs opacity-80">No disponible</span>
                     </Button>
                   </div>
                 </CardContent>
