@@ -236,7 +236,7 @@ serve(async (req) => {
       `;
 
       const emailResponse = await resend.emails.send({
-        from: "Thai Express <pedidos@aientik.es>",
+        from: "Thai Express <pedidos@thaiiexpress.es>",
         to: ["recoger@thaiiexpress.es"],
         subject: `🍜 Nuevo Pedido #${order.order_number} - Thai Express`,
         html: emailHtml,
