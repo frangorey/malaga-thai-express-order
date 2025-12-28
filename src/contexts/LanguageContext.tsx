@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type Language = 'es' | 'en' | 'fr';
+export type Language = 'es' | 'en' | 'fr' | 'de';
 
 interface LanguageContextType {
   language: Language;
@@ -28,7 +28,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   // Load saved language from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem('thaii-language') as Language;
-    if (savedLanguage && ['es', 'en', 'fr'].includes(savedLanguage)) {
+    if (savedLanguage && ['es', 'en', 'fr', 'de'].includes(savedLanguage)) {
       setLanguage(savedLanguage);
     }
   }, []);
@@ -1237,6 +1237,402 @@ const translations = {
     'drink_26_desc': 'Verre de Vin',
     'drink_27': 'Bouteille de Vin',
     'drink_27_desc': 'Bouteille de Vin',
+    'drink_28': 'Tinto de Verano',
+    'drink_28_desc': 'Tinto de Verano'
+  },
+  
+  de: {
+    // Header
+    'cart': 'Warenkorb',
+    'phone': '951 40 19 37',
+    'address': 'Plaza de la Solidaridad, 9 - Málaga',
+    
+    // Hero
+    'prepare_to_taste': 'BEREITEN SIE ES',
+    'to_your_liking': 'NACH IHREM GESCHMACK',
+    'choose_what_you_like': 'Wählen Sie, was Ihnen am besten gefällt und...',
+    'take_it_home': 'nehmen Sie es mit nach Hause!',
+    'order_online': 'ONLINE BESTELLEN',
+    'call_us': 'ANRUFEN: 951 40 19 37',
+    
+    // Auth
+    'auth_title': 'Bei Thaii Express anmelden',
+    'login': 'Anmelden',
+    'signup': 'Registrieren',
+    'email': 'E-Mail',
+    'password': 'Passwort',
+    'loading': 'Laden...',
+    'login_success': 'Anmeldung erfolgreich!',
+    'signup_success': 'Konto erstellt!',
+    'check_email_confirmation': 'Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen.',
+    'logout': 'Abmelden',
+    'myOrders': 'Meine Bestellungen',
+    
+    // Main Categories
+    'entrantes': 'Vorspeisen',
+    'arroz': 'Reis',
+    'tallarines': 'Nudeln',
+    'sopas': 'Suppen',
+    'pokes': 'Pokes',
+    'postres': 'Desserts',
+    'ensaladas': 'Salate',
+    'bebidas': 'Getränke',
+    
+    // Proteins
+    'chicken': 'Hähnchen',
+    'beef': 'Rindfleisch',
+    'pork': 'Schweinefleisch',
+    'shrimp': 'Garnelen',
+    'vegetables': 'Gemüse',
+    'select_protein': 'Wählen Sie Ihr Protein',
+    'protein_tab': 'Protein',
+    
+    // Sauces
+    'teriyaki': 'Teriyaki',
+    'sweet_sour': 'Süß-Sauer',
+    'curry_sauce': 'Curry',
+    'soy_sauce': 'Sojasauce',
+    'spicy_sauce': 'Scharf',
+    'select_sauce': 'Wählen Sie Ihre Sauce',
+    'sauce_tab': 'Sauce',
+    'spicy_level': 'Schärfegrad',
+    
+    // Rice Customizer
+    'rice_customizer_title': 'Passen Sie Ihren Reis an',
+    'rice_customizer_description': 'Wählen Sie Ihr Lieblingsprotein und Ihre Lieblingssauce, um Ihr perfektes Gericht zu kreieren',
+    'customize_rice': 'Reis anpassen',
+    'selected_items': 'Ausgewählte Artikel',
+    
+    // Subcategories
+    'classic': 'Klassisch',
+    'yellow_curry': 'Gelbes Curry',
+    'green_curry': 'Grünes Curry',
+    'red_curry': 'Rotes Curry',
+    
+    // Common
+    'price': 'Preis',
+    'add_to_cart': 'In den Warenkorb',
+    'vegetarian': 'Vegetarisch',
+    'spicy': 'Scharf',
+    
+    // Cart
+    'your_cart': 'Ihr Warenkorb',
+    'empty_cart': 'Ihr Warenkorb ist leer',
+    'quantity': 'Menge',
+    'remove': 'Entfernen',
+    'subtotal': 'Zwischensumme',
+    'delivery_fee': 'Liefergebühr',
+    'total': 'Gesamt',
+    'customer_info': 'Kundeninformationen',
+    'name': 'Name',
+    'phone_number': 'Telefon',
+    'address_full': 'Vollständige Adresse',
+    'notes': 'Notizen (optional)',
+    'send_order_whatsapp': 'BESTELLUNG PER WHATSAPP SENDEN',
+    
+    // Dialog
+    'doubts_about_dishes': 'Haben Sie Fragen zu unseren Gerichten?',
+    'khopi_greeting': 'Hallo! Ich bin Khopi, das Maskottchen von Thaii Express. Wenn Sie Fragen zu Zutaten haben oder Hilfe bei der Auswahl brauchen, rufen Sie uns an!',
+    'see_full_menu': 'VOLLSTÄNDIGES MENÜ ANSEHEN',
+    
+    // Footer
+    'restaurant_description': 'Authentisches asiatisches Essen zum Mitnehmen. Bereiten Sie es nach Ihrem Geschmack zu und nehmen Sie es mit nach Hause.',
+    'contact_title': 'KONTAKT',
+    'hours_title': 'ÖFFNUNGSZEITEN',
+    'monday_sunday': 'Montag - Sonntag',
+    'hours_time': '12:00 - 23:00',
+    'online_orders_available': 'Online-Bestellungen während der gesamten Öffnungszeiten verfügbar',
+    'all_rights_reserved': '© 2024 Thaii Express Málaga. Alle Rechte vorbehalten.',
+    'top_sales': 'Bestseller',
+    
+    // Loading and Error states
+    'loading_products': 'Produkte laden...',
+    'error_loading': 'Fehler',
+    'retry': 'Wiederholen',
+    'coming_soon': 'Demnächst verfügbar...',
+    
+    // Category descriptions
+    'starters_description': 'Köstliche Vorspeisen, um Ihr kulinarisches Erlebnis zu beginnen',
+    'noodles_description': 'Traditionelle asiatische Nudeln gebraten mit frischem Gemüse',
+    'soups_description': 'Wohltuende Suppen mit authentischen asiatischen Geschmacksrichtungen',
+    'pokes_description': 'Frische und gesunde Pokes mit hochwertigen Zutaten',
+    'desserts_description': 'Köstliche Desserts, um Ihr Erlebnis zu versüßen',
+    'salads_description': 'Frische und nahrhafte Salate mit saisonalen Zutaten',
+    'drinks_description': 'Erfrischende Getränke zu Ihrer Mahlzeit',
+    
+    // Rice Customizer Proteins
+    'chicken_protein': 'Hähnchen',
+    'beef_protein': 'Rindfleisch',
+    'shrimp_protein': 'Garnelen',
+    'chicken_beef': 'Hähnchen & Rindfleisch',
+    'chicken_shrimp': 'Hähnchen & Garnelen',
+    'beef_shrimp': 'Rindfleisch & Garnelen',
+    'mix_three': 'Hähnchen, Rindfleisch & Garnelen',
+    
+    // Rice Customizer Protein Descriptions
+    'chicken_desc': 'Zartes mariniertes Hähnchen',
+    'beef_desc': 'Saftiges gebratenes Rindfleisch',
+    'shrimp_desc': 'Frische Meeresgarnelen',
+    'chicken_beef_desc': 'Kombination aus Hähnchen und Rindfleisch',
+    'chicken_shrimp_desc': 'Hähnchen mit frischen Garnelen',
+    'beef_shrimp_desc': 'Rindfleisch mit Meeresgarnelen',
+    'mix_three_desc': 'Komplette Proteinkombination',
+    
+    // Rice Customizer Sauces
+    'classic_sauce': 'Klassische Sauce',
+    'original_sauce': 'Originalsauce',
+    'teriyaki_sauce': 'Teriyaki-Sauce',
+    'yellow_curry_sauce': 'Gelbes Curry',
+    'green_curry_sauce': 'Grünes Curry',
+    'red_curry_sauce': 'Rotes Curry',
+    
+    // Rice Customizer Sauce Descriptions
+    'classic_sauce_desc': 'Traditionelle asiatische Sauce',
+    'original_sauce_desc': 'Unser Spezialrezept',
+    'teriyaki_sauce_desc': 'Süße und herzhafte japanische Sauce',
+    'yellow_curry_sauce_desc': 'Mildes gelbes Curry',
+    'green_curry_sauce_desc': 'Mittelscharfes grünes Curry',
+    'red_curry_sauce_desc': 'Intensives scharfes rotes Curry',
+    
+    // Spicy levels
+    'medium_spicy': 'Mittelscharf',
+    'spicy_level_high': 'Scharf',
+    
+    // Custom rice creation
+    'custom_rice_with': 'Gebratener Reis mit',
+    'custom_rice_and': 'und',
+    'custom_rice_desc': 'Individueller gebratener Reis mit',
+
+    // Noodle types
+    'noodle_finos': 'Dünn (Nudeln)',
+    'noodle_anchos': 'Breit (Pad Thai)',
+    'noodle_glass': 'Glasnudeln',
+    'noodle_udon': 'Udon',
+    'noodle_finos_desc': 'Traditionelle dünne Nudeln',
+    'noodle_anchos_desc': 'Breite Pad Thai-Nudeln',
+    'noodle_glass_desc': 'Transparente Reisnudeln',
+    'noodle_udon_desc': 'Dicke japanische Nudeln',
+
+    // Noodle customizer
+    'noodle_customizer_title': 'PASSEN SIE IHRE NUDELN AN',
+    'noodle_customizer_description': 'Wählen Sie Ihre Nudelsorte, Lieblingsprotein und perfekte Sauce',
+    'step_noodle_type': 'Nudelsorte',
+    'step_protein': 'Protein',
+    'step_sauce': 'Sauce',
+    'noodle_type': 'Nudelsorte',
+    'custom_noodles_with': 'Individuelle Nudeln mit',
+    'custom_noodles_and': 'und',
+    'custom_noodles_desc': 'Im Wok gebratene Nudeln mit',
+    'custom_noodles_with_sauce': 'mit Sauce',
+    'order_summary': 'Bestellübersicht',
+    'protein': 'Protein',
+    'sauce': 'Sauce',
+    
+    // Extra vegetables
+    'extra_vegetables': 'Zusätzliches Gemüse',
+    'extra_vegetables_optional': 'Zusätzliches Gemüse (Optional)',
+    'extra_vegetables_desc': 'Wählen Sie das zusätzliche Gemüse, das Sie Ihrem Gericht hinzufügen möchten',
+    'extra_vegetables_label': 'Zusätzliches Gemüse',
+    'step_vegetables': 'Zusätzliches Gemüse',
+    
+    // Vegetable names
+    'veg_egg': 'Ei',
+    'veg_cilantro': 'Koriander',
+    'veg_basil': 'Basilikum',
+    'veg_bean_sprouts': 'Sojasprossen',
+    'veg_red_onion': 'Rote Zwiebel',
+    'veg_corn': 'Mais',
+    'veg_green_beans': 'Grüne Bohnen',
+    'veg_carrot': 'Karotte',
+    'veg_peanut': 'Erdnuss',
+    'veg_broccoli': 'Brokkoli',
+    'veg_scallion': 'Frühlingszwiebel',
+    'veg_mushroom': 'Pilze',
+    'veg_pepper': 'Paprika',
+
+    // Enhanced protein translations
+    'protein_chicken': 'Hähnchen',
+    'protein_beef': 'Rindfleisch',
+    'protein_shrimp': 'Garnelen',
+    'protein_chicken_desc': 'Frische und zarte Hähnchenbrust',
+    'protein_beef_desc': 'Zartes Premium-Rindfleisch',
+    'protein_shrimp_desc': 'Frische Meeresgarnelen',
+    'protein_chicken_beef': 'Hähnchen & Rindfleisch',
+    'protein_chicken_shrimp': 'Hähnchen & Garnelen',
+    'protein_beef_shrimp': 'Rindfleisch & Garnelen',
+    'protein_chicken_beef_shrimp': 'Hähnchen, Rindfleisch & Garnelen',
+    'protein_chicken_beef_desc': 'Perfekte Kombination aus Hähnchen und Rindfleisch',
+    'protein_chicken_shrimp_desc': 'Köstliche Mischung aus Hähnchen und Garnelen',
+    'protein_beef_shrimp_desc': 'Exquisite Kombination aus Rindfleisch und Garnelen',
+    'protein_chicken_beef_shrimp_desc': 'Dreifach-Protein: Hähnchen, Rindfleisch und Garnelen',
+
+    // Enhanced sauce translations
+    'sauce_classic': 'Klassisch',
+    'sauce_original': 'Original',
+    'sauce_teriyaki': 'Teriyaki',
+    'sauce_classic_desc': 'Soja- und Austernsauce',
+    'sauce_original_desc': 'Koriander, Sojasprossen, Karotte, Erdnuss, Tamarindensauce und Limette',
+    'sauce_teriyaki_desc': 'Traditionelle Teriyaki-Sauce',
+    
+    // Entrantes translations - German
+    'panko_chicken': 'Panko-Hähnchen (5 Stück)',
+    'panko_chicken_desc': 'Knusprige Hähnchenstücke paniert mit japanischem Panko',
+    'panko_shrimp': 'Panko-Garnelen (5 Stück)',
+    'panko_shrimp_desc': 'Garnelen paniert mit knusprigem Panko',
+    'chicken_skewer_1': 'Hähnchen-Spieß (1 Stück)',
+    'chicken_skewer_1_desc': 'Marinierter gegrillter Hähnchen-Spieß',
+    'chicken_skewer_2': 'Hähnchen-Spieß (2 Stück)',
+    'chicken_skewer_2_desc': 'Zwei marinierte gegrillte Hähnchen-Spieße',
+    'shrimp_skewer_1': 'Garnelen-Spieß (1 Stück)',
+    'shrimp_skewer_1_desc': 'Frischer gegrillter Garnelen-Spieß',
+    'shrimp_skewer_2': 'Garnelen-Spieß (2 Stück)',
+    'shrimp_skewer_2_desc': 'Zwei frische gegrillte Garnelen-Spieße',
+    'mushroom_skewer_1': 'Pilz-Spieß (1 Stück)',
+    'mushroom_skewer_1_desc': 'Frischer gegrillter Pilz-Spieß',
+    'mushroom_skewer_2': 'Pilz-Spieß (2 Stück)',
+    'mushroom_skewer_2_desc': 'Zwei frische gegrillte Pilz-Spieße',
+    'grilled_salmon': 'Gegrillter Lachs mit Fruchtsauce',
+    'grilled_salmon_desc': 'Gegrilltes Lachsfilet mit unserer speziellen Fruchtsauce',
+    'spring_rolls': 'Frühlingsrollen (2 Stück)',
+    'spring_rolls_desc': 'Knusprige Rollen gefüllt mit frischem Gemüse',
+    'shrimp_rolls': 'Garnelen-Rollen (8 Stück)',
+    'shrimp_rolls_desc': 'Knusprige Rollen gefüllt mit frischen Garnelen',
+    'chicken_wings': 'Flügel (6 Stück)',
+    'chicken_wings_desc': 'Marinierte und gewürzte Hähnchenflügel',
+    'gyoza_fried': 'Frittierte Garnelen-Gyoza (6 Stück)',
+    'gyoza_fried_desc': 'Japanische Teigtaschen gefüllt mit Garnelen, frittiert',
+    'gyoza_grilled': 'Gegrillte Garnelen-Gyoza (6 Stück)',
+    'gyoza_grilled_desc': 'Japanische Teigtaschen gefüllt mit Garnelen, gegrillt',
+    'bao_chicken': 'Hähnchen-Bao (2 Stück)',
+    'bao_chicken_desc': 'Asiatisches gedämpftes Brötchen gefüllt mit zartem Hähnchen',
+    'bao_shrimp': 'Garnelen-Bao (2 Stück)',
+    'bao_shrimp_desc': 'Asiatisches gedämpftes Brötchen gefüllt mit frischen Garnelen',
+    'edamame': 'Edamame',
+    'edamame_desc': 'Gekochte Sojabohnenhülsen mit Meersalz',
+    'edamame_spicy': 'Scharfe Edamame',
+    'edamame_spicy_desc': 'Gekochte Sojabohnenhülsen mit scharfen Gewürzen',
+
+    // Soup Customizer
+    'soup_customizer_title': 'Passen Sie Ihre Suppe an',
+    'soup_customizer_description': 'Wählen Sie Ihre Lieblingssuppe und Ihr Protein',
+    'step_soup_type': 'Wählen Sie Ihre Suppenart',
+    'soup_type': 'Suppenart',
+    'soup_miso': 'Miso-Suppe',
+    'soup_miso_desc': 'Tofu, Wakame, Frühlingszwiebel und Meeresfrüchtesauce',
+    'soup_tom_yam': 'Tom Yam-Suppe',
+    'soup_tom_yam_desc': 'Pilze, Karotte, Brokkoli, Kirschtomaten, Meeresfrüchtesauce, mittelscharf',
+    'custom_soup_with': 'Individuelle Suppe mit',
+    'custom_soup_desc': 'und Ihren Lieblingszutaten',
+    'prawn': 'Garnele',
+    'veggie': 'Vegetarisch',
+
+    // Poke customizer
+    'poke_customizer_title': 'Passen Sie Ihr Poke an',
+    'poke_customizer_description': 'Wählen Sie Ihre Lieblings-Poke-Bowl mit frischen Zutaten',
+    'step_poke_type': 'Poke-Typ',
+    'choose_your_poke': 'Wählen Sie Ihr bevorzugtes Poke',
+    'poke_type': 'Poke-Typ',
+    'selected': 'Ausgewählt',
+
+    // Poke products
+    'poke_korean_name': 'Koreanisches Poke',
+    'poke_korean_desc': 'Japanische Reisbasis mit Sojasauce, Crispy Hähnchen, Kimchi, Kiwi, Tofu, Garnelen, Algen, gebratene Zwiebeln, Sesam, Sojasauce und Kimchi-Sauce',
+    'poke_japanese_name': 'Japanisches Poke',
+    'poke_japanese_desc': 'Japanische Reisbasis mit Sojasauce, Wakame, Avocado, Sesam, Kirschtomaten, Kiwi, Lachs, Garnelen, japanische Sauce und Sojasauce',
+    'poke_indonesia_name': 'Indonesisches Poke',
+    'poke_indonesia_desc': 'Japanische Reisbasis mit Sojasauce, Avocado, Sesam, Mango, Ananas, Kiwi, Kirschtomaten, Gurke, Sojasauce und Fruchtsauce',
+    'poke_thailand_name': 'Thailand Poke',
+    'poke_thailand_desc': 'Japanische Reisbasis mit Sojasauce, Avocado, Ananas, Kiwi, Garnelen, Sesam, gebratene Zwiebeln, Hähnchen, Pfeffersauce und Fruchtsauce',
+    'poke_basic_name': 'Basic Poke',
+    'poke_basic_desc': 'Nach Wahl: 150g Hähnchen oder 2 Crispy Hähnchen, Sesam und 3 Gemüse/Früchte aus (Wakame, Kimchi, Tofu, Algen, Gurke, Avocado, Kiwi, Kirschtomaten, Ananas, Erdbeere, Mango), plus eine Sauce (Kimchi, Soja, Rosa, Frucht, Japanisch, Caesar, Süß-Sauer)',
+    'poke_premium_name': 'Premium Poke',
+    'poke_premium_desc': 'Nach Wahl: 100g Lachs oder 150g Hähnchen oder 2 Crispy Hähnchen, Sesam und Garnelen, plus 4 Gemüse/Früchte aus (Wakame, Kimchi, Tofu, Algen, Gurke, Avocado, Kiwi, Kirschtomaten, Ananas, Erdbeere, Mango), plus eine Sauce (Kimchi, Soja, Rosa, Frucht, Japanisch, Caesar, Süß-Sauer)',
+    
+    // Salad Customizer
+    'salad_customizer_title': 'PASSEN SIE IHREN SALAT AN',
+    'salad_customizer_description': 'Wählen Sie Ihren Lieblingssalat und bevorzugtes Protein',
+    'step_salad_type': 'Salattyp',
+    'salad_type': 'Salattyp',
+    
+    // Salad types
+    'salad_cesar': 'Caesar-Salat',
+    'salad_cesar_ingredients': 'Salat, Parmesan, Avocado, Kirschtomaten, Croutons, Vinaigrette und Caesar-Sauce',
+    'salad_classic_name': 'Klassischer Salat',
+    'salad_classic_ingredients': 'Salat, Parmesan, Avocado, Kirschtomaten, Gurke, rote Zwiebel, Croutons, Vinaigrette und Caesar-Sauce',
+    'salad_malaysia': 'Malaysia-Salat',
+    'salad_malaysia_ingredients': 'Salat, Gurke, Croutons, Kirschtomaten, Walnüsse, Sesam, Wok-Gemüse, Vinaigrette und Caesar-Sauce',
+    'salad_singapore': 'Singapur-Salat',
+    'salad_singapore_ingredients': 'Salat, Erdnuss, Chili, Gurke, Kirschtomaten, Minze, Koriander, rote Zwiebel, Wok-Rindfleisch, Vinaigrette und Aioli-Sauce',
+    'salad_thai': 'Thailand-Salat',
+    'salad_thai_ingredients': 'Salat, Erdnuss, Nudeln, Limette, Sesam, Vinaigrette und Caesar-Sauce',
+    'salad_noodles': 'Nudel-Salat',
+    'salad_noodles_ingredients': 'Salat, Erdnuss, Limette, Wok-Nudeln mit Karotte, Sesam, Vinaigrette und Caesar-Sauce',
+    'salad_crispy': 'Crispy-Salat',
+    'salad_crispy_ingredients': 'Salat, Karotte, Sojasprossen, Kirschtomaten, rote Zwiebel, Vinaigrette, rosa Sauce (scharf) und Panko nach Wahl (Hähnchen oder Garnelen)',
+    'salad_fruit': 'Obstsalat',
+    'salad_fruit_ingredients': 'Salat, Avocado, Kirschtomaten, Mango, Kiwi, Erdbeere und Fruchtsauce',
+    
+    // Salad protein options
+    'salad_protein_none': 'Ohne Protein',
+    'salad_protein_none_desc': 'Nur Salatzutaten',
+    'salad_protein_chicken': 'Hähnchen hinzufügen',
+    'salad_protein_chicken_desc': 'Salat mit zartem Hähnchen',
+    'salad_protein_shrimp': 'Garnelen hinzufügen',
+    'salad_protein_shrimp_desc': 'Salat mit frischen Garnelen',
+    'salad_protein_both': 'Hähnchen und Garnelen',
+    'salad_protein_both_desc': 'Salat mit Hähnchen und Garnelen',
+    
+    // Drinks Products
+    'drink_1': 'Coca Cola',
+    'drink_1_desc': 'Coca Cola 0,33L',
+    'drink_2': 'Coca Cola Zero',
+    'drink_2_desc': 'Coca Cola Zero 0,33L',
+    'drink_3': 'Fanta Orange',
+    'drink_3_desc': 'Fanta Orange 0,33L',
+    'drink_4': 'Fanta Zitrone',
+    'drink_4_desc': 'Fanta Zitrone 0,33L',
+    'drink_5': 'Nestea Zitrone',
+    'drink_5_desc': 'Nestea Zitrone 0,33L',
+    'drink_6': 'Nestea Maracuja',
+    'drink_6_desc': 'Nestea Maracuja 0,33L',
+    'drink_7': 'Aquarius Zitrone',
+    'drink_7_desc': 'Aquarius Zitrone 0,33L',
+    'drink_8': 'Aquarius Orange',
+    'drink_8_desc': 'Aquarius Orange 0,33L',
+    'drink_9': 'Sprite',
+    'drink_9_desc': 'Sprite 0,33L',
+    'drink_10': 'Wasser',
+    'drink_10_desc': 'Wasser 0,33L',
+    'drink_11': 'Sprudelwasser',
+    'drink_11_desc': 'Sprudelwasser 0,33L',
+    'drink_12': 'Apfelsaft',
+    'drink_12_desc': 'Apfelsaft 0,200L',
+    'drink_13': 'Ananassaft',
+    'drink_13_desc': 'Ananassaft 0,200L',
+    'drink_14': 'Orangensaft',
+    'drink_14_desc': 'Orangensaft 0,200L',
+    'drink_15': 'Pfirsichsaft',
+    'drink_15_desc': 'Pfirsichsaft 0,200L',
+    'drink_16': 'Tomatensaft',
+    'drink_16_desc': 'Tomatensaft 0,200L',
+    'drink_17': 'Shinga Bier',
+    'drink_17_desc': 'Shinga Bier 1/3',
+    'drink_18': 'Kirin Bier',
+    'drink_18_desc': 'Kirin Bier 1/3',
+    'drink_19': 'San Miguel Spezial Bier',
+    'drink_19_desc': 'San Miguel Spezial Bier 1/3',
+    'drink_20': 'San Miguel Glutenfrei Bier',
+    'drink_20_desc': 'San Miguel Glutenfrei Bier 1/3',
+    'drink_21': 'San Miguel 0.0 Bier',
+    'drink_21_desc': 'San Miguel 0.0 Alkoholfrei Bier 1/3',
+    'drink_22': 'Alhambra Spezial Bier',
+    'drink_22_desc': 'Alhambra Spezial Bier 1/3',
+    'drink_23': 'Alhambra Alkoholfrei Bier',
+    'drink_23_desc': 'Alhambra Alkoholfrei Bier 1/3',
+    'drink_26': 'Glas Wein',
+    'drink_26_desc': 'Glas Wein',
+    'drink_27': 'Flasche Wein',
+    'drink_27_desc': 'Flasche Wein',
     'drink_28': 'Tinto de Verano',
     'drink_28_desc': 'Tinto de Verano'
   }
