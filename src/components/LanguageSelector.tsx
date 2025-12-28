@@ -5,13 +5,15 @@ import { useLanguage, Language } from '@/contexts/LanguageContext';
 const flags = {
   es: '🇪🇸',
   en: '🇬🇧', 
-  fr: '🇫🇷'
+  fr: '🇫🇷',
+  de: '🇩🇪'
 };
 
 const languageNames = {
   es: 'Español',
   en: 'English',
-  fr: 'Français'
+  fr: 'Français',
+  de: 'Deutsch'
 };
 
 export const LanguageSelector = () => {
