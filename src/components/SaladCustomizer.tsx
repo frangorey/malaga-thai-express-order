@@ -37,42 +37,12 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
     {
       id: "cesar",
       name: t('salad_cesar'),
-      ingredients: t('salad_cesar_ingredients')
+      ingredients: "Lechuga, parmesano, aguacate, tomate, picatostes, salsas vinagreta y césar"
     },
     {
       id: "classic",
       name: t('salad_classic_name'),
-      ingredients: t('salad_classic_ingredients')
-    },
-    {
-      id: "malaysia",
-      name: t('salad_malaysia'),
-      ingredients: t('salad_malaysia_ingredients')
-    },
-    {
-      id: "singapur",
-      name: t('salad_singapore'),
-      ingredients: t('salad_singapore_ingredients')
-    },
-    {
-      id: "thailandia",
-      name: t('salad_thai'),
-      ingredients: t('salad_thai_ingredients')
-    },
-    {
-      id: "noodles",
-      name: t('salad_noodles'),
-      ingredients: t('salad_noodles_ingredients')
-    },
-    {
-      id: "crispy",
-      name: t('salad_crispy'),
-      ingredients: t('salad_crispy_ingredients')
-    },
-    {
-      id: "fruta",
-      name: t('salad_fruit'),
-      ingredients: t('salad_fruit_ingredients')
+      ingredients: "Lechuga, parmesano, aguacate, tomates cherry, pepino, cebolla roja, picatostes, salsas vinagreta y césar"
     }
   ];
 

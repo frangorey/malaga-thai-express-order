@@ -106,14 +106,6 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
       image: "/assets/sauce-original.jpg"
     },
     {
-      id: "teriyaki",
-      name: t('sauce_teriyaki'),
-      description: t('sauce_teriyaki_desc'),
-      spicyLevel: 0,
-      color: "bg-orange-600",
-      image: "/assets/sauce-teriyaki.jpg"
-    },
-    {
       id: "curry-amarillo",
       name: t('yellow_curry_sauce'),
       description: t('yellow_curry_sauce_desc'),
@@ -210,8 +202,7 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
       "curry-amarillo": "Curry Amarillo",
       "curry-verde": "Curry Verde",
       "curry-rojo": "Curry Rojo",
-      "original": "Classic",
-      "teriyaki": "Teriyaki"
+      "original": "Original"
     };
 
     // Map protein IDs to search patterns

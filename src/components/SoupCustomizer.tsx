@@ -32,7 +32,7 @@ export const SoupCustomizer = ({ onAddToCart }: SoupCustomizerProps) => {
   ];
 
   const proteins = [
-    { id: "veggie", name: t('veggie'), price: 8.10, isVegetarian: true },
+    { id: "veggie", name: t('veggie'), price: 8.90, isVegetarian: true },
     { id: "pollo", name: t('chicken'), price: 8.90, isVegetarian: false },
     { id: "langostino", name: t('prawn'), price: 9.40, isVegetarian: false }
   ];
