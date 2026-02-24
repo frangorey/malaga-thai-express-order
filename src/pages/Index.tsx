@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MenuSection } from "@/components/MenuSection";
@@ -22,10 +23,14 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
+  const [searchParams] = useSearchParams();
+
+  // Read table number from QR URL param (?mesa=X)
+  const tableNumber = searchParams.get('mesa') ? parseInt(searchParams.get('mesa')!, 10) : null;
+  const validTableNumber = tableNumber && tableNumber >= 1 && tableNumber <= 14 ? tableNumber : null;
 
   // Configurar la categoría activa inicial
   useEffect(() => {
-    // Default to arroz (rice) section
     if (!activeCategory) {
       setActiveCategory("arroz");
     }
@@ -74,25 +79,11 @@ const Index = () => {
     scrollToCategory("arroz");
   };
 
-  const handleRiceCustomization = (product: SupabaseProduct) => {
-    addToCart(product);
-  };
-
-  const handleNoodleCustomization = (product: SupabaseProduct) => {
-    addToCart(product);
-  };
-
-  const handleSoupCustomization = (product: SupabaseProduct) => {
-    addToCart(product);
-  };
-
-  const handlePokeCustomization = (product: SupabaseProduct) => {
-    addToCart(product);
-  };
-
-  const handleSaladCustomization = (product: SupabaseProduct) => {
-    addToCart(product);
-  };
+  const handleRiceCustomization = (product: SupabaseProduct) => addToCart(product);
+  const handleNoodleCustomization = (product: SupabaseProduct) => addToCart(product);
+  const handleSoupCustomization = (product: SupabaseProduct) => addToCart(product);
+  const handlePokeCustomization = (product: SupabaseProduct) => addToCart(product);
+  const handleSaladCustomization = (product: SupabaseProduct) => addToCart(product);
 
   if (loading) {
     return (
@@ -124,6 +115,13 @@ const Index = () => {
         cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
         onCartClick={() => setIsCartOpen(true)}
       />
+      
+      {/* Table banner if scanning QR */}
+      {validTableNumber && (
+        <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
+          🍽️ Estás pidiendo desde la Mesa {validTableNumber}
+        </div>
+      )}
       
       <Hero onOrderClick={handleOrderClick} />
       
@@ -217,6 +215,7 @@ const Index = () => {
           items={cartItems}
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeFromCart}
+          tableNumber={validTableNumber}
         />
       )}
     </main>

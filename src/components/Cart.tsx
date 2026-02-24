@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle, Store, Truck } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle, Store, Truck, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,10 +24,13 @@ interface CartProps {
   items: SupabaseCartItem[];
   onUpdateQuantity: (id: number, quantity: number) => void;
   onRemoveItem: (id: number) => void;
+  tableNumber?: number | null;
 }
 
-export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) => {
-  const [orderType, setOrderType] = useState<'pickup' | 'delivery' | null>(null);
+export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, tableNumber }: CartProps) => {
+  const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in' | null>(
+    tableNumber ? 'dine_in' : null
+  );
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phonePrefix: "",
@@ -39,25 +42,27 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const { toast } = useToast();
 
-  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = 0; // Solo recogida en restaurante, sin gastos de envío
-  const finalTotal = total;
+  // Auto-select dine_in when table number is present
+  useEffect(() => {
+    if (tableNumber) {
+      setOrderType('dine_in');
+    }
+  }, [tableNumber]);
 
-  const handleStripePayment = async () => {
+  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleOrder = async () => {
     if (!orderType) {
       toast({
         title: "Error",
-        description: "Por favor, selecciona si es para recoger o para domicilio",
+        description: "Por favor, selecciona el tipo de pedido",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate customer info based on order type
-    const infoToValidate = orderType === 'pickup' 
-      ? { ...customerInfo, address: 'N/A' } // Don't require address for pickup
-      : customerInfo;
-
+    // Validate customer info - address not needed for pickup/dine_in
+    const infoToValidate = { ...customerInfo, address: 'N/A' };
     const validation = validateCustomerInfo(infoToValidate);
     
     if (!validation.isValid) {
@@ -81,10 +86,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     setIsProcessingPayment(true);
 
     try {
-      // Use the sanitized and validated data from validation result
       const sanitizedInfo = validation.data!;
-
-      // Preparar items para Stripe
       const cartItems = items.map(item => ({
         id: item.id,
         name: item.name,
@@ -93,148 +95,39 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         customizations: item.customizations || []
       }));
 
-      // Enviar datos al agente de Relevance AI (only via create-payment edge function)
-      const orderData = {
-        items: cartItems,
-        customerInfo: sanitizedInfo,
-        orderType: orderType,
-        total: total,
-        deliveryFee: deliveryFee,
-        finalTotal: finalTotal
-      };
-
-      // Llamar al edge function para crear el pago (this will handle sending to Relevance AI)
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: {
-          items: cartItems,
-          customerInfo: sanitizedInfo,
-          deliveryFee: deliveryFee,
-          orderType: orderType
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data?.url) {
-        // Track order for realtime updates
-        if (data.orderNumber) {
-          trackOrder(data.orderNumber);
-        }
-        // Redirigir a Stripe Checkout
-        window.location.href = data.url;
-      } else {
-        throw new Error('No se recibió URL de pago');
-      }
-
-    } catch (error) {
-      toast({
-        title: "Error en el pago",
-        description: "Hubo un problema al procesar tu pago. Por favor, inténtalo de nuevo.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
-
-  const handleWhatsAppOrder = async () => {
-    if (!orderType) {
-      toast({
-        title: "Error",
-        description: "Por favor, selecciona si es para recoger o para domicilio",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate customer info based on order type
-    const infoToValidate = orderType === 'pickup' 
-      ? { ...customerInfo, address: 'N/A' } // Don't require address for pickup
-      : customerInfo;
-
-    const validation = validateCustomerInfo(infoToValidate);
-    
-    if (!validation.isValid) {
-      toast({
-        title: "Error",
-        description: validation.errors[0],
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (items.length === 0) {
-      toast({
-        title: "Error",
-        description: "El carrito está vacío",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsProcessingPayment(true);
-
-    try {
-      // Use the sanitized and validated data from validation result
-      const sanitizedInfo = validation.data!;
-
-      // Preparar items para el pedido
-      const cartItems = items.map(item => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        customizations: item.customizations || []
-      }));
-
-      // Call secure edge function (handles DB save + Relevance AI internally)
       const { data, error } = await supabase.functions.invoke('create-whatsapp-order', {
         body: {
           items: cartItems,
           customerInfo: sanitizedInfo,
           orderType: orderType,
-          deliveryFee: deliveryFee
+          deliveryFee: 0,
+          tableNumber: orderType === 'dine_in' ? tableNumber : null
         }
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (data?.success) {
-        // Track order for realtime updates
         if (data.orderNumber) {
           trackOrder(data.orderNumber);
         }
         
-        // Show success message to customer
+        const typeMsg = orderType === 'dine_in' 
+          ? `Tu pedido para la Mesa ${tableNumber} ha sido recibido.` 
+          : 'Tu pedido ha sido recibido y está siendo preparado.';
+
         toast({
           title: "¡Pedido tramitado!",
-          description: "Tu pedido ha sido recibido y está siendo preparado en cocina. Te avisaremos cuando esté listo para recoger.",
+          description: `${typeMsg} Te avisaremos cuando esté listo.`,
         });
         
-        // Clear form after successful order
-        setOrderType(null);
-        setCustomerInfo({
-          name: "",
-          phonePrefix: "",
-          phone: "",
-          address: "",
-          email: "",
-          notes: ""
-        });
-        
-        // Clear cart items
+        setOrderType(tableNumber ? 'dine_in' : null);
+        setCustomerInfo({ name: "", phonePrefix: "", phone: "", address: "", email: "", notes: "" });
         items.forEach(item => onRemoveItem(item.id));
-        
-        // Close cart
         onClose();
       } else {
         throw new Error(data?.error || 'Error al procesar el pedido');
       }
-
     } catch (error) {
       toast({
         title: "Error",
@@ -260,6 +153,16 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
             </Button>
           </div>
 
+          {/* Table indicator */}
+          {tableNumber && (
+            <Card className="mb-4 border-primary bg-primary/10">
+              <CardContent className="p-3 flex items-center gap-2">
+                <UtensilsCrossed className="w-5 h-5 text-primary" />
+                <span className="font-semibold text-primary">Mesa {tableNumber}</span>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Cart Items */}
           {items.length === 0 ? (
             <div className="text-center py-12">
@@ -273,11 +176,11 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                   <Card key={item.id} className="bg-card/50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                <img 
-                  src={item.image_url || '/placeholder.svg'} 
-                  alt={item.name}
-                  className="w-16 h-16 object-cover rounded"
-                />
+                        <img 
+                          src={item.image_url || '/placeholder.svg'} 
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
                         <div className="flex-1">
                           <h4 className="font-medium">{item.name}</h4>
                           <p className="text-sm text-muted-foreground">{item.price.toFixed(2)}€</p>
@@ -329,40 +232,42 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 </CardContent>
               </Card>
 
-              {/* Order Type Selection */}
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="text-lg">Tipo de Pedido</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      variant={orderType === 'pickup' ? 'default' : 'outline'}
-                      className="h-auto py-6 flex flex-col gap-2"
-                      onClick={() => setOrderType('pickup')}
-                    >
-                      <Store className="w-6 h-6" />
-                      <span className="font-semibold">Recoger</span>
-                      <span className="text-xs opacity-80">En restaurante</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-auto py-6 flex flex-col gap-2 opacity-60"
-                      onClick={() => {
-                        toast({
-                          title: "Servicio no disponible",
-                          description: "Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante",
-                          variant: "destructive",
-                        });
-                      }}
-                    >
-                      <Truck className="w-6 h-6" />
-                      <span className="font-semibold">Domicilio</span>
-                      <span className="text-xs opacity-80">No disponible</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Order Type Selection - only if not dine_in via QR */}
+              {!tableNumber && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Tipo de Pedido</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant={orderType === 'pickup' ? 'default' : 'outline'}
+                        className="h-auto py-6 flex flex-col gap-2"
+                        onClick={() => setOrderType('pickup')}
+                      >
+                        <Store className="w-6 h-6" />
+                        <span className="font-semibold">Recoger</span>
+                        <span className="text-xs opacity-80">En restaurante</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-6 flex flex-col gap-2 opacity-60"
+                        onClick={() => {
+                          toast({
+                            title: "Servicio no disponible",
+                            description: "Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante",
+                            variant: "destructive",
+                          });
+                        }}
+                      >
+                        <Truck className="w-6 h-6" />
+                        <span className="font-semibold">Domicilio</span>
+                        <span className="text-xs opacity-80">No disponible</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Customer Info Form */}
               {orderType && (
@@ -460,19 +365,6 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                       />
                     </div>
                     
-                    {orderType === 'delivery' && (
-                      <div>
-                        <Label htmlFor="address">Dirección de entrega *</Label>
-                        <Textarea
-                          id="address"
-                          value={customerInfo.address}
-                          onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
-                          placeholder="Calle, número, piso, código postal..."
-                          rows={3}
-                        />
-                      </div>
-                    )}
-                    
                     <div>
                       <Label htmlFor="notes">Observaciones</Label>
                       <Textarea
@@ -487,40 +379,27 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 </Card>
               )}
 
-              {/* Payment Options */}
+              {/* Payment - Only pay in store */}
               <div className="space-y-3">
                 <Button 
                   variant="neon" 
                   className="w-full text-lg py-6"
-                  onClick={handleStripePayment}
-                  disabled={isProcessingPayment}
+                  onClick={handleOrder}
+                  disabled={isProcessingPayment || !orderType}
                 >
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  {isProcessingPayment ? "PROCESANDO..." : "PAGAR CON TARJETA"}
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">O</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full text-lg py-6"
-                  onClick={handleWhatsAppOrder}
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  PAGAR CONTRA REEMBOLSO
+                  <Store className="w-5 h-5 mr-2" />
+                  {isProcessingPayment 
+                    ? "PROCESANDO..." 
+                    : orderType === 'dine_in' 
+                      ? `PEDIR A MESA ${tableNumber}` 
+                      : "REALIZAR PEDIDO"}
                 </Button>
               </div>
               
               <p className="text-xs text-muted-foreground text-center mt-4">
-                💳 Pago seguro con tarjeta vía Stripe<br />
-                💰 O paga en efectivo al recibir tu pedido
+                {orderType === 'dine_in' 
+                  ? '🍽️ Tu pedido se enviará directamente a cocina · Paga al camarero' 
+                  : '💰 Paga en el restaurante al recoger tu pedido'}
               </p>
             </>
           )}

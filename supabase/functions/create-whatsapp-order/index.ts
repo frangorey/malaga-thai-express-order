@@ -27,8 +27,9 @@ interface CustomerInfo {
 interface OrderRequest {
   items: CartItem[];
   customerInfo: CustomerInfo;
-  orderType: 'pickup' | 'delivery';
+  orderType: 'pickup' | 'delivery' | 'dine_in';
   deliveryFee: number;
+  tableNumber?: number | null;
 }
 
 // Server-side validation
@@ -64,8 +65,16 @@ function validateOrderRequest(data: unknown): { valid: boolean; error?: string; 
   }
 
   // Order type validation
-  if (req.orderType !== 'pickup' && req.orderType !== 'delivery') {
+  if (req.orderType !== 'pickup' && req.orderType !== 'delivery' && req.orderType !== 'dine_in') {
     return { valid: false, error: 'Invalid order type' };
+  }
+
+  // Table number validation for dine_in
+  if (req.orderType === 'dine_in') {
+    const tableNum = typeof req.tableNumber === 'number' ? req.tableNumber : null;
+    if (!tableNum || tableNum < 1 || tableNum > 14) {
+      return { valid: false, error: 'Invalid table number' };
+    }
   }
 
   // Address validation for delivery
@@ -98,8 +107,9 @@ function validateOrderRequest(data: unknown): { valid: boolean; error?: string; 
         email: info.email ? (info.email as string).trim() : undefined,
         notes: info.notes ? sanitize(info.notes as string) : undefined,
       },
-      orderType: req.orderType as 'pickup' | 'delivery',
+      orderType: req.orderType as 'pickup' | 'delivery' | 'dine_in',
       deliveryFee: typeof req.deliveryFee === 'number' ? req.deliveryFee : 0,
+      tableNumber: req.orderType === 'dine_in' ? (req.tableNumber as number) : null,
     }
   };
 }
@@ -123,7 +133,7 @@ serve(async (req) => {
       );
     }
 
-    const { items, customerInfo, orderType, deliveryFee } = validation.data;
+    const { items, customerInfo, orderType, deliveryFee, tableNumber } = validation.data;
 
     // Calculate totals
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -152,12 +162,13 @@ serve(async (req) => {
       customer_email: customerInfo.email || null,
       delivery_address: orderType === 'delivery' ? customerInfo.address : null,
       order_type: orderType,
+      table_number: orderType === 'dine_in' ? tableNumber : null,
       items: items,
       total_amount: finalTotal,
       delivery_fee: deliveryFee,
       payment_method: 'cash',
       payment_status: 'pending',
-      order_status: 'preparing', // Set to preparing since order is confirmed
+      order_status: 'preparing',
       notes: customerInfo.notes || null
     }).select().single();
 
@@ -196,7 +207,7 @@ serve(async (req) => {
             
             <div style="background-color: #fef2f2; border-left: 4px solid #e11d48; padding: 15px; margin-bottom: 20px;">
               <strong>Nº Pedido:</strong> ${order.order_number}<br>
-              <strong>Tipo:</strong> ${orderType === 'pickup' ? '🏪 Recoger en restaurante' : '🚚 Entrega a domicilio'}<br>
+              <strong>Tipo:</strong> ${orderType === 'dine_in' ? `🍽️ Mesa ${tableNumber}` : orderType === 'pickup' ? '🏪 Recoger en restaurante' : '🚚 Entrega a domicilio'}<br>
               <strong>Pago:</strong> Contra reembolso (efectivo)
             </div>
 
@@ -252,7 +263,7 @@ serve(async (req) => {
     try {
       const orderSummary = `
 NUEVO PEDIDO THAI EXPRESS
-Tipo: ${orderType === 'pickup' ? 'Recoger en restaurante' : 'Entrega a domicilio'}
+Tipo: ${orderType === 'dine_in' ? `Mesa ${tableNumber}` : orderType === 'pickup' ? 'Recoger en restaurante' : 'Entrega a domicilio'}
 
 DATOS DEL CLIENTE:
 Nombre: ${customerInfo.name}
