@@ -33,16 +33,36 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [activeTab, setActiveTab] = useState("salad");
 
-  const saladTypes: SaladType[] = [
+   const saladTypes: SaladType[] = [
     {
       id: "cesar",
       name: t('salad_cesar'),
-      ingredients: "Lechuga, parmesano, aguacate, tomate, picatostes, salsas vinagreta y césar"
+      ingredients: t('salad_cesar_ingredients')
     },
     {
       id: "classic",
       name: t('salad_classic_name'),
-      ingredients: "Lechuga, parmesano, aguacate, tomates cherry, pepino, cebolla roja, picatostes, salsas vinagreta y césar"
+      ingredients: t('salad_classic_ingredients')
+    },
+    {
+      id: "malaysia",
+      name: t('salad_malaysia'),
+      ingredients: t('salad_malaysia_ingredients')
+    },
+    {
+      id: "thailandia",
+      name: t('salad_thai'),
+      ingredients: t('salad_thai_ingredients')
+    },
+    {
+      id: "crispy",
+      name: t('salad_crispy'),
+      ingredients: t('salad_crispy_ingredients')
+    },
+    {
+      id: "fruta",
+      name: t('salad_fruit'),
+      ingredients: t('salad_fruit_ingredients')
     }
   ];
 
@@ -179,7 +199,7 @@ export const SaladCustomizer = ({ onAddToCart }: SaladCustomizerProps) => {
             </TabsList>
 
             <TabsContent value="salad" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {saladTypes.map((salad) => (
                   <Card
                     key={salad.id}

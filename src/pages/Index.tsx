@@ -196,11 +196,11 @@ const Index = () => {
           </div>
         )}
 
-        {activeCategory === "otras" && (
+         {activeCategory === "otras" && (
           <div id="category-otras" className="py-8">
             <MenuSection 
-              title="OTRAS COSAS DEL MUNDO"
-              description="Platos especiales de otras cocinas del mundo"
+              title={t('otras_title')}
+              description={t('otras_description')}
               items={getProductsByCategory('Otras del Mundo')}
               onAddToCart={addToCart}
             />
