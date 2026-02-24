@@ -453,37 +453,39 @@ export const RiceCustomizer = ({ onAddToCart }: RiceCustomizerProps) => {
                 ))}
               </div>
 
-              {selectedProtein && selectedSauce && (
-                <div className="text-center bg-card/50 backdrop-blur-sm p-6 rounded-lg border">
-                  <h3 className="text-xl font-bold mb-4">{t('order_summary')}</h3>
-                  <div className="space-y-2 mb-4">
-                    <p><strong>{t('protein')}:</strong> {proteins.find(p => p.id === selectedProtein)?.name}</p>
-                    <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
-                    {selectedVegetables.length > 0 && (
-                      <p><strong>{t('extra_vegetables_label')}:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
-                    )}
-                    {selectedExtras.length > 0 && (
-                      <p><strong>{t('extras_label')}:</strong> {selectedExtras.map(id => {
-                        const extra = allExtras.find(e => e.id === id);
-                        return extra ? t(extra.nameKey) : '';
-                      }).join(", ")}</p>
-                    )}
-                    <p className="text-xl font-bold neon-text">
-                      <strong>{t('total')}:</strong> {getTotalPrice().toFixed(2)}€
-                    </p>
-                  </div>
-                  <Button
-                    variant="neon"
-                    size="lg"
-                    onClick={handleAddToCart}
-                    className="w-full md:w-auto"
-                  >
-                    {t('add_to_cart')}
-                  </Button>
-                </div>
-              )}
             </TabsContent>
           </Tabs>
+
+          {/* Order summary - always visible when selections are made */}
+          {selectedProtein && selectedSauce && (
+            <div className="text-center bg-card/50 backdrop-blur-sm p-6 rounded-lg border mt-8">
+              <h3 className="text-xl font-bold mb-4">{t('order_summary')}</h3>
+              <div className="space-y-2 mb-4">
+                <p><strong>{t('protein')}:</strong> {proteins.find(p => p.id === selectedProtein)?.name}</p>
+                <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
+                {selectedVegetables.length > 0 && (
+                  <p><strong>{t('extra_vegetables_label')}:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
+                )}
+                {selectedExtras.length > 0 && (
+                  <p><strong>{t('extras_label')}:</strong> {selectedExtras.map(id => {
+                    const extra = allExtras.find(e => e.id === id);
+                    return extra ? t(extra.nameKey) : '';
+                  }).join(", ")}</p>
+                )}
+                <p className="text-xl font-bold neon-text">
+                  <strong>{t('total')}:</strong> {getTotalPrice().toFixed(2)}€
+                </p>
+              </div>
+              <Button
+                variant="neon"
+                size="lg"
+                onClick={handleAddToCart}
+                className="w-full md:w-auto"
+              >
+                {t('add_to_cart')}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </section>
