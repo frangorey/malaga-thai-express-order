@@ -139,14 +139,6 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
       spicyLevel: 0,
       color: "bg-green-500",
       image: "/assets/sauce-original.jpg"
-    },
-    {
-      id: "teriyaki",
-      name: t('sauce_teriyaki'),
-      description: t('sauce_teriyaki_desc'),
-      spicyLevel: 0,
-      color: "bg-orange-600",
-      image: "/assets/sauce-teriyaki.jpg"
     }
   ];
 

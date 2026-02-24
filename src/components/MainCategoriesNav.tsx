@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ChefHat, Wheat, Utensils, Soup, Fish, IceCream, Salad, Coffee, LucideIcon } from "lucide-react";
+import { ChefHat, Wheat, Utensils, Soup, Fish, IceCream, Salad, Coffee, Globe, LucideIcon } from "lucide-react";
 
 interface MainCategoriesNavProps {
   activeCategory: string;
@@ -15,6 +15,7 @@ const mainCategories: { id: string; name: string; icon: LucideIcon }[] = [
   { id: "pokes", name: "Pokes", icon: Fish },
   { id: "postres", name: "Postres", icon: IceCream },
   { id: "ensaladas", name: "Ensaladas", icon: Salad },
+  { id: "otras", name: "Otras del Mundo", icon: Globe },
   { id: "bebidas", name: "Bebidas", icon: Coffee },
 ];
 
@@ -23,7 +24,7 @@ export const MainCategoriesNav = ({ activeCategory, onCategoryChange }: MainCate
   return (
     <nav className="bg-background/95 backdrop-blur-sm border-b border-border py-3 sm:py-4 lg:py-6">
       <div className="container mx-auto px-3 sm:px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3 lg:gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-9 gap-2 sm:gap-3 lg:gap-4">
           {mainCategories.map((category) => {
             const Icon = category.icon;
             return (

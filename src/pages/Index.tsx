@@ -170,11 +170,12 @@ const Index = () => {
 
         {activeCategory === "postres" && (
           <div id="category-postres" className="py-8">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('postres')}</h2>
-              <p className="text-muted-foreground mb-8">{t('desserts_description')}</p>
-              <p className="text-lg text-muted-foreground">{t('coming_soon')}</p>
-            </div>
+            <MenuSection 
+              title={t('postres')}
+              description={t('desserts_description')}
+              items={getProductsByCategory('Postres')}
+              onAddToCart={addToCart}
+            />
           </div>
         )}
 
@@ -190,6 +191,17 @@ const Index = () => {
               title={t('bebidas')}
               description={t('drinks_description')}
               items={getProductsByCategory('Bebidas')}
+              onAddToCart={addToCart}
+            />
+          </div>
+        )}
+
+        {activeCategory === "otras" && (
+          <div id="category-otras" className="py-8">
+            <MenuSection 
+              title="OTRAS COSAS DEL MUNDO"
+              description="Platos especiales de otras cocinas del mundo"
+              items={getProductsByCategory('Otras del Mundo')}
               onAddToCart={addToCart}
             />
           </div>
