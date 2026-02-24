@@ -1,4 +1,4 @@
-import { ShoppingCart, Phone, MapPin, LogIn, UserPlus, LogOut, ClipboardList, Shield } from "lucide-react";
+import { ShoppingCart, Phone, MapPin, LogIn, UserPlus, LogOut, ClipboardList, Shield, UtensilsCrossed } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -18,7 +18,7 @@ export const Header = ({
 }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isModerator } = useUserRole();
   
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -62,6 +62,17 @@ export const Header = ({
                     >
                       <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span className="hidden md:inline text-sm">Admin</span>
+                    </Button>
+                  </Link>
+                )}
+                {isModerator && !isAdmin && (
+                  <Link to="/waiter">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 h-9 sm:h-10 border-primary/50 text-primary hover:bg-primary/10"
+                    >
+                      <UtensilsCrossed className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="hidden md:inline text-sm">Pedidos</span>
                     </Button>
                   </Link>
                 )}

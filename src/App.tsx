@@ -12,6 +12,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
 import OrderHistory from "./pages/OrderHistory";
 import AdminPanel from "./pages/AdminPanel";
+import WaiterPanel from "./pages/WaiterPanel";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/orders" element={<OrderHistory />} />
               <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/waiter" element={<WaiterPanel />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-cancelled" element={<PaymentCancelled />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
