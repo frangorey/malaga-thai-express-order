@@ -88,6 +88,7 @@ const translations = {
     'pokes': 'Pokes',
     'postres': 'Postres',
     'ensaladas': 'Ensaladas',
+    'otras': 'Otras del Mundo',
     'bebidas': 'Bebidas',
     
     // Proteins
@@ -222,7 +223,7 @@ const translations = {
     'noodle_udon': 'Udon',
     'noodle_finos_desc': 'Tallarines finos tradicionales',
     'noodle_anchos_desc': 'Tallarines anchos estilo Pad Thai',
-    'noodle_glass_desc': 'Tallarines transparentes de arroz',
+    'noodle_glass_desc': 'Tallarines transparentes de habas',
     'noodle_udon_desc': 'Tallarines gruesos japoneses',
 
     // Noodle customizer
@@ -303,8 +304,8 @@ const translations = {
     'mushroom_skewer_1_desc': 'Pincho de champiñones frescos a la plancha',
     'mushroom_skewer_2': 'Pinchito de champiñones (2 unidades)',
     'mushroom_skewer_2_desc': 'Dos pinchos de champiñones frescos a la plancha',
-    'grilled_salmon': 'Salmón a la plancha con salsa fruta',
-    'grilled_salmon_desc': 'Filete de salmón a la plancha con nuestra salsa de fruta especial',
+    'grilled_salmon': 'Salmón a la plancha',
+    'grilled_salmon_desc': 'Filete de salmón fresco a la plancha',
     'spring_rolls': 'Rollito de primavera (2 unidades)',
     'spring_rolls_desc': 'Rollitos crujientes rellenos de verduras frescas',
     'shrimp_rolls': 'Rollito de gambas (8 unidades)',
@@ -368,9 +369,10 @@ const translations = {
     
     // Salad types
     'salad_cesar': 'Ensalada César',
-    'salad_cesar_ingredients': 'Lechuga, Parmesano, Aguacate, Tomates cherry, picatostes, salsa vinagreta y salsa césar',
+    'salad_cesar_ingredients': 'Lechuga, parmesano, aguacate, tomate, picatostes, salsas vinagreta y césar',
     'salad_classic_name': 'Ensalada Classic',
-    'salad_classic_ingredients': 'Lechuga, Parmesano, Aguacate, Tomates cherry, pepino, cebolla roja, picatostes, salsa vinagreta y salsa césar',
+    'salad_classic_ingredients': 'Lechuga, parmesano, aguacate, tomates cherry, pepino, cebolla roja, picatostes, salsas vinagreta y césar',
+    
     'salad_malaysia': 'Ensalada Malaysia',
     'salad_malaysia_ingredients': 'Lechuga, pepino, picatostes, tomate cherry, nueces, sésamo, verduras al wok, salsa vinagreta y salsa césar',
     'salad_singapore': 'Ensalada Singapur',
@@ -484,6 +486,7 @@ const translations = {
     'pokes': 'Pokes',
     'postres': 'Desserts',
     'ensaladas': 'Salads',
+    'otras': 'World Dishes',
     'bebidas': 'Drinks',
     
     // Proteins
@@ -618,7 +621,7 @@ const translations = {
     'noodle_udon': 'Udon',
     'noodle_finos_desc': 'Traditional thin noodles',
     'noodle_anchos_desc': 'Wide Pad Thai style noodles',
-    'noodle_glass_desc': 'Transparent rice noodles',
+    'noodle_glass_desc': 'Transparent bean noodles',
     'noodle_udon_desc': 'Thick Japanese noodles',
 
     // Noodle customizer
@@ -699,8 +702,8 @@ const translations = {
     'mushroom_skewer_1_desc': 'Fresh grilled mushroom skewer',
     'mushroom_skewer_2': 'Mushroom skewer (2 pieces)',
     'mushroom_skewer_2_desc': 'Two fresh grilled mushroom skewers',
-    'grilled_salmon': 'Grilled salmon with fruit sauce',
-    'grilled_salmon_desc': 'Grilled salmon fillet with our special fruit sauce',
+    'grilled_salmon': 'Grilled salmon',
+    'grilled_salmon_desc': 'Fresh grilled salmon fillet',
     'spring_rolls': 'Spring rolls (2 pieces)',
     'spring_rolls_desc': 'Crispy rolls filled with fresh vegetables',
     'shrimp_rolls': 'Shrimp rolls (8 pieces)',
@@ -764,9 +767,9 @@ const translations = {
     
     // Salad types
     'salad_cesar': 'Caesar Salad',
-    'salad_cesar_ingredients': 'Lettuce, Parmesan, Avocado, Cherry tomatoes, croutons, vinaigrette and caesar sauce',
+    'salad_cesar_ingredients': 'Lettuce, parmesan, avocado, tomato, croutons, vinaigrette and caesar sauce',
     'salad_classic_name': 'Classic Salad',
-    'salad_classic_ingredients': 'Lettuce, Parmesan, Avocado, Cherry tomatoes, cucumber, red onion, croutons, vinaigrette and caesar sauce',
+    'salad_classic_ingredients': 'Lettuce, parmesan, avocado, cherry tomatoes, cucumber, red onion, croutons, vinaigrette and caesar sauce',
     'salad_malaysia': 'Malaysia Salad',
     'salad_malaysia_ingredients': 'Lettuce, cucumber, croutons, cherry tomatoes, walnuts, sesame, wok vegetables, vinaigrette and caesar sauce',
     'salad_singapore': 'Singapore Salad',
@@ -880,6 +883,7 @@ const translations = {
     'pokes': 'Pokes',
     'postres': 'Desserts',
     'ensaladas': 'Salades',
+    'otras': 'Plats du Monde',
     'bebidas': 'Boissons',
     
     // Proteins
@@ -1014,7 +1018,7 @@ const translations = {
     'noodle_udon': 'Udon',
     'noodle_finos_desc': 'Nouilles fines traditionnelles',
     'noodle_anchos_desc': 'Nouilles larges style Pad Thai',
-    'noodle_glass_desc': 'Nouilles de riz transparentes',
+    'noodle_glass_desc': 'Vermicelles transparents de haricots',
     'noodle_udon_desc': 'Nouilles japonaises épaisses',
 
     // Noodle customizer
@@ -1095,8 +1099,8 @@ const translations = {
     'mushroom_skewer_1_desc': 'Brochette de champignons frais grillés',
     'mushroom_skewer_2': 'Brochette de champignons (2 pièces)',
     'mushroom_skewer_2_desc': 'Deux brochettes de champignons frais grillés',
-    'grilled_salmon': 'Saumon grillé sauce aux fruits',
-    'grilled_salmon_desc': 'Filet de saumon grillé avec notre sauce aux fruits spéciale',
+    'grilled_salmon': 'Saumon grillé',
+    'grilled_salmon_desc': 'Filet de saumon frais grillé',
     'spring_rolls': 'Rouleaux de printemps (2 pièces)',
     'spring_rolls_desc': 'Rouleaux croustillants farcis aux légumes frais',
     'shrimp_rolls': 'Rouleaux de crevettes (8 pièces)',
@@ -1276,6 +1280,7 @@ const translations = {
     'pokes': 'Pokes',
     'postres': 'Desserts',
     'ensaladas': 'Salate',
+    'otras': 'Weltgerichte',
     'bebidas': 'Getränke',
     
     // Proteins
@@ -1410,7 +1415,7 @@ const translations = {
     'noodle_udon': 'Udon',
     'noodle_finos_desc': 'Traditionelle dünne Nudeln',
     'noodle_anchos_desc': 'Breite Pad Thai-Nudeln',
-    'noodle_glass_desc': 'Transparente Reisnudeln',
+    'noodle_glass_desc': 'Transparente Bohnennudeln',
     'noodle_udon_desc': 'Dicke japanische Nudeln',
 
     // Noodle customizer
@@ -1491,8 +1496,8 @@ const translations = {
     'mushroom_skewer_1_desc': 'Frischer gegrillter Pilz-Spieß',
     'mushroom_skewer_2': 'Pilz-Spieß (2 Stück)',
     'mushroom_skewer_2_desc': 'Zwei frische gegrillte Pilz-Spieße',
-    'grilled_salmon': 'Gegrillter Lachs mit Fruchtsauce',
-    'grilled_salmon_desc': 'Gegrilltes Lachsfilet mit unserer speziellen Fruchtsauce',
+    'grilled_salmon': 'Gegrillter Lachs',
+    'grilled_salmon_desc': 'Frisches gegrilltes Lachsfilet',
     'spring_rolls': 'Frühlingsrollen (2 Stück)',
     'spring_rolls_desc': 'Knusprige Rollen gefüllt mit frischem Gemüse',
     'shrimp_rolls': 'Garnelen-Rollen (8 Stück)',
