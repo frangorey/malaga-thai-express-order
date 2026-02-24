@@ -7,6 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
 import { useProducts } from "@/hooks/useProducts";
 import { useToast } from "@/hooks/use-toast";
+import { allExtras, ExtraItem } from "@/data/extrasData";
 
 interface NoodleType {
   id: string;
@@ -49,6 +50,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
   const [selectedProtein, setSelectedProtein] = useState<string>("");
   const [selectedSauce, setSelectedSauce] = useState<string>("");
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("noodle");
 
   const noodleTypes: NoodleType[] = [
@@ -200,19 +202,30 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
     );
   };
 
+  const handleExtraToggle = (extraId: string) => {
+    setSelectedExtras(prev => 
+      prev.includes(extraId) 
+        ? prev.filter(id => id !== extraId)
+        : [...prev, extraId]
+    );
+  };
+
   const getTotalPrice = (): number => {
     const basePrice = getPrice(selectedProtein);
     const vegetablesPrice = selectedVegetables.reduce((sum, vegId) => {
       const veg = vegetables.find(v => v.id === vegId);
       return sum + (veg?.price || 0);
     }, 0);
-    return basePrice + vegetablesPrice;
+    const extrasPrice = selectedExtras.reduce((sum, extraId) => {
+      const extra = allExtras.find(e => e.id === extraId);
+      return sum + (extra?.price || 0);
+    }, 0);
+    return basePrice + vegetablesPrice + extrasPrice;
   };
 
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedNoodleType || !selectedProtein || !selectedSauce) return null;
 
-    // Map noodle type IDs to DB subcategories
     const noodleTypeMap: Record<string, string> = {
       "finos": "Finos",
       "anchos": "Anchos", 
@@ -220,7 +233,6 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
       "udon": "Udon"
     };
 
-    // Map protein IDs to search patterns in product name
     const proteinMap: Record<string, string[]> = {
       "pollo": ["con pollo classic", "con pollo original", "con pollo teriyaki"],
       "ternera": ["con ternera classic", "con ternera original", "con ternera teriyaki"],
@@ -234,24 +246,16 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
     const noodleType = noodleTypeMap[selectedNoodleType] || "Finos";
     const proteinPatterns = proteinMap[selectedProtein] || [];
 
-    // Build the expected product name pattern
-    // Product names are like: "Tallarines Finos con pollo classic"
-    // or "Tallarines Finos MIX 2 con pollo y ternera classic"
-    
-    // For single proteins, include the sauce in the pattern
     let searchPattern = "";
     if (["pollo", "ternera", "gambas"].includes(selectedProtein)) {
-      // Single protein - sauce is at the end of the name
       const proteinName = selectedProtein === "pollo" ? "pollo" : 
                           selectedProtein === "ternera" ? "ternera" : "gambas";
       searchPattern = `con ${proteinName} ${selectedSauce}`;
     } else {
-      // Mix proteins - sauce is at the end after the protein combo
       const proteinCombo = proteinPatterns[0] || "";
       searchPattern = `${proteinCombo} ${selectedSauce}`;
     }
 
-    // Find matching product in DB
     const matchingProduct = products.find(p => 
       p.category === "Tallarines" && 
       p.subcategory?.toLowerCase() === noodleType.toLowerCase() &&
@@ -279,29 +283,46 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
       .map(id => vegetables.find(v => v.id === id)?.name)
       .filter(Boolean);
 
+    const extrasNames = selectedExtras
+      .map(id => {
+        const extra = allExtras.find(e => e.id === id);
+        return extra ? t(extra.nameKey) : null;
+      })
+      .filter(Boolean);
+
+    const allCustomizations = [...vegetablesNames, ...extrasNames] as string[];
+
     const vegetablesPrice = selectedVegetables.reduce((sum, vegId) => {
       const veg = vegetables.find(v => v.id === vegId);
       return sum + (veg?.price || 0);
     }, 0);
 
+    const extrasPrice = selectedExtras.reduce((sum, extraId) => {
+      const extra = allExtras.find(e => e.id === extraId);
+      return sum + (extra?.price || 0);
+    }, 0);
+
     const customProduct: SupabaseProduct = {
       ...baseProduct,
-      name: vegetablesNames.length > 0 
-        ? `${baseProduct.name} + ${vegetablesNames.join(", ")}`
+      name: allCustomizations.length > 0 
+        ? `${baseProduct.name} + ${allCustomizations.join(", ")}`
         : baseProduct.name,
-      price: baseProduct.price + vegetablesPrice,
-      customizations: vegetablesNames
+      price: baseProduct.price + vegetablesPrice + extrasPrice,
+      customizations: allCustomizations
     };
 
     onAddToCart(customProduct);
     
-    // Reset selections
     setSelectedNoodleType("");
     setSelectedProtein("");
     setSelectedSauce("");
     setSelectedVegetables([]);
+    setSelectedExtras([]);
     setActiveTab("noodle");
   };
+
+  const sauceExtras = allExtras.filter(e => e.category === 'sauce');
+  const complementExtras = allExtras.filter(e => e.category === 'complement');
 
   return (
     <section className="py-12 px-4">
@@ -326,7 +347,7 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="noodle">{t('step_noodle_type')}</TabsTrigger>
               <TabsTrigger value="protein" disabled={!selectedNoodleType}>
                 {t('step_protein')}
@@ -336,6 +357,9 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
               </TabsTrigger>
               <TabsTrigger value="vegetables" disabled={!selectedSauce}>
                 {t('step_vegetables')}
+              </TabsTrigger>
+              <TabsTrigger value="extras" disabled={!selectedSauce}>
+                {t('step_extras')}
               </TabsTrigger>
             </TabsList>
 
@@ -430,6 +454,51 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+
+            <TabsContent value="extras" className="mt-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">{t('extras_title')}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{t('extras_desc')}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                {sauceExtras.map((extra) => (
+                  <Card
+                    key={extra.id}
+                    className={`cursor-pointer transition-all duration-300 hover:neon-border ${
+                      selectedExtras.includes(extra.id) ? 'neon-border bg-primary/10' : ''
+                    }`}
+                    onClick={() => handleExtraToggle(extra.id)}
+                  >
+                    <CardHeader className="text-center p-4">
+                      <CardTitle className="text-sm">{t(extra.nameKey)}</CardTitle>
+                      <CardDescription className="text-sm font-bold text-primary">
+                        +{extra.price.toFixed(2)}€
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+                {complementExtras.map((extra) => (
+                  <Card
+                    key={extra.id}
+                    className={`cursor-pointer transition-all duration-300 hover:neon-border ${
+                      selectedExtras.includes(extra.id) ? 'neon-border bg-primary/10' : ''
+                    }`}
+                    onClick={() => handleExtraToggle(extra.id)}
+                  >
+                    <CardHeader className="text-center p-4">
+                      <CardTitle className="text-sm">{t(extra.nameKey)}</CardTitle>
+                      <CardDescription className="text-sm font-bold text-primary">
+                        +{extra.price.toFixed(2)}€
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
 
               {selectedNoodleType && selectedProtein && selectedSauce && (
                 <div className="text-center bg-card/50 backdrop-blur-sm p-6 rounded-lg border">
@@ -440,6 +509,12 @@ export const NoodleCustomizer = ({ onAddToCart }: NoodleCustomizerProps) => {
                     <p><strong>{t('sauce')}:</strong> {sauces.find(s => s.id === selectedSauce)?.name}</p>
                     {selectedVegetables.length > 0 && (
                       <p><strong>{t('extra_vegetables_label')}:</strong> {selectedVegetables.map(id => vegetables.find(v => v.id === id)?.name).join(", ")}</p>
+                    )}
+                    {selectedExtras.length > 0 && (
+                      <p><strong>{t('extras_label')}:</strong> {selectedExtras.map(id => {
+                        const extra = allExtras.find(e => e.id === id);
+                        return extra ? t(extra.nameKey) : '';
+                      }).join(", ")}</p>
                     )}
                     <p className="text-xl font-bold neon-text">
                       <strong>{t('total')}:</strong> {getTotalPrice().toFixed(2)}€
