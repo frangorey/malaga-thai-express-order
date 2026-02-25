@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, Volume2, VolumeX, BellOff } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -24,6 +24,7 @@ interface Order {
   notes: string | null;
   items: any;
   created_at: string;
+  confirmed_at: string | null;
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -41,11 +42,13 @@ const WaiterPanel = () => {
   const { isModerator, isLoading: roleLoading } = useUserRole();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup'>('all');
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const hasUnacknowledgedOrders = useRef(false);
+
+  // Check if there are unconfirmed orders (received status, no confirmed_at)
+  const hasUnconfirmedOrders = orders.some(o => o.order_status === 'received' && !o.confirmed_at);
 
   useEffect(() => {
     if (!roleLoading && !user) {
@@ -58,16 +61,17 @@ const WaiterPanel = () => {
     }
   }, [user, isModerator, roleLoading, navigate]);
 
-  // Repeating loud alarm for pending orders
+  // Repeating loud alarm while there are unconfirmed orders
   useEffect(() => {
-    if (hasUnacknowledgedOrders.current && soundEnabled) {
-      // Play immediately
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current);
+      alarmIntervalRef.current = null;
+    }
+
+    if (hasUnconfirmedOrders) {
       playLoudAlarm();
-      // Then repeat every 12 seconds
       alarmIntervalRef.current = setInterval(() => {
-        if (hasUnacknowledgedOrders.current && soundEnabled) {
-          playLoudAlarm();
-        }
+        playLoudAlarm();
       }, 12000);
     }
 
@@ -77,7 +81,7 @@ const WaiterPanel = () => {
         alarmIntervalRef.current = null;
       }
     };
-  }, [soundEnabled, orders]);
+  }, [hasUnconfirmedOrders]);
 
   useEffect(() => {
     if (isModerator) {
@@ -88,10 +92,7 @@ const WaiterPanel = () => {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'orders' },
-          (payload) => {
-            if (payload.eventType === 'INSERT') {
-              hasUnacknowledgedOrders.current = true;
-            }
+          () => {
             fetchOrders();
           }
         )
@@ -108,14 +109,13 @@ const WaiterPanel = () => {
       const audioCtx = new AudioContext();
       const now = audioCtx.currentTime;
 
-      // Play 3 loud beeps in quick succession for urgency
       for (let i = 0; i < 3; i++) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.frequency.value = i % 2 === 0 ? 1200 : 900; // alternating pitch
-        osc.type = 'square'; // harsher, louder waveform
+        osc.frequency.value = i % 2 === 0 ? 1200 : 900;
+        osc.type = 'square';
         const start = now + i * 0.25;
         gain.gain.setValueAtTime(0.8, start);
         gain.gain.exponentialRampToValueAtTime(0.01, start + 0.2);
@@ -127,12 +127,26 @@ const WaiterPanel = () => {
     }
   };
 
-  const acknowledgeOrders = () => {
-    hasUnacknowledgedOrders.current = false;
-    if (alarmIntervalRef.current) {
-      clearInterval(alarmIntervalRef.current);
-      alarmIntervalRef.current = null;
+  const handleConfirmOrder = async (order: Order) => {
+    setConfirmingId(order.id);
+    const confirmedAt = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        order_status: 'confirmed',
+        confirmed_at: confirmedAt,
+      } as any)
+      .eq('id', order.id);
+
+    if (error) {
+      console.error('Error confirming order:', error);
+      toast.error('Error al confirmar el pedido');
+    } else {
+      toast.success(`Pedido ${order.order_number} tramitado ✅`);
+      fetchOrders();
     }
+    setConfirmingId(null);
   };
 
   const fetchOrders = async () => {
@@ -147,9 +161,8 @@ const WaiterPanel = () => {
       console.error('Error fetching orders:', error);
       toast.error('Error al cargar los pedidos');
     } else {
-      const newOrders = data || [];
+      const newOrders = (data || []) as unknown as Order[];
       if (newOrders.length > orderCountRef.current && orderCountRef.current > 0) {
-        hasUnacknowledgedOrders.current = true;
         toast.success('¡Nuevo pedido recibido!');
       }
       orderCountRef.current = newOrders.length;
@@ -167,14 +180,12 @@ const WaiterPanel = () => {
       return {
         icon: <UtensilsCrossed className="w-4 h-4" />,
         label: `Mesa ${order.table_number || '?'}`,
-        variant: 'default' as const,
         className: 'bg-primary text-primary-foreground',
       };
     }
     return {
       icon: <Store className="w-4 h-4" />,
       label: 'Recoger',
-      variant: 'secondary' as const,
       className: 'bg-secondary text-secondary-foreground',
     };
   };
@@ -198,24 +209,6 @@ const WaiterPanel = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-2xl font-bold text-foreground flex-1">Panel Camarero</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            title={soundEnabled ? 'Silenciar notificaciones' : 'Activar notificaciones'}
-          >
-            {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={acknowledgeOrders}
-            className="animate-pulse"
-            title="Silenciar alarma de pedidos nuevos"
-          >
-            <BellOff className="w-4 h-4 mr-2" />
-            Silenciar alarma
-          </Button>
           <Button variant="outline" size="sm" onClick={fetchOrders} disabled={isLoading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Actualizar
@@ -256,9 +249,10 @@ const WaiterPanel = () => {
               const typeInfo = getOrderTypeInfo(order);
               const statusInfo = STATUS_LABELS[order.order_status] || { label: order.order_status, color: 'bg-muted' };
               const items = Array.isArray(order.items) ? order.items : [];
+              const isReceived = order.order_status === 'received' && !order.confirmed_at;
 
               return (
-                <Card key={order.id} className="border-2 hover:border-primary/50 transition-colors">
+                <Card key={order.id} className={`border-2 transition-colors ${isReceived ? 'border-destructive animate-pulse' : 'hover:border-primary/50'}`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-mono">{order.order_number}</CardTitle>
@@ -269,10 +263,15 @@ const WaiterPanel = () => {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
-                        {format(new Date(order.created_at), 'HH:mm', { locale: es })}
+                        🕐 Pedido: {format(new Date(order.created_at), 'HH:mm:ss', { locale: es })}
                       </span>
                       <Badge className={`${statusInfo.color} text-white`}>{statusInfo.label}</Badge>
                     </div>
+                    {order.confirmed_at && (
+                      <div className="text-sm text-green-600 font-medium">
+                        ✅ Tramitado: {format(new Date(order.confirmed_at), 'HH:mm:ss', { locale: es })}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent className="pt-0 space-y-3">
                     {/* Customer */}
@@ -305,6 +304,20 @@ const WaiterPanel = () => {
                       <span>Total</span>
                       <span>{order.total_amount.toFixed(2)}€</span>
                     </div>
+
+                    {/* Confirm button - only for unconfirmed orders */}
+                    {isReceived && (
+                      <Button
+                        className="w-full mt-2"
+                        variant="neon"
+                        size="lg"
+                        disabled={confirmingId === order.id}
+                        onClick={() => handleConfirmOrder(order)}
+                      >
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        {confirmingId === order.id ? 'Tramitando...' : 'Pedido Tramitado'}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               );
