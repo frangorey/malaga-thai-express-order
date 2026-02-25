@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, Volume2, VolumeX, BellOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -44,6 +44,8 @@ const WaiterPanel = () => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup'>('all');
   const orderCountRef = useRef(0);
+  const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasUnacknowledgedOrders = useRef(false);
 
   useEffect(() => {
     if (!roleLoading && !user) {
@@ -56,6 +58,27 @@ const WaiterPanel = () => {
     }
   }, [user, isModerator, roleLoading, navigate]);
 
+  // Repeating loud alarm for pending orders
+  useEffect(() => {
+    if (hasUnacknowledgedOrders.current && soundEnabled) {
+      // Play immediately
+      playLoudAlarm();
+      // Then repeat every 12 seconds
+      alarmIntervalRef.current = setInterval(() => {
+        if (hasUnacknowledgedOrders.current && soundEnabled) {
+          playLoudAlarm();
+        }
+      }, 12000);
+    }
+
+    return () => {
+      if (alarmIntervalRef.current) {
+        clearInterval(alarmIntervalRef.current);
+        alarmIntervalRef.current = null;
+      }
+    };
+  }, [soundEnabled, orders]);
+
   useEffect(() => {
     if (isModerator) {
       fetchOrders();
@@ -66,8 +89,8 @@ const WaiterPanel = () => {
           'postgres_changes',
           { event: '*', schema: 'public', table: 'orders' },
           (payload) => {
-            if (payload.eventType === 'INSERT' && soundEnabled) {
-              playNotificationSound();
+            if (payload.eventType === 'INSERT') {
+              hasUnacknowledgedOrders.current = true;
             }
             fetchOrders();
           }
@@ -78,23 +101,37 @@ const WaiterPanel = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [isModerator, soundEnabled]);
+  }, [isModerator]);
 
-  const playNotificationSound = () => {
+  const playLoudAlarm = () => {
     try {
       const audioCtx = new AudioContext();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-      oscillator.start(audioCtx.currentTime);
-      oscillator.stop(audioCtx.currentTime + 0.5);
+      const now = audioCtx.currentTime;
+
+      // Play 3 loud beeps in quick succession for urgency
+      for (let i = 0; i < 3; i++) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = i % 2 === 0 ? 1200 : 900; // alternating pitch
+        osc.type = 'square'; // harsher, louder waveform
+        const start = now + i * 0.25;
+        gain.gain.setValueAtTime(0.8, start);
+        gain.gain.exponentialRampToValueAtTime(0.01, start + 0.2);
+        osc.start(start);
+        osc.stop(start + 0.2);
+      }
     } catch (e) {
       console.log('Sound not available');
+    }
+  };
+
+  const acknowledgeOrders = () => {
+    hasUnacknowledgedOrders.current = false;
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current);
+      alarmIntervalRef.current = null;
     }
   };
 
@@ -111,7 +148,8 @@ const WaiterPanel = () => {
       toast.error('Error al cargar los pedidos');
     } else {
       const newOrders = data || [];
-      if (newOrders.length > orderCountRef.current && orderCountRef.current > 0 && soundEnabled) {
+      if (newOrders.length > orderCountRef.current && orderCountRef.current > 0) {
+        hasUnacknowledgedOrders.current = true;
         toast.success('¡Nuevo pedido recibido!');
       }
       orderCountRef.current = newOrders.length;
@@ -167,6 +205,16 @@ const WaiterPanel = () => {
             title={soundEnabled ? 'Silenciar notificaciones' : 'Activar notificaciones'}
           >
             {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={acknowledgeOrders}
+            className="animate-pulse"
+            title="Silenciar alarma de pedidos nuevos"
+          >
+            <BellOff className="w-4 h-4 mr-2" />
+            Silenciar alarma
           </Button>
           <Button variant="outline" size="sm" onClick={fetchOrders} disabled={isLoading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
