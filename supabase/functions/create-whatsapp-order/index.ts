@@ -168,7 +168,8 @@ serve(async (req) => {
       delivery_fee: deliveryFee,
       payment_method: 'cash',
       payment_status: 'pending',
-      order_status: 'preparing',
+      order_status: 'received',
+      order_source: 'whatsapp',
       notes: customerInfo.notes || null
     }).select().single();
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -25,6 +25,7 @@ interface Order {
   items: any;
   created_at: string;
   confirmed_at: string | null;
+  order_source: string;
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -42,7 +43,7 @@ const WaiterPanel = () => {
   const { isModerator, isLoading: roleLoading } = useUserRole();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup'>('all');
+  const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup' | 'delivery'>('all');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -136,7 +137,7 @@ const WaiterPanel = () => {
       .update({
         order_status: 'confirmed',
         confirmed_at: confirmedAt,
-      } as any)
+      })
       .eq('id', order.id);
 
     if (error) {
@@ -183,6 +184,13 @@ const WaiterPanel = () => {
         className: 'bg-primary text-primary-foreground',
       };
     }
+    if (order.order_type === 'delivery') {
+      return {
+        icon: <Store className="w-4 h-4" />,
+        label: 'Domicilio',
+        className: 'bg-purple-600 text-white',
+      };
+    }
     return {
       icon: <Store className="w-4 h-4" />,
       label: 'Recoger',
@@ -221,6 +229,7 @@ const WaiterPanel = () => {
             { key: 'all' as const, label: 'Todos', count: orders.length },
             { key: 'dine_in' as const, label: '🍽️ Mesa', count: orders.filter(o => o.order_type === 'dine_in').length },
             { key: 'pickup' as const, label: '🏪 Recoger', count: orders.filter(o => o.order_type === 'pickup').length },
+            { key: 'delivery' as const, label: '🚚 Domicilio', count: orders.filter(o => o.order_type === 'delivery').length },
           ].map(tab => (
             <Button
               key={tab.key}
@@ -256,10 +265,23 @@ const WaiterPanel = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-mono">{order.order_number}</CardTitle>
-                      <Badge className={`${typeInfo.className} flex items-center gap-1`}>
-                        {typeInfo.icon}
-                        {typeInfo.label}
-                      </Badge>
+                      <div className="flex items-center gap-1">
+                        {order.order_source === 'whatsapp' ? (
+                          <Badge className="bg-green-600 text-white flex items-center gap-1">
+                            <MessageCircle className="w-3 h-3" />
+                            WhatsApp
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-blue-600 text-white flex items-center gap-1">
+                            <Globe className="w-3 h-3" />
+                            Web
+                          </Badge>
+                        )}
+                        <Badge className={`${typeInfo.className} flex items-center gap-1`}>
+                          {typeInfo.icon}
+                          {typeInfo.label}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
