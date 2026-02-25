@@ -71,10 +71,13 @@ function validateOrderRequest(data: unknown): { valid: boolean; error?: string; 
 
   // Table number validation for dine_in
   if (req.orderType === 'dine_in') {
-    const tableNum = typeof req.tableNumber === 'number' ? req.tableNumber : null;
-    if (!tableNum || tableNum < 1 || tableNum > 14) {
+    const raw = req.tableNumber;
+    const tableNum = typeof raw === 'number' ? raw : (typeof raw === 'string' ? parseInt(raw, 10) : NaN);
+    if (isNaN(tableNum) || tableNum < 1 || tableNum > 14) {
       return { valid: false, error: 'Invalid table number' };
     }
+    // Store parsed number
+    (req as Record<string, unknown>).tableNumber = tableNum;
   }
 
   // Address validation for delivery
