@@ -32,17 +32,103 @@ interface OrderRequest {
   tableNumber?: number | null;
 }
 
+// --- Input normalization layer ---
+function normalizePayload(raw: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...raw };
+
+  // orderType / order_type
+  if (out.order_type !== undefined && out.orderType === undefined) {
+    out.orderType = out.order_type;
+  }
+
+  // tableNumber / table_number
+  if (out.table_number !== undefined && out.tableNumber === undefined) {
+    out.tableNumber = out.table_number;
+  }
+
+  // deliveryFee / delivery_fee
+  if (out.delivery_fee !== undefined && out.deliveryFee === undefined) {
+    out.deliveryFee = out.delivery_fee;
+  }
+
+  // items: if string, try JSON.parse
+  if (typeof out.items === 'string') {
+    try {
+      out.items = JSON.parse(out.items as string);
+    } catch {
+      // leave as-is, validation will catch it
+    }
+  }
+
+  // customerInfo: accept nested OR flat Relevance format
+  if (!out.customerInfo || typeof out.customerInfo !== 'object') {
+    const name = out.customer_name ?? out.customerName ?? '';
+    const phonePrefix = out.phone_prefix ?? out.phonePrefix ?? '+34';
+    const phone = out.phone ?? '';
+    const address = out.address ?? out.delivery_address ?? '';
+    const email = out.email ?? out.customer_email ?? '';
+    const notes = out.notes ?? '';
+    out.customerInfo = { name, phonePrefix, phone, address, email, notes };
+  } else {
+    // Also normalise snake_case keys inside customerInfo
+    const ci = out.customerInfo as Record<string, unknown>;
+    if (ci.phone_prefix !== undefined && ci.phonePrefix === undefined) {
+      ci.phonePrefix = ci.phone_prefix;
+    }
+  }
+
+  return out;
+}
+
+// --- Robust table number parser ---
+function parseTableNumber(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number') {
+    if (!Number.isInteger(raw) || raw < 1 || raw > 14) return null;
+    return raw;
+  }
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (!/^[0-9]{1,2}$/.test(trimmed)) return null;
+    const n = Number(trimmed);
+    if (n < 1 || n > 14) return null;
+    return n;
+  }
+  return null;
+}
+
 // Server-side validation
 function validateOrderRequest(data: unknown): { valid: boolean; error?: string; data?: OrderRequest } {
   if (!data || typeof data !== 'object') {
     return { valid: false, error: 'Invalid request body' };
   }
 
-  const req = data as Record<string, unknown>;
+  // Normalize first
+  const req = normalizePayload(data as Record<string, unknown>);
+
+  // Log diagnostic info for debugging
+  console.log('Normalized payload keys:', Object.keys(req));
+  console.log('orderType:', req.orderType, '| tableNumber:', req.tableNumber, '(type:', typeof req.tableNumber, ')');
 
   // Validate items
   if (!Array.isArray(req.items) || req.items.length === 0) {
+    console.error('Validation diagnostic:', { keys: Object.keys(req), itemsType: typeof req.items, reason: 'Cart is empty or not array' });
     return { valid: false, error: 'Cart is empty' };
+  }
+
+  // Validate each item
+  const items: CartItem[] = (req.items as Record<string, unknown>[]).map((item) => ({
+    id: typeof item.id === 'string' ? parseInt(item.id as string, 10) : Number(item.id),
+    name: String(item.name || ''),
+    price: typeof item.price === 'string' ? parseFloat(item.price as string) : Number(item.price),
+    quantity: typeof item.quantity === 'string' ? parseInt(item.quantity as string, 10) : Number(item.quantity),
+    customizations: Array.isArray(item.customizations) ? item.customizations as string[] : undefined,
+  }));
+
+  for (const item of items) {
+    if (isNaN(item.price) || isNaN(item.quantity) || item.quantity < 1) {
+      return { valid: false, error: `Invalid item data: ${item.name}` };
+    }
   }
 
   // Validate customerInfo
@@ -56,28 +142,33 @@ function validateOrderRequest(data: unknown): { valid: boolean; error?: string; 
     return { valid: false, error: 'Invalid customer name' };
   }
 
-  // Phone validation
-  if (typeof info.phonePrefix !== 'string' || info.phonePrefix.length === 0) {
-    return { valid: false, error: 'Missing phone prefix' };
-  }
+  // Phone validation - be lenient with prefix
+  const phonePrefix = typeof info.phonePrefix === 'string' && info.phonePrefix.length > 0
+    ? info.phonePrefix
+    : '+34';
   if (typeof info.phone !== 'string' || !/^[0-9\s\-()]{6,15}$/.test(info.phone)) {
     return { valid: false, error: 'Invalid phone number' };
   }
 
   // Order type validation
   if (req.orderType !== 'pickup' && req.orderType !== 'delivery' && req.orderType !== 'dine_in') {
+    console.error('Validation diagnostic:', { orderType: req.orderType, orderTypeRaw: (data as Record<string, unknown>).order_type, reason: 'Invalid order type' });
     return { valid: false, error: 'Invalid order type' };
   }
 
   // Table number validation for dine_in
+  let tableNumber: number | null = null;
   if (req.orderType === 'dine_in') {
-    const raw = req.tableNumber;
-    const tableNum = typeof raw === 'number' ? raw : (typeof raw === 'string' ? parseInt(raw, 10) : NaN);
-    if (isNaN(tableNum) || tableNum < 1 || tableNum > 14) {
+    tableNumber = parseTableNumber(req.tableNumber);
+    if (tableNumber === null) {
+      console.error('Validation diagnostic:', {
+        tableNumberRaw: req.tableNumber,
+        tableNumberType: typeof req.tableNumber,
+        table_number_raw: (data as Record<string, unknown>).table_number,
+        reason: 'Invalid table number (must be integer 1-14)',
+      });
       return { valid: false, error: 'Invalid table number' };
     }
-    // Store parsed number
-    (req as Record<string, unknown>).tableNumber = tableNum;
   }
 
   // Address validation for delivery
@@ -98,21 +189,25 @@ function validateOrderRequest(data: unknown): { valid: boolean; error?: string; 
   // Sanitize strings (basic HTML stripping)
   const sanitize = (str: string): string => str.replace(/<[^>]*>/g, '').trim();
 
+  const deliveryFee = typeof req.deliveryFee === 'number' ? req.deliveryFee
+    : typeof req.deliveryFee === 'string' ? parseFloat(req.deliveryFee) || 0
+    : 0;
+
   return {
     valid: true,
     data: {
-      items: req.items as CartItem[],
+      items,
       customerInfo: {
         name: sanitize(info.name as string),
-        phonePrefix: (info.phonePrefix as string).trim(),
+        phonePrefix: phonePrefix.trim(),
         phone: (info.phone as string).trim(),
         address: info.address ? sanitize(info.address as string) : undefined,
         email: info.email ? (info.email as string).trim() : undefined,
         notes: info.notes ? sanitize(info.notes as string) : undefined,
       },
       orderType: req.orderType as 'pickup' | 'delivery' | 'dine_in',
-      deliveryFee: typeof req.deliveryFee === 'number' ? req.deliveryFee : 0,
-      tableNumber: req.orderType === 'dine_in' ? (req.tableNumber as number) : null,
+      deliveryFee,
+      tableNumber,
     }
   };
 }
@@ -259,11 +354,10 @@ serve(async (req) => {
 
       console.log("Email sent successfully:", emailResponse);
     } catch (emailError) {
-      // Log but don't fail - order is already saved
       console.error("Email error (non-fatal):", emailError);
     }
 
-    // Send to Relevance AI (server-to-server, internal call)
+    // Send to Relevance AI
     try {
       const orderSummary = `
 NUEVO PEDIDO THAI EXPRESS
@@ -302,7 +396,6 @@ TOTAL: ${finalTotal.toFixed(2)}€
       );
       console.log('Sent to Relevance AI');
     } catch (relevanceError) {
-      // Log but don't fail - order is already saved
       console.error('Relevance AI error (non-fatal):', relevanceError);
     }
 
