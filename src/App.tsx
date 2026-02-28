@@ -16,30 +16,49 @@ import WaiterPanel from "./pages/WaiterPanel";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <OrderStatusTracker />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/orders" element={<OrderHistory />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/waiter" element={<WaiterPanel />} />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/payment-cancelled" element={<PaymentCancelled />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
-);
+// Set to false to restore the app
+const MAINTENANCE_MODE = true;
+
+const App = () => {
+  if (MAINTENANCE_MODE) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl md:text-4xl font-bold text-foreground">
+            Esta página web no está operativa
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground">
+            Disculpen las molestias
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <OrderStatusTracker />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/orders" element={<OrderHistory />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/waiter" element={<WaiterPanel />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
