@@ -17,7 +17,7 @@ import WaiterPanel from "./pages/WaiterPanel";
 const queryClient = new QueryClient();
 
 // Set to false to restore the app
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const App = () => {
   if (MAINTENANCE_MODE) {
