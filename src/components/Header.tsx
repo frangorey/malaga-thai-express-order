@@ -10,11 +10,13 @@ import { useUserRole } from "@/hooks/useUserRole";
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
+  onLogoClick?: () => void;
 }
 
 export const Header = ({
   cartItemsCount,
-  onCartClick
+  onCartClick,
+  onLogoClick
 }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
