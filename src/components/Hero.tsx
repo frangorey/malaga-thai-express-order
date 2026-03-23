@@ -5,12 +5,15 @@ import { getOptimizedImageUrl } from "@/lib/imageOptimization";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef, useEffect } from "react";
 
-// Use WebP-optimized URLs
-const heroImage = getOptimizedImageUrl(
+// URL de tu imagen de respaldo (Poster). Si el vídeo tarda en cargar, se verá esto.
+const heroPosterImage = getOptimizedImageUrl(
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/premium_photo-1697729549014-2faefb25efba.jpg",
   1920,
   75
 );
+
+// URL real del vídeo subido a Supabase
+const heroVideoUrl = "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
 
 const topSalesImages = [
   {
@@ -50,27 +53,32 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
     Autoplay({ delay: 8000, stopOnInteraction: false })
   );
 
-  // Preload hero image for better LCP
+  // Precargamos la imagen del poster por si el dispositivo no puede reproducir el vídeo rápido
   useEffect(() => {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    link.href = heroImage;
+    link.href = heroPosterImage;
     document.head.appendChild(link);
   }, []);
   
   return (
     <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image - Optimized WebP */}
+      {/* BACKGROUND VIDEO - Optimizado para Web y Móvil */}
       <div className="absolute inset-0">
-        <img 
-          src={heroImage}
-          alt="Thaii Express Hero Background"
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={heroPosterImage}
           className="w-full h-full object-cover"
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-        />
+        >
+          <source src={heroVideoUrl} type="video/mp4" />
+          {/* Fallback de seguridad si el navegador no soporta video */}
+          <img src={heroPosterImage} alt="Thaii Express Hero Background" className="w-full h-full object-cover" />
+        </video>
+        {/* Overlay oscuro para garantizar que el texto y los botones se lean perfectamente */}
         <div className="absolute inset-0 bg-black/40"></div>
       </div>
 
