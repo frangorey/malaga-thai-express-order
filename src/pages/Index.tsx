@@ -10,7 +10,7 @@ import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
 
-const TEMP_VIDEO_URL =
+const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -53,7 +53,7 @@ const Index = () => {
           created_at: p.created_at ?? new Date().toISOString(),
           updated_at: p.updated_at ?? new Date().toISOString(),
         } as SupabaseProduct,
-        videoUrl: TEMP_VIDEO_URL,
+        videoUrl: p.video_url || FALLBACK_VIDEO_URL,
         posterUrl: p.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E",
         tags: [] as string[],
       }));
