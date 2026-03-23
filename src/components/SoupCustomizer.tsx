@@ -75,6 +75,7 @@ export const SoupCustomizer = ({ onAddToCart }: SoupCustomizerProps) => {
       is_vegetarian: protein.isVegetarian,
       is_spicy: soupType.isSpicy,
       is_available: true,
+      video_url: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
