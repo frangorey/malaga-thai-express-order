@@ -956,7 +956,64 @@ const translations = {
     'extra_fruta_variada': 'Extra Medium Fruit Mix',
     'extra_mochi': 'Extra Mochi',
     'extra_noodles_frito_huevo': 'Extra Fried Noodles with Egg',
-    'extra_patatas_fritas': 'Extra French Fries'
+    'extra_patatas_fritas': 'Extra French Fries',
+
+    // Cart/Checkout flow
+    'your_order': 'Your Order',
+    'table': 'Table',
+    'ordering_from_table': 'You are ordering from Table',
+    'order_type': 'Order Type',
+    'pickup': 'Pickup',
+    'at_restaurant': 'At restaurant',
+    'delivery': 'Delivery',
+    'not_available': 'Not available',
+    'your_details': 'Your Details',
+    'contact_phone': 'Contact phone',
+    'prefix': 'Prefix',
+    'email_optional': 'Email (optional)',
+    'observations': 'Notes',
+    'notes_placeholder': 'No onion, extra spicy, etc...',
+    'processing': 'PROCESSING...',
+    'order_to_table': 'ORDER TO TABLE',
+    'place_order': 'PLACE ORDER',
+    'pay_at_restaurant': 'Pay at the restaurant when picking up your order',
+    'order_sent_to_kitchen': 'Your order will be sent directly to the kitchen · Pay the waiter',
+    'service_unavailable': 'Service unavailable',
+    'service_unavailable_desc': 'This service is temporarily disabled, currently we only have pickup service at the restaurant',
+    'order_received': 'Your order has been received and is being prepared.',
+    'order_received_table': 'Your order for Table {table} has been received.',
+    'order_processed': 'Order processed!',
+    'order_notify': 'We will notify you when it is ready.',
+    'order_error': 'There was a problem processing your order. Please try again.',
+    'cart_empty_error': 'The cart is empty',
+    'select_order_type': 'Please select the order type',
+    'your_full_name': 'Your full name',
+    'phone_placeholder': 'Phone number',
+    'customize': 'Customize',
+    'from_price': 'From €10.60',
+
+    // Variant labels
+    'variant_edamame': 'Edamame',
+    'variant_edamame_spicy': 'Spicy Edamame (+€0.20)',
+    'variant_fried': 'Fried',
+    'variant_grilled': 'Grilled',
+    'variant_1_unit': '1 unit',
+    'variant_2_units': '2 units',
+    'variant_gyozas': 'Shrimp Gyoza (6 pcs)',
+    'variant_pinchito_shrimp': 'Shrimp skewer',
+    'variant_pinchito_chicken': 'Chicken skewer',
+
+    // Soup variant labels
+    'soup_chicken_label': 'Chicken',
+    'soup_prawn_label': 'Prawn',
+    'soup_veggie_label': 'Veggie',
+
+    // Noodle card labels
+    'noodles_pad_thai': 'Pad Thai (Wide)',
+    'noodles_finos_card': 'Noodles (Thin)',
+    'noodles_glass_card': 'Glass',
+    'noodles_udon_card': 'Udon',
+    'rice_fried_thai': 'Thai Fried Rice'
   },
   
   fr: {
