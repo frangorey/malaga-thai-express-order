@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
@@ -8,7 +8,22 @@ import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getCategoryVideoItems } from "@/utils/mockVideoItems";
+import { useProducts } from "@/hooks/useProducts";
+
+const TEMP_VIDEO_URL =
+  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
+
+const CATEGORY_MAP: Record<string, string> = {
+  entrantes: "Entrantes",
+  arroz: "Arroces",
+  tallarines: "Tallarines",
+  sopas: "Sopas",
+  pokes: "Pokes",
+  postres: "Postres",
+  ensaladas: "Ensaladas",
+  otras: "Otras del Mundo",
+  bebidas: "Bebidas",
+};
 
 const Index = () => {
   const { t } = useLanguage();
@@ -16,10 +31,33 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
   const [searchParams] = useSearchParams();
+  const { products, loading } = useProducts();
 
   const mesaParam = searchParams.get('mesa');
   const tableNumber = mesaParam ? parseInt(mesaParam, 10) : null;
   const validTableNumber = tableNumber && tableNumber >= 1 && tableNumber <= 14 ? tableNumber : null;
+
+  const videoItems = useMemo(() => {
+    const dbCategory = CATEGORY_MAP[activeCategory];
+    if (!dbCategory) return [];
+
+    return products
+      .filter((p) => p.category === dbCategory)
+      .map((p) => ({
+        product: {
+          ...p,
+          description: p.description ?? "",
+          is_vegetarian: p.is_vegetarian ?? false,
+          is_spicy: p.is_spicy ?? false,
+          is_available: p.is_available ?? true,
+          created_at: p.created_at ?? new Date().toISOString(),
+          updated_at: p.updated_at ?? new Date().toISOString(),
+        } as SupabaseProduct,
+        videoUrl: TEMP_VIDEO_URL,
+        posterUrl: p.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E",
+        tags: [] as string[],
+      }));
+  }, [products, activeCategory]);
 
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
@@ -64,10 +102,16 @@ const Index = () => {
         onCategoryChange={setActiveCategory}
       />
 
-      <TikTokStyleMenu
-        items={getCategoryVideoItems(activeCategory)}
-        onAddToCart={addToCart}
-      />
+      {loading ? (
+        <div className="flex items-center justify-center h-[85dvh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        </div>
+      ) : (
+        <TikTokStyleMenu
+          items={videoItems}
+          onAddToCart={addToCart}
+        />
+      )}
 
       <Footer />
 
