@@ -6,12 +6,16 @@ import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
+import { RiceCustomizerDrawer } from "@/components/RiceCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
 
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
+
+const RICE_VIDEO_URL =
+  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-video.mp4";
 
 const CATEGORY_MAP: Record<string, string> = {
   entrantes: "Entrantes",
@@ -49,7 +53,6 @@ const VARIANT_GROUPS: Record<string, { displayName: string; ids: number[]; label
   },
 };
 
-// Collect all variant IDs for quick lookup
 const ALL_VARIANT_IDS = new Set(
   Object.values(VARIANT_GROUPS).flatMap((g) => g.ids)
 );
@@ -74,6 +77,7 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
+  const [isRiceCustomizerOpen, setIsRiceCustomizerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
 
@@ -87,12 +91,27 @@ const Index = () => {
 
     const categoryProducts = products.filter((p) => p.category === dbCategory);
 
+    // For Arroces: show a single customizable card
+    if (dbCategory === "Arroces") {
+      const firstRice = categoryProducts[0];
+      if (!firstRice) return [];
+
+      return [{
+        product: toSupabaseProduct(firstRice),
+        videoUrl: RICE_VIDEO_URL,
+        posterUrl: firstRice.image_url || PLACEHOLDER_POSTER,
+        tags: [],
+        displayName: "🍚 Arroz Frito Thai",
+        onCustomize: () => setIsRiceCustomizerOpen(true),
+        customizeLabel: "Personalizar 🍚",
+      }] as FeaturedItem[];
+    }
+
     // For Entrantes, group variant products into single cards
     if (dbCategory === "Entrantes") {
       const items: FeaturedItem[] = [];
       const processedIds = new Set<number>();
 
-      // First, add grouped variant cards
       for (const group of Object.values(VARIANT_GROUPS)) {
         const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
         if (groupProducts.length === 0) continue;
@@ -113,7 +132,6 @@ const Index = () => {
         });
       }
 
-      // Then, add remaining non-grouped products
       for (const p of categoryProducts) {
         if (processedIds.has(p.id)) continue;
         items.push({
@@ -202,6 +220,12 @@ const Index = () => {
           tableNumber={validTableNumber}
         />
       )}
+
+      <RiceCustomizerDrawer
+        open={isRiceCustomizerOpen}
+        onClose={() => setIsRiceCustomizerOpen(false)}
+        onAddToCart={addToCart}
+      />
     </main>
   );
 };
