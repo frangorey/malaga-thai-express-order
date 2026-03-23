@@ -60,6 +60,25 @@ const Index = () => {
   const tableNumber = mesaParam ? parseInt(mesaParam, 10) : null;
   const validTableNumber = tableNumber && tableNumber >= 1 && tableNumber <= 14 ? tableNumber : null;
 
+  const NOODLE_CARDS: { type: NoodleType; displayNameKey: string; videoUrl: string; emoji: string }[] = [
+    { type: "Anchos", displayNameKey: "noodles_pad_thai", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/padthaii-video.mp4", emoji: "🍜" },
+    { type: "Finos", displayNameKey: "noodles_finos_card", videoUrl: FALLBACK_VIDEO_URL, emoji: "🥢" },
+    { type: "Glass", displayNameKey: "noodles_glass_card", videoUrl: FALLBACK_VIDEO_URL, emoji: "✨" },
+    { type: "Udon", displayNameKey: "noodles_udon_card", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/udon-video.mp4", emoji: "🍲" },
+  ];
+
+  const VARIANT_GROUPS: Record<string, { displayNameKey: string; ids: number[]; labelKeys: Record<number, string> }> = {
+    edamame: { displayNameKey: "variant_edamame", ids: [206, 207], labelKeys: { 206: "variant_edamame", 207: "variant_edamame_spicy" } },
+    gyozas: { displayNameKey: "variant_gyozas", ids: [202, 203], labelKeys: { 202: "variant_fried", 203: "variant_grilled" } },
+    pinchito_langostino: { displayNameKey: "variant_pinchito_shrimp", ids: [194, 195], labelKeys: { 194: "variant_1_unit", 195: "variant_2_units" } },
+    pinchito_pollo: { displayNameKey: "variant_pinchito_chicken", ids: [192, 193], labelKeys: { 192: "variant_1_unit", 193: "variant_2_units" } },
+  };
+
+  const SOUP_GROUPS: Record<string, { displayNameKey: string; emoji: string; ids: number[]; proteinKeys: Record<number, string> }> = {
+    tom_yam: { displayNameKey: "soup_tom_yam", emoji: "🍲", ids: [130, 131, 132], proteinKeys: { 130: "soup_chicken_label", 131: "soup_prawn_label", 132: "soup_veggie_label" } },
+    miso: { displayNameKey: "soup_miso", emoji: "🍜", ids: [127, 128, 129], proteinKeys: { 127: "soup_chicken_label", 128: "soup_prawn_label", 129: "soup_veggie_label" } },
+  };
+
   const videoItems = useMemo(() => {
     const dbCategory = CATEGORY_MAP[activeCategory];
     if (!dbCategory) return [];
@@ -75,9 +94,9 @@ const Index = () => {
         videoUrl: RICE_VIDEO_URL,
         posterUrl: firstRice.image_url || PLACEHOLDER_POSTER,
         tags: [],
-        displayName: "🍚 Arroz Frito Thai",
+        displayName: `🍚 ${t('rice_fried_thai')}`,
         onCustomize: () => setIsRiceCustomizerOpen(true),
-        customizeLabel: "Personalizar 🍚",
+        customizeLabel: `${t('customize')} 🍚`,
       }] as FeaturedItem[];
     }
 
@@ -91,9 +110,9 @@ const Index = () => {
           videoUrl: nc.videoUrl,
           posterUrl: firstProduct?.image_url || PLACEHOLDER_POSTER,
           tags: [],
-          displayName: `${nc.emoji} Tallarines ${nc.displayName}`,
+          displayName: `${nc.emoji} ${t('tallarines')} ${t(nc.displayNameKey)}`,
           onCustomize: () => setNoodleCustomizer({ open: true, type: nc.type }),
-          customizeLabel: `Personalizar ${nc.emoji}`,
+          customizeLabel: `${t('customize')} ${nc.emoji}`,
         } as FeaturedItem;
       }).filter(Boolean);
     }
@@ -110,10 +129,10 @@ const Index = () => {
           videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
           posterUrl: primary.image_url || PLACEHOLDER_POSTER,
           tags: [],
-          displayName: group.displayName,
+          displayName: `${group.emoji} ${t(group.displayNameKey)}`,
           variants: groupProducts.map((p) => ({
             product: toSupabaseProduct(p),
-            label: group.labels[p.id] || p.name,
+            label: `${t(group.proteinKeys[p.id] || '')} — ${p.price.toFixed(2)}€`,
           })),
         });
       }
@@ -135,10 +154,10 @@ const Index = () => {
           videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
           posterUrl: primary.image_url || PLACEHOLDER_POSTER,
           tags: [],
-          displayName: group.displayName,
+          displayName: t(group.displayNameKey),
           variants: groupProducts.map((p) => ({
             product: toSupabaseProduct(p),
-            label: group.labels[p.id] || p.name,
+            label: t(group.labelKeys[p.id] || ''),
           })),
         });
       }
@@ -162,7 +181,7 @@ const Index = () => {
       posterUrl: p.image_url || PLACEHOLDER_POSTER,
       tags: [] as string[],
     }));
-  }, [products, activeCategory]);
+  }, [products, activeCategory, t]);
 
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
