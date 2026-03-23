@@ -22,7 +22,7 @@ export const TikTokStyleMenu = ({ items, onAddToCart }: TikTokStyleMenuProps) =>
   if (!items.length) return null;
 
   return (
-    <div className="w-full max-w-lg mx-auto h-[85dvh] snap-y snap-mandatory overflow-y-auto scrollbar-hide">
+    <div className="w-full max-w-lg mx-auto h-full snap-y snap-mandatory overflow-y-auto scrollbar-hide">
       {items.map((item) => (
         <VideoMenuCard
           key={item.product.id}
