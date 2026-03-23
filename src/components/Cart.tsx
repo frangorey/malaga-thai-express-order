@@ -296,7 +296,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                           onValueChange={(value) => setCustomerInfo({...customerInfo, phonePrefix: value})}
                         >
                           <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Prefijo" />
+                            <SelectValue placeholder={t('prefix')} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="+34">🇪🇸 +34</SelectItem>
