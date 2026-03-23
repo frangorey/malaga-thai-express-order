@@ -275,21 +275,21 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
               {orderType && (
                 <Card className="mb-6">
                   <CardHeader>
-                    <CardTitle className="text-lg">Tus Datos</CardTitle>
+                    <CardTitle className="text-lg">{t('your_details')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Nombre *</Label>
+                      <Label htmlFor="name">{t('name')} *</Label>
                       <Input
                         id="name"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                        placeholder="Tu nombre completo"
+                        placeholder={t('your_full_name')}
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone">Teléfono de contacto *</Label>
+                      <Label htmlFor="phone">{t('contact_phone')} *</Label>
                       <div className="flex gap-2">
                         <Select 
                           value={customerInfo.phonePrefix} 
