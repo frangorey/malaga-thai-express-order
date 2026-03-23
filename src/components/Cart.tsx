@@ -11,6 +11,7 @@ import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackOrder } from "@/hooks/useOrderRealtime";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Nuevo tipo para el carrito con productos de Supabase
 export interface SupabaseCartItem extends SupabaseProduct {
@@ -28,6 +29,7 @@ interface CartProps {
 }
 
 export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, tableNumber }: CartProps) => {
+  const { t } = useLanguage();
   const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in' | null>(
     tableNumber ? 'dine_in' : null
   );
@@ -55,7 +57,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
     if (!orderType) {
       toast({
         title: "Error",
-        description: "Por favor, selecciona el tipo de pedido",
+        description: t('select_order_type'),
         variant: "destructive",
       });
       return;
@@ -77,7 +79,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
     if (items.length === 0) {
       toast({
         title: "Error", 
-        description: "El carrito está vacío",
+        description: t('cart_empty_error'),
         variant: "destructive",
       });
       return;
@@ -113,12 +115,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         }
         
         const typeMsg = orderType === 'dine_in' 
-          ? `Tu pedido para la Mesa ${tableNumber} ha sido recibido.` 
-          : 'Tu pedido ha sido recibido y está siendo preparado.';
+          ? t('order_received_table').replace('{table}', String(tableNumber))
+          : t('order_received');
 
         toast({
-          title: "¡Pedido tramitado!",
-          description: `${typeMsg} Te avisaremos cuando esté listo.`,
+          title: t('order_processed'),
+          description: `${typeMsg} ${t('order_notify')}`,
         });
         
         setOrderType(tableNumber ? 'dine_in' : null);
@@ -126,12 +128,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         items.forEach(item => onRemoveItem(item.id));
         onClose();
       } else {
-        throw new Error(data?.error || 'Error al procesar el pedido');
+      throw new Error(data?.error || t('order_error'));
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu pedido. Por favor, inténtalo de nuevo.",
+        description: t('order_error'),
         variant: "destructive",
       });
     } finally {
@@ -147,7 +149,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold neon-text">Tu Pedido</h2>
+            <h2 className="text-2xl font-bold neon-text">{t('your_order')}</h2>
             <Button variant="ghost" onClick={onClose}>
               <X className="w-6 h-6" />
             </Button>
@@ -158,7 +160,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
             <Card className="mb-4 border-primary bg-primary/10">
               <CardContent className="p-3 flex items-center gap-2">
                 <UtensilsCrossed className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-primary">Mesa {tableNumber}</span>
+                <span className="font-semibold text-primary">{t('table')} {tableNumber}</span>
               </CardContent>
             </Card>
           )}
@@ -167,7 +169,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
           {items.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Tu carrito está vacío</p>
+              <p className="text-muted-foreground">{t('empty_cart')}</p>
             </div>
           ) : (
             <>
@@ -236,7 +238,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
               {!tableNumber && (
                 <Card className="mb-6">
                   <CardHeader>
-                    <CardTitle className="text-lg">Tipo de Pedido</CardTitle>
+                    <CardTitle className="text-lg">{t('order_type')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-3">
@@ -246,23 +248,23 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                         onClick={() => setOrderType('pickup')}
                       >
                         <Store className="w-6 h-6" />
-                        <span className="font-semibold">Recoger</span>
-                        <span className="text-xs opacity-80">En restaurante</span>
+                        <span className="font-semibold">{t('pickup')}</span>
+                        <span className="text-xs opacity-80">{t('at_restaurant')}</span>
                       </Button>
                       <Button
                         variant="outline"
                         className="h-auto py-6 flex flex-col gap-2 opacity-60"
                         onClick={() => {
                           toast({
-                            title: "Servicio no disponible",
-                            description: "Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante",
+                            title: t('service_unavailable'),
+                            description: t('service_unavailable_desc'),
                             variant: "destructive",
                           });
                         }}
                       >
                         <Truck className="w-6 h-6" />
-                        <span className="font-semibold">Domicilio</span>
-                        <span className="text-xs opacity-80">No disponible</span>
+                        <span className="font-semibold">{t('delivery')}</span>
+                        <span className="text-xs opacity-80">{t('not_available')}</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -273,28 +275,28 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
               {orderType && (
                 <Card className="mb-6">
                   <CardHeader>
-                    <CardTitle className="text-lg">Tus Datos</CardTitle>
+                    <CardTitle className="text-lg">{t('your_details')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Nombre *</Label>
+                      <Label htmlFor="name">{t('name')} *</Label>
                       <Input
                         id="name"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                        placeholder="Tu nombre completo"
+                        placeholder={t('your_full_name')}
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone">Teléfono de contacto *</Label>
+                      <Label htmlFor="phone">{t('contact_phone')} *</Label>
                       <div className="flex gap-2">
                         <Select 
                           value={customerInfo.phonePrefix} 
                           onValueChange={(value) => setCustomerInfo({...customerInfo, phonePrefix: value})}
                         >
                           <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Prefijo" />
+                            <SelectValue placeholder={t('prefix')} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="+34">🇪🇸 +34</SelectItem>
@@ -349,13 +351,13 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                           className="flex-1"
                           value={customerInfo.phone}
                           onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                          placeholder="Número de teléfono"
+                          placeholder={t('phone_placeholder')}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="email">Email (opcional)</Label>
+                      <Label htmlFor="email">{t('email_optional')}</Label>
                       <Input
                         id="email"
                         type="email"
@@ -366,12 +368,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                     </div>
                     
                     <div>
-                      <Label htmlFor="notes">Observaciones</Label>
+                      <Label htmlFor="notes">{t('observations')}</Label>
                       <Textarea
                         id="notes"
                         value={customerInfo.notes}
                         onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
-                        placeholder="Sin cebolla, extra picante, etc..."
+                        placeholder={t('notes_placeholder')}
                         rows={2}
                       />
                     </div>
@@ -389,17 +391,17 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                 >
                   <Store className="w-5 h-5 mr-2" />
                   {isProcessingPayment 
-                    ? "PROCESANDO..." 
+                    ? t('processing')
                     : orderType === 'dine_in' 
-                      ? `PEDIR A MESA ${tableNumber}` 
-                      : "REALIZAR PEDIDO"}
+                      ? `${t('order_to_table')} ${tableNumber}` 
+                      : t('place_order')}
                 </Button>
               </div>
               
               <p className="text-xs text-muted-foreground text-center mt-4">
                 {orderType === 'dine_in' 
-                  ? '🍽️ Tu pedido se enviará directamente a cocina · Paga al camarero' 
-                  : '💰 Paga en el restaurante al recoger tu pedido'}
+                  ? `🍽️ ${t('order_sent_to_kitchen')}` 
+                  : `💰 ${t('pay_at_restaurant')}`}
               </p>
             </>
           )}

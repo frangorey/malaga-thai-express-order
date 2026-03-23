@@ -134,7 +134,7 @@ export const VideoMenuCard = ({
 
             {onCustomize && (
               <span className="inline-block bg-primary/80 text-primary-foreground font-medium text-sm px-4 py-1.5 rounded-full shadow-lg">
-                {t("rice_customizer_description") !== "rice_customizer_description" ? "Desde 10,60€" : "From 10.60€"}
+                {t("from_price")}
               </span>
             )}
 

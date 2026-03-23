@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { VideoMenuCard, ProductVariant } from "@/components/VideoMenuCard";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { SupabaseProduct } from "@/types/menu";
@@ -21,6 +22,15 @@ interface TikTokStyleMenuProps {
 }
 
 export const TikTokStyleMenu = ({ items, onAddToCart, activeCategory, onCategoryChange }: TikTokStyleMenuProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll to top when category changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeCategory]);
+
   if (!items.length) return null;
 
   return (
@@ -34,7 +44,7 @@ export const TikTokStyleMenu = ({ items, onAddToCart, activeCategory, onCategory
         />
       )}
 
-      <div className="w-full h-full snap-y snap-mandatory overflow-y-auto scrollbar-hide">
+      <div ref={scrollRef} className="w-full h-full snap-y snap-mandatory overflow-y-auto scrollbar-hide">
         {items.map((item) => (
           <div key={item.product.id} className="h-full w-full snap-start relative flex-shrink-0">
             <VideoMenuCard
