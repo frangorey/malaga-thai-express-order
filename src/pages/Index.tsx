@@ -2,20 +2,13 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { MenuSection } from "@/components/MenuSection";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
-import { RiceCustomizer } from "@/components/RiceCustomizer";
-import { NoodleCustomizer } from "@/components/NoodleCustomizer";
-import { SoupCustomizer } from "@/components/SoupCustomizer";
-import { PokeCustomizer } from "@/components/PokeCustomizer";
-import { SaladCustomizer } from "@/components/SaladCustomizer";
+import { TikTokStyleMenu } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
-import { useProducts } from "@/hooks/useProducts";
 import { SupabaseProduct } from "@/types/menu";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getCategoryVideoItems } from "@/utils/mockVideoItems";
 
 const Index = () => {
   const { t } = useLanguage();
