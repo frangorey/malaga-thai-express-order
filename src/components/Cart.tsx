@@ -128,12 +128,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         items.forEach(item => onRemoveItem(item.id));
         onClose();
       } else {
-        throw new Error(data?.error || 'Error al procesar el pedido');
+      throw new Error(data?.error || t('order_error'));
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu pedido. Por favor, inténtalo de nuevo.",
+        description: t('order_error'),
         variant: "destructive",
       });
     } finally {
