@@ -149,7 +149,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold neon-text">Tu Pedido</h2>
+            <h2 className="text-2xl font-bold neon-text">{t('your_order')}</h2>
             <Button variant="ghost" onClick={onClose}>
               <X className="w-6 h-6" />
             </Button>
