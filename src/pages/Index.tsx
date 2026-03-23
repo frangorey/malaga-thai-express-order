@@ -53,7 +53,7 @@ const Index = () => {
           created_at: p.created_at ?? new Date().toISOString(),
           updated_at: p.updated_at ?? new Date().toISOString(),
         } as SupabaseProduct,
-        videoUrl: TEMP_VIDEO_URL,
+        videoUrl: p.video_url || FALLBACK_VIDEO_URL,
         posterUrl: p.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E",
         tags: [] as string[],
       }));

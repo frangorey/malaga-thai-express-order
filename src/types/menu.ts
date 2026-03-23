@@ -17,6 +17,7 @@ export interface SupabaseProduct {
   description: string;
   price: number;
   image_url: string | null;
+  video_url: string | null;
   category: string;
   subcategory: string | null;
   is_vegetarian: boolean;
