@@ -102,7 +102,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
           </h2>
         </div>
 
-        {/* Carrusel de Top Ventas - Mobile First */}
+        {/* Carrusel de Top Ventas - Oculto temporalmente
         <div className="mb-6 sm:mb-8 w-full max-w-6xl mx-auto">
           <h3 className="font-semibold text-foreground mb-3 sm:mb-4">
             {t('top_sales')}
@@ -139,6 +139,7 @@ export const Hero = ({ onOrderClick }: HeroProps) => {
             </CarouselContent>
           </Carousel>
         </div>
+        */}
         
         <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
           {t('choose_what_you_like')} <span className="neon-text font-semibold">{t('take_it_home')}</span>
