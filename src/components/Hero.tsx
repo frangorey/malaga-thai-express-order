@@ -64,7 +64,7 @@ export const Hero = ({ onOrderClick, compact }: HeroProps) => {
   }, []);
   
   return (
-    <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden">
+    <section className={compact ? "relative h-[25dvh] min-h-[200px] flex items-center justify-center overflow-hidden" : "relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden"}>
       {/* BACKGROUND VIDEO - Optimizado para Web y Móvil */}
       <div className="absolute inset-0">
         <video
