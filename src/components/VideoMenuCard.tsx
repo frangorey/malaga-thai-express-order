@@ -100,7 +100,7 @@ export const VideoMenuCard = ({
   return (
     <div
       ref={cardRef}
-      className="relative h-[85dvh] w-full snap-center flex-shrink-0 overflow-hidden rounded-none sm:rounded-xl"
+      className="relative h-full w-full snap-start flex-shrink-0 overflow-hidden rounded-none sm:rounded-xl"
     >
       {/* Video background */}
       <video

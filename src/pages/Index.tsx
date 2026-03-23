@@ -252,37 +252,45 @@ const Index = () => {
   const handleOrderClick = () => setActiveCategory("arroz");
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header
-        cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-        onCartClick={() => setIsCartOpen(true)}
-      />
+    <main className="h-[100dvh] w-full bg-background flex flex-col overflow-hidden">
+      <div className="flex-none">
+        <Header
+          cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+          onCartClick={() => setIsCartOpen(true)}
+        />
+      </div>
 
       {validTableNumber && (
-        <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
+        <div className="flex-none bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
           🍽️ Estás pidiendo desde la Mesa {validTableNumber}
         </div>
       )}
 
-      <Hero onOrderClick={handleOrderClick} />
+      <div className="flex-none">
+        <Hero onOrderClick={handleOrderClick} compact />
+      </div>
 
-      <MainCategoriesNav
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
-
-      {loading ? (
-        <div className="flex items-center justify-center h-[85dvh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-        </div>
-      ) : (
-        <TikTokStyleMenu
-          items={videoItems}
-          onAddToCart={addToCart}
+      <div className="flex-none">
+        <MainCategoriesNav
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
         />
-      )}
+      </div>
 
-      <Footer />
+      <div className="flex-1 min-h-0 relative">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+          </div>
+        ) : (
+          <TikTokStyleMenu
+            items={videoItems}
+            onAddToCart={addToCart}
+          />
+        )}
+      </div>
+
+      {/* Footer hidden for app-like layout */}
 
       {isCartOpen && (
         <Cart
