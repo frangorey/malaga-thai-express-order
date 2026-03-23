@@ -169,7 +169,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
           {items.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Tu carrito está vacío</p>
+              <p className="text-muted-foreground">{t('empty_cart')}</p>
             </div>
           ) : (
             <>
