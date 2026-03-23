@@ -45,9 +45,10 @@ const topSalesImages = [
 
 interface HeroProps {
   onOrderClick: () => void;
+  compact?: boolean;
 }
 
-export const Hero = ({ onOrderClick }: HeroProps) => {
+export const Hero = ({ onOrderClick, compact }: HeroProps) => {
   const { t } = useLanguage();
   const plugin = useRef(
     Autoplay({ delay: 8000, stopOnInteraction: false })
