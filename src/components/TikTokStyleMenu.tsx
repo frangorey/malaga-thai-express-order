@@ -36,6 +36,7 @@ export const TikTokStyleMenu = ({ items, onAddToCart }: TikTokStyleMenuProps) =>
           onCustomize={item.onCustomize}
           customizeLabel={item.customizeLabel}
         />
+        </div>
       ))}
     </div>
   );

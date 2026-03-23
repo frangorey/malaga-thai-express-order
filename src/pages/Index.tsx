@@ -249,45 +249,52 @@ const Index = () => {
     setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const handleOrderClick = () => setActiveCategory("arroz");
+  const handleOrderClick = () => {
+    setActiveCategory("arroz");
+    document.getElementById('menu-inmersivo')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+    document.getElementById('menu-inmersivo')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <main className="h-[100dvh] w-full bg-background flex flex-col overflow-hidden">
-      <div className="flex-none">
+    <main className="w-full bg-background overflow-y-auto snap-y snap-mandatory scrollbar-hide">
+      <section className="snap-start flex-none">
         <Header
           cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onCartClick={() => setIsCartOpen(true)}
         />
-      </div>
 
-      {validTableNumber && (
-        <div className="flex-none bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
-          🍽️ Estás pidiendo desde la Mesa {validTableNumber}
-        </div>
-      )}
+        {validTableNumber && (
+          <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
+            🍽️ Estás pidiendo desde la Mesa {validTableNumber}
+          </div>
+        )}
 
-      <div className="flex-none">
         <Hero onOrderClick={handleOrderClick} compact />
-      </div>
+      </section>
 
-      <div className="flex-none">
+      <div id="menu-inmersivo" className="relative h-[100dvh] w-full bg-black snap-start">
         <MainCategoriesNav
           activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
+          onCategoryChange={handleCategoryChange}
+          floating
         />
-      </div>
 
-      <div className="flex-1 min-h-0 relative">
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-          </div>
-        ) : (
-          <TikTokStyleMenu
-            items={videoItems}
-            onAddToCart={addToCart}
-          />
-        )}
+        <div className="absolute inset-0 w-full h-full">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+            </div>
+          ) : (
+            <TikTokStyleMenu
+              items={videoItems}
+              onAddToCart={addToCart}
+            />
+          )}
+        </div>
       </div>
 
       {/* Footer hidden for app-like layout */}
