@@ -11,6 +11,7 @@ import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackOrder } from "@/hooks/useOrderRealtime";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Nuevo tipo para el carrito con productos de Supabase
 export interface SupabaseCartItem extends SupabaseProduct {
