@@ -10,11 +10,13 @@ import { useUserRole } from "@/hooks/useUserRole";
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
+  onLogoClick?: () => void;
 }
 
 export const Header = ({
   cartItemsCount,
-  onCartClick
+  onCartClick,
+  onLogoClick
 }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
@@ -25,7 +27,12 @@ export const Header = ({
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-2 sm:gap-4">
           {/* Logo - Mobile First */}
-          <div className="flex items-center flex-shrink-0">
+          <div
+            className="flex items-center flex-shrink-0 cursor-pointer"
+            onClick={onLogoClick}
+            role={onLogoClick ? "button" : undefined}
+            tabIndex={onLogoClick ? 0 : undefined}
+          >
             <div className="neon-border rounded-lg p-1.5 sm:p-2 bg-card">
               <img 
                 src="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/logo-Thaii.png" 
