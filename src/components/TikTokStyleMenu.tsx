@@ -8,6 +8,9 @@ export interface FeaturedItem {
   tags?: string[];
   variants?: ProductVariant[];
   displayName?: string;
+  /** If set, show a customize button instead of add-to-cart */
+  onCustomize?: () => void;
+  customizeLabel?: string;
 }
 
 interface TikTokStyleMenuProps {
@@ -30,6 +33,8 @@ export const TikTokStyleMenu = ({ items, onAddToCart }: TikTokStyleMenuProps) =>
           onAddToCart={onAddToCart}
           variants={item.variants}
           displayName={item.displayName}
+          onCustomize={item.onCustomize}
+          customizeLabel={item.customizeLabel}
         />
       ))}
     </div>

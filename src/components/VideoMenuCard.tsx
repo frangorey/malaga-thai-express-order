@@ -126,9 +126,15 @@ export const VideoMenuCard = ({
               {displayName || product.name}
             </h3>
 
-            {!hasVariants && (
+            {!hasVariants && !onCustomize && (
               <span className="inline-block bg-primary text-primary-foreground font-bold text-lg px-4 py-1.5 rounded-full shadow-lg">
                 {product.price.toFixed(2)}€
+              </span>
+            )}
+
+            {onCustomize && (
+              <span className="inline-block bg-primary/80 text-primary-foreground font-medium text-sm px-4 py-1.5 rounded-full shadow-lg">
+                {t("rice_customizer_description") !== "rice_customizer_description" ? "Desde 10,60€" : "From 10.60€"}
               </span>
             )}
 
@@ -158,8 +164,18 @@ export const VideoMenuCard = ({
             </div>
           </div>
 
-          {/* Right: single add button (no variants) */}
-          {!hasVariants && (
+          {/* Right: customize button */}
+          {onCustomize && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onCustomize(); }}
+              className="flex-shrink-0 px-5 py-3 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground font-bold text-sm shadow-2xl hover:scale-105 active:scale-95 transition-transform duration-200"
+            >
+              {customizeLabel || "Personalizar 🍚"}
+            </button>
+          )}
+
+          {/* Right: single add button (no variants, no customize) */}
+          {!hasVariants && !onCustomize && (
             <button
               onClick={handleAddToCart}
               aria-label={t("add_to_cart")}
