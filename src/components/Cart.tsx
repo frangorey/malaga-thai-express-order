@@ -369,12 +369,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                     </div>
                     
                     <div>
-                      <Label htmlFor="notes">Observaciones</Label>
+                      <Label htmlFor="notes">{t('observations')}</Label>
                       <Textarea
                         id="notes"
                         value={customerInfo.notes}
                         onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
-                        placeholder="Sin cebolla, extra picante, etc..."
+                        placeholder={t('notes_placeholder')}
                         rows={2}
                       />
                     </div>
