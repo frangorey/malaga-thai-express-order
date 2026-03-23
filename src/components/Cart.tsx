@@ -57,7 +57,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
     if (!orderType) {
       toast({
         title: "Error",
-        description: "Por favor, selecciona el tipo de pedido",
+        description: t('select_order_type'),
         variant: "destructive",
       });
       return;
