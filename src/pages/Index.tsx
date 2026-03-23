@@ -5,7 +5,7 @@ import { Hero } from "@/components/Hero";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
-import { Footer } from "@/components/Footer";
+// import { Footer } from "@/components/Footer";
 import { RiceCustomizerDrawer } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
