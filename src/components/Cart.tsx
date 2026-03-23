@@ -238,7 +238,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
               {!tableNumber && (
                 <Card className="mb-6">
                   <CardHeader>
-                    <CardTitle className="text-lg">Tipo de Pedido</CardTitle>
+                    <CardTitle className="text-lg">{t('order_type')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-3">
@@ -248,23 +248,23 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                         onClick={() => setOrderType('pickup')}
                       >
                         <Store className="w-6 h-6" />
-                        <span className="font-semibold">Recoger</span>
-                        <span className="text-xs opacity-80">En restaurante</span>
+                        <span className="font-semibold">{t('pickup')}</span>
+                        <span className="text-xs opacity-80">{t('at_restaurant')}</span>
                       </Button>
                       <Button
                         variant="outline"
                         className="h-auto py-6 flex flex-col gap-2 opacity-60"
                         onClick={() => {
                           toast({
-                            title: "Servicio no disponible",
-                            description: "Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante",
+                            title: t('service_unavailable'),
+                            description: t('service_unavailable_desc'),
                             variant: "destructive",
                           });
                         }}
                       >
                         <Truck className="w-6 h-6" />
-                        <span className="font-semibold">Domicilio</span>
-                        <span className="text-xs opacity-80">No disponible</span>
+                        <span className="font-semibold">{t('delivery')}</span>
+                        <span className="text-xs opacity-80">{t('not_available')}</span>
                       </Button>
                     </div>
                   </CardContent>
