@@ -392,10 +392,10 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                 >
                   <Store className="w-5 h-5 mr-2" />
                   {isProcessingPayment 
-                    ? "PROCESANDO..." 
+                    ? t('processing')
                     : orderType === 'dine_in' 
-                      ? `PEDIR A MESA ${tableNumber}` 
-                      : "REALIZAR PEDIDO"}
+                      ? `${t('order_to_table')} ${tableNumber}` 
+                      : t('place_order')}
                 </Button>
               </div>
               
