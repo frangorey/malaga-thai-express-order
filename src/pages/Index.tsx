@@ -115,6 +115,7 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
+  const [isViewingFeed, setIsViewingFeed] = useState(false);
   const [isRiceCustomizerOpen, setIsRiceCustomizerOpen] = useState(false);
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
@@ -251,20 +252,26 @@ const Index = () => {
 
   const handleOrderClick = () => {
     setActiveCategory("arroz");
-    document.getElementById('menu-inmersivo')?.scrollIntoView({ behavior: 'smooth' });
+    setIsViewingFeed(true);
   };
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
-    document.getElementById('menu-inmersivo')?.scrollIntoView({ behavior: 'smooth' });
+    setIsViewingFeed(true);
+  };
+
+  const handleGoHome = () => {
+    setIsViewingFeed(false);
   };
 
   return (
-    <main className="w-full bg-background overflow-y-auto snap-y snap-mandatory scrollbar-hide">
-      <section className="snap-start flex-none">
+    <main className="h-[100dvh] w-full flex flex-col bg-background overflow-hidden">
+      {/* Header — always visible */}
+      <div className="flex-none z-50">
         <Header
           cartItemsCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           onCartClick={() => setIsCartOpen(true)}
+          onLogoClick={isViewingFeed ? handleGoHome : undefined}
         />
 
         {validTableNumber && (
@@ -272,18 +279,22 @@ const Index = () => {
             🍽️ Estás pidiendo desde la Mesa {validTableNumber}
           </div>
         )}
+      </div>
 
-        <Hero onOrderClick={handleOrderClick} compact />
-      </section>
+      {/* Conditional view: Home vs Immersive Feed */}
+      {!isViewingFeed ? (
+        /* HOME VIEW */
+        <div className="flex-1 overflow-y-auto">
+          <Hero onOrderClick={handleOrderClick} />
 
-      <div id="menu-inmersivo" className="relative h-[100dvh] w-full bg-black snap-start">
-        <MainCategoriesNav
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-          floating
-        />
-
-        <div className="absolute inset-0 w-full h-full">
+          <MainCategoriesNav
+            activeCategory={activeCategory}
+            onCategoryChange={handleCategoryChange}
+          />
+        </div>
+      ) : (
+        /* IMMERSIVE FEED VIEW */
+        <div className="flex-1 min-h-0 w-full bg-black relative">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
@@ -292,10 +303,12 @@ const Index = () => {
             <TikTokStyleMenu
               items={videoItems}
               onAddToCart={addToCart}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
             />
           )}
         </div>
-      </div>
+      )}
 
       {/* Footer hidden for app-like layout */}
 
