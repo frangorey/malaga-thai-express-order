@@ -160,7 +160,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
             <Card className="mb-4 border-primary bg-primary/10">
               <CardContent className="p-3 flex items-center gap-2">
                 <UtensilsCrossed className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-primary">Mesa {tableNumber}</span>
+                <span className="font-semibold text-primary">{t('table')} {tableNumber}</span>
               </CardContent>
             </Card>
           )}
