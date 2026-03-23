@@ -28,7 +28,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   // Load saved language from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem('thaii-language') as Language;
-    if (savedLanguage && ['es', 'en', 'fr', 'de'].includes(savedLanguage)) {
+    if (savedLanguage && ['es', 'en', 'fr', 'de', 'ru'].includes(savedLanguage)) {
       setLanguage(savedLanguage);
     }
   }, []);
