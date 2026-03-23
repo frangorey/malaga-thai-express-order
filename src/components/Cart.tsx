@@ -115,12 +115,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         }
         
         const typeMsg = orderType === 'dine_in' 
-          ? `Tu pedido para la Mesa ${tableNumber} ha sido recibido.` 
-          : 'Tu pedido ha sido recibido y está siendo preparado.';
+          ? t('order_received_table').replace('{table}', String(tableNumber))
+          : t('order_received');
 
         toast({
-          title: "¡Pedido tramitado!",
-          description: `${typeMsg} Te avisaremos cuando esté listo.`,
+          title: t('order_processed'),
+          description: `${typeMsg} ${t('order_notify')}`,
         });
         
         setOrderType(tableNumber ? 'dine_in' : null);
