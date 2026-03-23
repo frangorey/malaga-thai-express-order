@@ -1,0 +1,1 @@
+UPDATE products SET video_url = 'https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/pinchito-pollo-video.mp4' WHERE id IN (192, 193);
