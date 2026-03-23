@@ -38,6 +38,10 @@ interface VideoMenuCardProps {
   variants?: ProductVariant[];
   /** Display name override (for grouped cards) */
   displayName?: string;
+  /** When set, show a "Personalizar" button that calls this instead of add-to-cart */
+  onCustomize?: () => void;
+  /** Label for the customize button */
+  customizeLabel?: string;
 }
 
 export const VideoMenuCard = ({
