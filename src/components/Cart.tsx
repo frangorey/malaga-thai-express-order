@@ -29,6 +29,7 @@ interface CartProps {
 }
 
 export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, tableNumber }: CartProps) => {
+  const { t } = useLanguage();
   const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in' | null>(
     tableNumber ? 'dine_in' : null
   );
