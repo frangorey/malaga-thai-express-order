@@ -1,11 +1,13 @@
-import { VideoMenuCard } from "@/components/VideoMenuCard";
+import { VideoMenuCard, ProductVariant } from "@/components/VideoMenuCard";
 import { SupabaseProduct } from "@/types/menu";
 
-interface FeaturedItem {
+export interface FeaturedItem {
   product: SupabaseProduct;
   videoUrl: string;
   posterUrl: string;
   tags?: string[];
+  variants?: ProductVariant[];
+  displayName?: string;
 }
 
 interface TikTokStyleMenuProps {
@@ -26,6 +28,8 @@ export const TikTokStyleMenu = ({ items, onAddToCart }: TikTokStyleMenuProps) =>
           posterUrl={item.posterUrl}
           tags={item.tags}
           onAddToCart={onAddToCart}
+          variants={item.variants}
+          displayName={item.displayName}
         />
       ))}
     </div>
