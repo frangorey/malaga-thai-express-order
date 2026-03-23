@@ -37,6 +37,7 @@ export function getCategoryVideoItems(categoryName: string): FeaturedItem[] {
       category: config.label,
       subcategory: null,
       is_vegetarian: i % 3 === 0,
+      video_url: null,
       is_spicy: i % 4 === 0,
       is_available: true,
       created_at: new Date().toISOString(),
