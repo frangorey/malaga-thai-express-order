@@ -6,14 +6,16 @@ const flags = {
   es: '🇪🇸',
   en: '🇬🇧', 
   fr: '🇫🇷',
-  de: '🇩🇪'
+  de: '🇩🇪',
+  ru: '🇷🇺'
 };
 
 const languageNames = {
   es: 'Español',
   en: 'English',
   fr: 'Français',
-  de: 'Deutsch'
+  de: 'Deutsch',
+  ru: 'Русский'
 };
 
 export const LanguageSelector = () => {
