@@ -52,6 +52,8 @@ export const VideoMenuCard = ({
   onAddToCart,
   variants,
   displayName,
+  onCustomize,
+  customizeLabel,
 }: VideoMenuCardProps) => {
   const { t } = useLanguage();
   const [cardRef, isVisible] = useInViewport<HTMLDivElement>(0.6);
