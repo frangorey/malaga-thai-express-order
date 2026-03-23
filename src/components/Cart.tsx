@@ -79,7 +79,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
     if (items.length === 0) {
       toast({
         title: "Error", 
-        description: "El carrito está vacío",
+        description: t('cart_empty_error'),
         variant: "destructive",
       });
       return;
