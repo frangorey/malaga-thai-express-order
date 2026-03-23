@@ -353,7 +353,6 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                           onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
                           placeholder={t('phone_placeholder')}
                         />
-                        />
                       </div>
                     </div>
 
