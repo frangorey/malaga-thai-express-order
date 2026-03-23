@@ -351,7 +351,8 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                           className="flex-1"
                           value={customerInfo.phone}
                           onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                          placeholder="Número de teléfono"
+                          placeholder={t('phone_placeholder')}
+                        />
                         />
                       </div>
                     </div>
