@@ -475,7 +475,64 @@ const translations = {
     'extra_fruta_variada': 'Extra Fruta Mediana Variada',
     'extra_mochi': 'Extra Mochi',
     'extra_noodles_frito_huevo': 'Extra Noodles Frito con Huevo',
-    'extra_patatas_fritas': 'Extra Patatas Fritas'
+    'extra_patatas_fritas': 'Extra Patatas Fritas',
+
+    // Cart/Checkout flow
+    'your_order': 'Tu Pedido',
+    'table': 'Mesa',
+    'ordering_from_table': 'Estás pidiendo desde la Mesa',
+    'order_type': 'Tipo de Pedido',
+    'pickup': 'Recoger',
+    'at_restaurant': 'En restaurante',
+    'delivery': 'Domicilio',
+    'not_available': 'No disponible',
+    'your_details': 'Tus Datos',
+    'contact_phone': 'Teléfono de contacto',
+    'prefix': 'Prefijo',
+    'email_optional': 'Email (opcional)',
+    'observations': 'Observaciones',
+    'notes_placeholder': 'Sin cebolla, extra picante, etc...',
+    'processing': 'PROCESANDO...',
+    'order_to_table': 'PEDIR A MESA',
+    'place_order': 'REALIZAR PEDIDO',
+    'pay_at_restaurant': 'Paga en el restaurante al recoger tu pedido',
+    'order_sent_to_kitchen': 'Tu pedido se enviará directamente a cocina · Paga al camarero',
+    'service_unavailable': 'Servicio no disponible',
+    'service_unavailable_desc': 'Este servicio está temporalmente deshabilitado, actualmente solo tenemos servicio para recoger en restaurante',
+    'order_received': 'Tu pedido ha sido recibido y está siendo preparado.',
+    'order_received_table': 'Tu pedido para la Mesa {table} ha sido recibido.',
+    'order_processed': '¡Pedido tramitado!',
+    'order_notify': 'Te avisaremos cuando esté listo.',
+    'order_error': 'Hubo un problema al procesar tu pedido. Por favor, inténtalo de nuevo.',
+    'cart_empty_error': 'El carrito está vacío',
+    'select_order_type': 'Por favor, selecciona el tipo de pedido',
+    'your_full_name': 'Tu nombre completo',
+    'phone_placeholder': 'Número de teléfono',
+    'customize': 'Personalizar',
+    'from_price': 'Desde 10,60€',
+
+    // Variant labels
+    'variant_edamame': 'Edamame',
+    'variant_edamame_spicy': 'Edamame Picante (+0,20€)',
+    'variant_fried': 'Fritas',
+    'variant_grilled': 'A la Plancha',
+    'variant_1_unit': '1 unidad',
+    'variant_2_units': '2 unidades',
+    'variant_gyozas': 'Gyozas con gambas (6 uds)',
+    'variant_pinchito_shrimp': 'Pinchito de langostino',
+    'variant_pinchito_chicken': 'Pinchito de pollo',
+
+    // Soup variant labels
+    'soup_chicken_label': 'Pollo',
+    'soup_prawn_label': 'Langostino',
+    'soup_veggie_label': 'Veggie',
+
+    // Noodle card labels
+    'noodles_pad_thai': 'Pad Thai (Anchos)',
+    'noodles_finos_card': 'Noodles (Finos)',
+    'noodles_glass_card': 'Glass',
+    'noodles_udon_card': 'Udon',
+    'rice_fried_thai': 'Arroz Frito Thai'
   },
   
   en: {
