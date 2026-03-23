@@ -7,6 +7,7 @@ import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { RiceCustomizerDrawer } from "@/components/RiceCustomizerDrawer";
+import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -29,7 +30,6 @@ const CATEGORY_MAP: Record<string, string> = {
   bebidas: "Bebidas",
 };
 
-/** IDs to group into a single card with variant buttons */
 const VARIANT_GROUPS: Record<string, { displayName: string; ids: number[]; labels: Record<number, string> }> = {
   edamame: {
     displayName: "Edamame",
@@ -53,9 +53,47 @@ const VARIANT_GROUPS: Record<string, { displayName: string; ids: number[]; label
   },
 };
 
-const ALL_VARIANT_IDS = new Set(
-  Object.values(VARIANT_GROUPS).flatMap((g) => g.ids)
-);
+/** Sopas: group by subcategory, show protein variants */
+const SOUP_GROUPS: Record<string, { displayName: string; ids: number[]; labels: Record<number, string> }> = {
+  tom_yam: {
+    displayName: "🍲 Sopa Tom Yam",
+    ids: [130, 131, 132],
+    labels: { 130: "Pollo — 8,90€", 131: "Langostino — 9,40€", 132: "Veggie — 8,90€" },
+  },
+  miso: {
+    displayName: "🍜 Sopa Miso",
+    ids: [127, 128, 129],
+    labels: { 127: "Pollo — 8,90€", 128: "Langostino — 9,40€", 129: "Veggie — 8,90€" },
+  },
+};
+
+/** Noodle types with their video URLs and display info */
+const NOODLE_CARDS: { type: NoodleType; displayName: string; videoUrl: string; emoji: string }[] = [
+  {
+    type: "Anchos",
+    displayName: "Pad Thai (Anchos)",
+    videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/padthaii-video.mp4",
+    emoji: "🍜",
+  },
+  {
+    type: "Finos",
+    displayName: "Noodles (Finos)",
+    videoUrl: FALLBACK_VIDEO_URL,
+    emoji: "🥢",
+  },
+  {
+    type: "Glass",
+    displayName: "Glass",
+    videoUrl: FALLBACK_VIDEO_URL,
+    emoji: "✨",
+  },
+  {
+    type: "Udon",
+    displayName: "Udon",
+    videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/udon-video.mp4",
+    emoji: "🍲",
+  },
+];
 
 function toSupabaseProduct(p: ReturnType<typeof useProducts>["products"][number]): SupabaseProduct {
   return {
@@ -78,6 +116,7 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
   const [isRiceCustomizerOpen, setIsRiceCustomizerOpen] = useState(false);
+  const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
 
@@ -91,11 +130,10 @@ const Index = () => {
 
     const categoryProducts = products.filter((p) => p.category === dbCategory);
 
-    // For Arroces: show a single customizable card
+    // ARROCES: single customizable card
     if (dbCategory === "Arroces") {
       const firstRice = categoryProducts[0];
       if (!firstRice) return [];
-
       return [{
         product: toSupabaseProduct(firstRice),
         videoUrl: RICE_VIDEO_URL,
@@ -107,7 +145,46 @@ const Index = () => {
       }] as FeaturedItem[];
     }
 
-    // For Entrantes, group variant products into single cards
+    // TALLARINES: 4 cards, one per noodle type
+    if (dbCategory === "Tallarines") {
+      return NOODLE_CARDS.map((nc) => {
+        const firstProduct = categoryProducts.find((p) => p.subcategory === nc.type);
+        const product = firstProduct ? toSupabaseProduct(firstProduct) : toSupabaseProduct(categoryProducts[0]);
+        return {
+          product,
+          videoUrl: nc.videoUrl,
+          posterUrl: firstProduct?.image_url || PLACEHOLDER_POSTER,
+          tags: [],
+          displayName: `${nc.emoji} Tallarines ${nc.displayName}`,
+          onCustomize: () => setNoodleCustomizer({ open: true, type: nc.type }),
+          customizeLabel: `Personalizar ${nc.emoji}`,
+        } as FeaturedItem;
+      }).filter(Boolean);
+    }
+
+    // SOPAS: 2 cards with protein variants
+    if (dbCategory === "Sopas") {
+      const items: FeaturedItem[] = [];
+      for (const group of Object.values(SOUP_GROUPS)) {
+        const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
+        if (groupProducts.length === 0) continue;
+        const primary = groupProducts[0];
+        items.push({
+          product: toSupabaseProduct(primary),
+          videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
+          posterUrl: primary.image_url || PLACEHOLDER_POSTER,
+          tags: [],
+          displayName: group.displayName,
+          variants: groupProducts.map((p) => ({
+            product: toSupabaseProduct(p),
+            label: group.labels[p.id] || p.name,
+          })),
+        });
+      }
+      return items;
+    }
+
+    // ENTRANTES: grouped variants
     if (dbCategory === "Entrantes") {
       const items: FeaturedItem[] = [];
       const processedIds = new Set<number>();
@@ -115,10 +192,8 @@ const Index = () => {
       for (const group of Object.values(VARIANT_GROUPS)) {
         const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
         if (groupProducts.length === 0) continue;
-
         groupProducts.forEach((p) => processedIds.add(p.id));
         const primary = groupProducts[0];
-
         items.push({
           product: toSupabaseProduct(primary),
           videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
@@ -141,7 +216,6 @@ const Index = () => {
           tags: [],
         });
       }
-
       return items;
     }
 
@@ -225,6 +299,13 @@ const Index = () => {
         open={isRiceCustomizerOpen}
         onClose={() => setIsRiceCustomizerOpen(false)}
         onAddToCart={addToCart}
+      />
+
+      <NoodleCustomizerDrawer
+        open={noodleCustomizer.open}
+        onClose={() => setNoodleCustomizer((prev) => ({ ...prev, open: false }))}
+        onAddToCart={addToCart}
+        noodleType={noodleCustomizer.type}
       />
     </main>
   );
