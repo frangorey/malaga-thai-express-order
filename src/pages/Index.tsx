@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
-import { TikTokStyleMenu } from "@/components/TikTokStyleMenu";
+import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
 import { SupabaseProduct } from "@/types/menu";
@@ -25,6 +25,50 @@ const CATEGORY_MAP: Record<string, string> = {
   bebidas: "Bebidas",
 };
 
+/** IDs to group into a single card with variant buttons */
+const VARIANT_GROUPS: Record<string, { displayName: string; ids: number[]; labels: Record<number, string> }> = {
+  edamame: {
+    displayName: "Edamame",
+    ids: [206, 207],
+    labels: { 206: "Edamame", 207: "Edamame Picante (+0,20€)" },
+  },
+  gyozas: {
+    displayName: "Gyozas con gambas (6 uds)",
+    ids: [202, 203],
+    labels: { 202: "Fritas", 203: "A la Plancha" },
+  },
+  pinchito_langostino: {
+    displayName: "Pinchito de langostino",
+    ids: [194, 195],
+    labels: { 194: "1 unidad", 195: "2 unidades" },
+  },
+  pinchito_pollo: {
+    displayName: "Pinchito de pollo",
+    ids: [192, 193],
+    labels: { 192: "1 unidad", 193: "2 unidades" },
+  },
+};
+
+// Collect all variant IDs for quick lookup
+const ALL_VARIANT_IDS = new Set(
+  Object.values(VARIANT_GROUPS).flatMap((g) => g.ids)
+);
+
+function toSupabaseProduct(p: ReturnType<typeof useProducts>["products"][number]): SupabaseProduct {
+  return {
+    ...p,
+    description: p.description ?? "",
+    is_vegetarian: p.is_vegetarian ?? false,
+    is_spicy: p.is_spicy ?? false,
+    is_available: p.is_available ?? true,
+    created_at: p.created_at ?? new Date().toISOString(),
+    updated_at: p.updated_at ?? new Date().toISOString(),
+  } as SupabaseProduct;
+}
+
+const PLACEHOLDER_POSTER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E";
+
 const Index = () => {
   const { t } = useLanguage();
   const [cartItems, setCartItems] = useState<SupabaseCartItem[]>([]);
@@ -41,22 +85,55 @@ const Index = () => {
     const dbCategory = CATEGORY_MAP[activeCategory];
     if (!dbCategory) return [];
 
-    return products
-      .filter((p) => p.category === dbCategory)
-      .map((p) => ({
-        product: {
-          ...p,
-          description: p.description ?? "",
-          is_vegetarian: p.is_vegetarian ?? false,
-          is_spicy: p.is_spicy ?? false,
-          is_available: p.is_available ?? true,
-          created_at: p.created_at ?? new Date().toISOString(),
-          updated_at: p.updated_at ?? new Date().toISOString(),
-        } as SupabaseProduct,
-        videoUrl: p.video_url || FALLBACK_VIDEO_URL,
-        posterUrl: p.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E",
-        tags: [] as string[],
-      }));
+    const categoryProducts = products.filter((p) => p.category === dbCategory);
+
+    // For Entrantes, group variant products into single cards
+    if (dbCategory === "Entrantes") {
+      const items: FeaturedItem[] = [];
+      const processedIds = new Set<number>();
+
+      // First, add grouped variant cards
+      for (const group of Object.values(VARIANT_GROUPS)) {
+        const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
+        if (groupProducts.length === 0) continue;
+
+        groupProducts.forEach((p) => processedIds.add(p.id));
+        const primary = groupProducts[0];
+
+        items.push({
+          product: toSupabaseProduct(primary),
+          videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
+          posterUrl: primary.image_url || PLACEHOLDER_POSTER,
+          tags: [],
+          displayName: group.displayName,
+          variants: groupProducts.map((p) => ({
+            product: toSupabaseProduct(p),
+            label: group.labels[p.id] || p.name,
+          })),
+        });
+      }
+
+      // Then, add remaining non-grouped products
+      for (const p of categoryProducts) {
+        if (processedIds.has(p.id)) continue;
+        items.push({
+          product: toSupabaseProduct(p),
+          videoUrl: p.video_url || FALLBACK_VIDEO_URL,
+          posterUrl: p.image_url || PLACEHOLDER_POSTER,
+          tags: [],
+        });
+      }
+
+      return items;
+    }
+
+    // Default: one card per product
+    return categoryProducts.map((p) => ({
+      product: toSupabaseProduct(p),
+      videoUrl: p.video_url || FALLBACK_VIDEO_URL,
+      posterUrl: p.image_url || PLACEHOLDER_POSTER,
+      tags: [] as string[],
+    }));
   }, [products, activeCategory]);
 
   const addToCart = (product: SupabaseProduct) => {
