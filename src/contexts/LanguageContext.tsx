@@ -62,7 +62,7 @@ const translations = {
     // Hero
     'prepare_to_taste': 'PREPÁRALO',
     'to_your_liking': 'AL GUSTO',
-    'choose_what_you_like': 'Escoge lo que más te guste y...',
+    'choose_what_you_like': 'Elige tu plato favorito y...',
     'take_it_home': '¡llévátelo a casa!',
     'order_online': 'HACER PEDIDO ONLINE',
      'call_us': 'LLAMAR: 951 40 19 37',
