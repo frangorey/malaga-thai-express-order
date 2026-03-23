@@ -401,8 +401,8 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
               
               <p className="text-xs text-muted-foreground text-center mt-4">
                 {orderType === 'dine_in' 
-                  ? '🍽️ Tu pedido se enviará directamente a cocina · Paga al camarero' 
-                  : '💰 Paga en el restaurante al recoger tu pedido'}
+                  ? `🍽️ ${t('order_sent_to_kitchen')}` 
+                  : `💰 ${t('pay_at_restaurant')}`}
               </p>
             </>
           )}
