@@ -8,7 +8,6 @@ export interface FeaturedItem {
   tags?: string[];
   variants?: ProductVariant[];
   displayName?: string;
-  /** If set, show a customize button instead of add-to-cart */
   onCustomize?: () => void;
   customizeLabel?: string;
 }
@@ -22,20 +21,21 @@ export const TikTokStyleMenu = ({ items, onAddToCart }: TikTokStyleMenuProps) =>
   if (!items.length) return null;
 
   return (
-    <div className="w-full max-w-lg mx-auto h-full snap-y snap-mandatory overflow-y-auto scrollbar-hide">
+    <div className="w-full h-full snap-y snap-mandatory overflow-y-auto scrollbar-hide">
       {items.map((item) => (
-        <VideoMenuCard
-          key={item.product.id}
-          product={item.product}
-          videoUrl={item.videoUrl}
-          posterUrl={item.posterUrl}
-          tags={item.tags}
-          onAddToCart={onAddToCart}
-          variants={item.variants}
-          displayName={item.displayName}
-          onCustomize={item.onCustomize}
-          customizeLabel={item.customizeLabel}
-        />
+        <div key={item.product.id} className="h-full w-full snap-start relative flex-shrink-0">
+          <VideoMenuCard
+            product={item.product}
+            videoUrl={item.videoUrl}
+            posterUrl={item.posterUrl}
+            tags={item.tags}
+            onAddToCart={onAddToCart}
+            variants={item.variants}
+            displayName={item.displayName}
+            onCustomize={item.onCustomize}
+            customizeLabel={item.customizeLabel}
+          />
+        </div>
       ))}
     </div>
   );

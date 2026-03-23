@@ -100,7 +100,7 @@ export const VideoMenuCard = ({
   return (
     <div
       ref={cardRef}
-      className="relative h-full w-full snap-start flex-shrink-0 overflow-hidden rounded-none sm:rounded-xl"
+      className="relative h-full w-full overflow-hidden"
     >
       {/* Video background */}
       <video
@@ -114,8 +114,8 @@ export const VideoMenuCard = ({
         preload="none"
       />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Gradient overlay – stronger at bottom for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
       {/* Floating UI */}
       <div className="absolute bottom-0 left-0 right-0 p-5 pb-8 z-10">
