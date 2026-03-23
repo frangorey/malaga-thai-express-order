@@ -230,7 +230,7 @@ const Index = () => {
 
         {validTableNumber && (
           <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
-            🍽️ Estás pidiendo desde la Mesa {validTableNumber}
+            🍽️ {t('ordering_from_table')} {validTableNumber}
           </div>
         )}
       </div>
