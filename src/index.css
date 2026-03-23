@@ -235,3 +235,12 @@ All colors MUST be HSL.
     z-index: 10000 !important;
   }
 }
+
+/* Hide scrollbar for TikTok-style scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
