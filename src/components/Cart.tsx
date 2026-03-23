@@ -358,7 +358,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                     </div>
 
                     <div>
-                      <Label htmlFor="email">Email (opcional)</Label>
+                      <Label htmlFor="email">{t('email_optional')}</Label>
                       <Input
                         id="email"
                         type="email"
