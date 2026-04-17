@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import FloorPlanView from '@/components/waiter/FloorPlanView';
+import TableDetailDrawer from '@/components/waiter/TableDetailDrawer';
 
 interface Order {
   id: string;
@@ -45,6 +47,8 @@ const WaiterPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup' | 'delivery'>('all');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
+  const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
