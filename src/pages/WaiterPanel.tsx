@@ -92,22 +92,30 @@ const WaiterPanel = () => {
     if (isModerator) {
       fetchOrders();
 
+      // Realtime (principal)
       const channel = supabase
         .channel('waiter-orders')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'orders' },
           (payload) => {
-            console.log('🔴 Realtime evento recibido:', payload);
+            console.log('Realtime evento:', payload);
             fetchOrders();
           }
         )
         .subscribe((status) => {
-          console.log('🟡 Realtime status:', status);
+          console.log('Realtime status:', status);
         });
+
+      // Polling de respaldo cada 8 segundos
+      // Por si el WebSocket cae en tablet/móvil
+      const pollInterval = setInterval(() => {
+        fetchOrders();
+      }, 8000);
 
       return () => {
         supabase.removeChannel(channel);
+        clearInterval(pollInterval);
       };
     }
   }, [isModerator]);
