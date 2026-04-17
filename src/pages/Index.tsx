@@ -290,6 +290,21 @@ const Index = () => {
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
       />
+
+      {validTableNumber && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-primary/30 py-3 px-4">
+          <div className="flex items-center justify-between gap-3 max-w-2xl mx-auto">
+            <span className="neon-text font-bold text-sm sm:text-base">
+              🍽️ {t('ordering_from_table') ? `Mesa ${validTableNumber}` : `Mesa ${validTableNumber}`}
+            </span>
+            <Link to={`/mesa/${validTableNumber}`}>
+              <Button variant="neon" size="sm">
+                Ver pedidos y cuenta →
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
