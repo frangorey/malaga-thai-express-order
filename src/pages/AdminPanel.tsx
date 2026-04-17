@@ -11,7 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera } from 'lucide-react';
+import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode } from 'lucide-react';
+import TableQRCodes from '@/components/admin/TableQRCodes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -224,6 +225,10 @@ const AdminPanel = () => {
               <Camera className="w-4 h-4" />
               Fotos Platos
             </TabsTrigger>
+            <TabsTrigger value="qrs" className="flex items-center gap-2">
+              <QrCode className="w-4 h-4" />
+              QRs de Mesa
+            </TabsTrigger>
           </TabsList>
 
           {/* ORDERS TAB */}
@@ -390,6 +395,15 @@ const AdminPanel = () => {
                     </Card>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* QR CODES TAB */}
+          <TabsContent value="qrs">
+            <Card>
+              <CardContent className="pt-6">
+                <TableQRCodes />
               </CardContent>
             </Card>
           </TabsContent>

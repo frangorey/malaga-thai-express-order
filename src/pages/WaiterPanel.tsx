@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import FloorPlanView from '@/components/waiter/FloorPlanView';
+import TableDetailDrawer from '@/components/waiter/TableDetailDrawer';
 
 interface Order {
   id: string;
@@ -45,6 +47,8 @@ const WaiterPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup' | 'delivery'>('all');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
+  const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -223,26 +227,58 @@ const WaiterPanel = () => {
           </Button>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-6">
-          {[
-            { key: 'all' as const, label: 'Todos', count: orders.length },
-            { key: 'dine_in' as const, label: '🍽️ Mesa', count: orders.filter(o => o.order_type === 'dine_in').length },
-            { key: 'pickup' as const, label: '🏪 Recoger', count: orders.filter(o => o.order_type === 'pickup').length },
-            { key: 'delivery' as const, label: '🚚 Domicilio', count: orders.filter(o => o.order_type === 'delivery').length },
-          ].map(tab => (
-            <Button
-              key={tab.key}
-              variant={filter === tab.key ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter(tab.key)}
-            >
-              {tab.label} ({tab.count})
-            </Button>
-          ))}
+        {/* View toggle */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={viewMode === 'floor' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('floor')}
+          >
+            <Map className="w-4 h-4 mr-2" />
+            🗺️ Plano
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="w-4 h-4 mr-2" />
+            📋 Lista
+          </Button>
         </div>
 
-        {/* Orders grid */}
+        {/* Filter tabs (only in list view) */}
+        {viewMode === 'list' && (
+          <div className="flex gap-2 mb-6">
+            {[
+              { key: 'all' as const, label: 'Todos', count: orders.length },
+              { key: 'dine_in' as const, label: '🍽️ Mesa', count: orders.filter(o => o.order_type === 'dine_in').length },
+              { key: 'pickup' as const, label: '🏪 Recoger', count: orders.filter(o => o.order_type === 'pickup').length },
+              { key: 'delivery' as const, label: '🚚 Domicilio', count: orders.filter(o => o.order_type === 'delivery').length },
+            ].map(tab => (
+              <Button
+                key={tab.key}
+                variant={filter === tab.key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter(tab.key)}
+              >
+                {tab.label} ({tab.count})
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {/* Floor plan view */}
+        {viewMode === 'floor' && !isLoading && (
+          <FloorPlanView
+            orders={orders}
+            onSelectTable={(n) => setSelectedTable(n)}
+          />
+        )}
+
+        {/* Orders grid (list view) */}
+        {viewMode === 'list' && (
+        <>
         {isLoading ? (
           <div className="flex justify-center py-12">
             <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -346,7 +382,18 @@ const WaiterPanel = () => {
             })}
           </div>
         )}
+        </>
+        )}
       </div>
+
+      {/* Table detail drawer */}
+      <TableDetailDrawer
+        tableNumber={selectedTable}
+        orders={orders.filter(o => o.order_type === 'dine_in' && o.table_number === selectedTable)}
+        onClose={() => setSelectedTable(null)}
+        onConfirmOrder={handleConfirmOrder}
+        confirmingId={confirmingId}
+      />
     </div>
   );
 };
