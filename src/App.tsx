@@ -13,6 +13,7 @@ import PaymentCancelled from "./pages/PaymentCancelled";
 import OrderHistory from "./pages/OrderHistory";
 import AdminPanel from "./pages/AdminPanel";
 import WaiterPanel from "./pages/WaiterPanel";
+import MesaPanel from "./pages/MesaPanel";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => {
                 <Route path="/orders" element={<OrderHistory />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/waiter" element={<WaiterPanel />} />
+                <Route path="/mesa/:tableNumber" element={<MesaPanel />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/payment-cancelled" element={<PaymentCancelled />} />
                 <Route path="*" element={<NotFound />} />

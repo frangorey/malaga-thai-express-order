@@ -7,35 +7,36 @@ export interface TablePosition {
   x_percent: number;
   y_percent: number;
   section: 'salon' | 'terraza';
+  bill_requested: boolean;
+  bill_requested_at: string | null;
 }
 
 // Default positions (match initial INSERT in DB)
 export const DEFAULT_POSITIONS: TablePosition[] = [
-  { table_number: 1, x_percent: 10, y_percent: 20, section: 'salon' },
-  { table_number: 2, x_percent: 30, y_percent: 20, section: 'salon' },
-  { table_number: 3, x_percent: 50, y_percent: 20, section: 'salon' },
-  { table_number: 4, x_percent: 70, y_percent: 20, section: 'salon' },
-  { table_number: 5, x_percent: 90, y_percent: 20, section: 'salon' },
-  { table_number: 6, x_percent: 10, y_percent: 20, section: 'terraza' },
-  { table_number: 7, x_percent: 22, y_percent: 20, section: 'terraza' },
-  { table_number: 8, x_percent: 34, y_percent: 20, section: 'terraza' },
-  { table_number: 9, x_percent: 46, y_percent: 20, section: 'terraza' },
-  { table_number: 10, x_percent: 58, y_percent: 20, section: 'terraza' },
-  { table_number: 11, x_percent: 70, y_percent: 20, section: 'terraza' },
-  { table_number: 12, x_percent: 82, y_percent: 20, section: 'terraza' },
-  { table_number: 13, x_percent: 10, y_percent: 60, section: 'terraza' },
-  { table_number: 14, x_percent: 22, y_percent: 60, section: 'terraza' },
+  { table_number: 1, x_percent: 10, y_percent: 20, section: 'salon', bill_requested: false, bill_requested_at: null },
+  { table_number: 2, x_percent: 30, y_percent: 20, section: 'salon', bill_requested: false, bill_requested_at: null },
+  { table_number: 3, x_percent: 50, y_percent: 20, section: 'salon', bill_requested: false, bill_requested_at: null },
+  { table_number: 4, x_percent: 70, y_percent: 20, section: 'salon', bill_requested: false, bill_requested_at: null },
+  { table_number: 5, x_percent: 90, y_percent: 20, section: 'salon', bill_requested: false, bill_requested_at: null },
+  { table_number: 6, x_percent: 10, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 7, x_percent: 22, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 8, x_percent: 34, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 9, x_percent: 46, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 10, x_percent: 58, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 11, x_percent: 70, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 12, x_percent: 82, y_percent: 20, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 13, x_percent: 10, y_percent: 60, section: 'terraza', bill_requested: false, bill_requested_at: null },
+  { table_number: 14, x_percent: 22, y_percent: 60, section: 'terraza', bill_requested: false, bill_requested_at: null },
 ];
 
-export const useTableLayout = () => {
+export const useTableLayout = (options?: { realtime?: boolean }) => {
   const [layout, setLayout] = useState<TablePosition[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchLayout = useCallback(async () => {
-    setIsLoading(true);
     const { data, error } = await supabase
       .from('table_layout')
-      .select('table_number, x_percent, y_percent, section')
+      .select('table_number, x_percent, y_percent, section, bill_requested, bill_requested_at')
       .order('table_number');
 
     if (error) {
@@ -49,6 +50,8 @@ export const useTableLayout = () => {
           x_percent: Number(r.x_percent),
           y_percent: Number(r.y_percent),
           section: r.section as 'salon' | 'terraza',
+          bill_requested: !!r.bill_requested,
+          bill_requested_at: r.bill_requested_at,
         }))
       );
     }
@@ -58,6 +61,22 @@ export const useTableLayout = () => {
   useEffect(() => {
     fetchLayout();
   }, [fetchLayout]);
+
+  // Optional realtime subscription on table_layout
+  useEffect(() => {
+    if (!options?.realtime) return;
+    const channel = supabase
+      .channel('table-layout-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'table_layout' },
+        () => fetchLayout()
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [options?.realtime, fetchLayout]);
 
   const updatePosition = useCallback(
     async (tableNumber: number, x: number, y: number) => {
@@ -76,7 +95,6 @@ export const useTableLayout = () => {
       if (error) {
         console.error('Error updating table position:', error);
         toast.error(`Error al guardar mesa ${tableNumber}`);
-        // Revert by refetching
         fetchLayout();
       }
     },
@@ -116,11 +134,28 @@ export const useTableLayout = () => {
           x_percent: 50,
           y_percent: 50,
           section: 'salon',
+          bill_requested: false,
+          bill_requested_at: null,
         }
       );
     },
     [layout]
   );
 
-  return { layout, isLoading, updatePosition, resetToDefaults, getPosition, refetch: fetchLayout };
+  const clearBillRequest = useCallback(
+    async (tableNumber: number) => {
+      const { error } = await supabase
+        .from('table_layout')
+        .update({ bill_requested: false, bill_requested_at: null })
+        .eq('table_number', tableNumber);
+      if (error) {
+        toast.error(`Error al limpiar mesa ${tableNumber}`);
+      } else {
+        fetchLayout();
+      }
+    },
+    [fetchLayout]
+  );
+
+  return { layout, isLoading, updatePosition, resetToDefaults, getPosition, refetch: fetchLayout, clearBillRequest };
 };
