@@ -334,6 +334,8 @@ export type Database = {
       }
       table_layout: {
         Row: {
+          bill_requested: boolean | null
+          bill_requested_at: string | null
           created_at: string | null
           id: string
           section: string
@@ -343,6 +345,8 @@ export type Database = {
           y_percent: number
         }
         Insert: {
+          bill_requested?: boolean | null
+          bill_requested_at?: string | null
           created_at?: string | null
           id?: string
           section?: string
@@ -352,6 +356,8 @@ export type Database = {
           y_percent?: number
         }
         Update: {
+          bill_requested?: boolean | null
+          bill_requested_at?: string | null
           created_at?: string | null
           id?: string
           section?: string
