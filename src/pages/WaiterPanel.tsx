@@ -53,7 +53,7 @@ const WaiterPanel = () => {
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Check if there are unconfirmed orders (received status, no confirmed_at)
-  const hasUnconfirmedOrders = orders.some(o => o.order_status === 'received' && !o.confirmed_at);
+  const hasUnconfirmedOrders = orders.some(o => o.order_status === 'received');
 
   useEffect(() => {
     if (!roleLoading && !user) {
