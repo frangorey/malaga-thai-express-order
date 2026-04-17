@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
