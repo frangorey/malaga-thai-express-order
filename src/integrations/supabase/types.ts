@@ -332,6 +332,36 @@ export type Database = {
         }
         Relationships: []
       }
+      table_layout: {
+        Row: {
+          created_at: string | null
+          id: string
+          section: string
+          table_number: number
+          updated_at: string | null
+          x_percent: number
+          y_percent: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          section?: string
+          table_number: number
+          updated_at?: string | null
+          x_percent?: number
+          y_percent?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          section?: string
+          table_number?: number
+          updated_at?: string | null
+          x_percent?: number
+          y_percent?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
