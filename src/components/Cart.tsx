@@ -63,17 +63,36 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
       return;
     }
 
-    // Validate customer info - address not needed for pickup/dine_in
-    const infoToValidate = { ...customerInfo, address: 'N/A' };
-    const validation = validateCustomerInfo(infoToValidate);
-    
-    if (!validation.isValid) {
-      toast({
-        title: "Error",
-        description: validation.errors[0],
-        variant: "destructive",
-      });
-      return;
+    const isDineInQR = orderType === 'dine_in' && !!tableNumber;
+
+    // For dine_in via QR, skip validation - waiter knows the table
+    let validation;
+    if (isDineInQR) {
+      validation = {
+        isValid: true,
+        errors: [],
+        data: {
+          name: `Mesa ${tableNumber}`,
+          phone: "0000000000",
+          phonePrefix: "+34",
+          address: "N/A",
+          email: "",
+          notes: customerInfo.notes || ""
+        }
+      };
+    } else {
+      // Validate customer info - address not needed for pickup
+      const infoToValidate = { ...customerInfo, address: 'N/A' };
+      validation = validateCustomerInfo(infoToValidate);
+
+      if (!validation.isValid) {
+        toast({
+          title: "Error",
+          description: validation.errors[0],
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (items.length === 0) {
