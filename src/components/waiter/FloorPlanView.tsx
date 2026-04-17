@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import TableCard, { TableStatus } from './TableCard';
+import { useTableLayout } from '@/hooks/useTableLayout';
 
 interface Order {
   id: string;
@@ -32,6 +33,8 @@ const STATUS_PRIORITY: Record<TableStatus, number> = {
 };
 
 const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
+  const { getPosition } = useTableLayout();
+
   const tableMap = useMemo(() => {
     const map = new Map<number, {
       status: TableStatus;
@@ -82,17 +85,27 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
       latestTime: null,
       pendingCount: 0,
     };
+    const pos = getPosition(n);
     return (
-      <TableCard
+      <div
         key={n}
-        tableNumber={n}
-        status={data.status}
-        ordersCount={data.ordersCount}
-        total={data.total}
-        latestTime={data.latestTime}
-        pendingCount={data.pendingCount}
-        onClick={() => onSelectTable(n)}
-      />
+        className="absolute"
+        style={{
+          left: `${pos.x_percent}%`,
+          top: `${pos.y_percent}%`,
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <TableCard
+          tableNumber={n}
+          status={data.status}
+          ordersCount={data.ordersCount}
+          total={data.total}
+          latestTime={data.latestTime}
+          pendingCount={data.pendingCount}
+          onClick={() => onSelectTable(n)}
+        />
+      </div>
     );
   };
 
@@ -104,7 +117,7 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
           🍽️ <span>Salón</span>
           <span className="text-sm text-muted-foreground font-normal">({SALON.length} mesas)</span>
         </h2>
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-start p-4 rounded-xl bg-muted/30 border border-border">
+        <div className="relative w-full h-[300px] rounded-xl bg-muted/30 border border-border">
           {SALON.map(renderTable)}
         </div>
       </section>
@@ -115,7 +128,7 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
           🌿 <span>Terraza</span>
           <span className="text-sm text-muted-foreground font-normal">({TERRAZA.length} mesas)</span>
         </h2>
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-start p-4 rounded-xl bg-muted/30 border border-border">
+        <div className="relative w-full h-[300px] rounded-xl bg-muted/30 border border-border">
           {TERRAZA.map(renderTable)}
         </div>
       </section>
