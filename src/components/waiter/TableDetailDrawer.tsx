@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Clock, RefreshCw } from 'lucide-react';
+import { CheckCircle, Clock, RefreshCw, ChefHat, PackageCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,8 @@ interface TableDetailDrawerProps {
   orders: Order[];
   onClose: () => void;
   onConfirmOrder: (order: Order) => void;
+  onMarkReady?: (order: Order) => void;
+  onMarkDelivered?: (order: Order) => void;
   confirmingId: string | null;
 }
 
@@ -46,6 +48,8 @@ const TableDetailDrawer = ({
   orders,
   onClose,
   onConfirmOrder,
+  onMarkReady,
+  onMarkDelivered,
   confirmingId,
 }: TableDetailDrawerProps) => {
   const [history, setHistory] = useState<Order[]>([]);
@@ -157,6 +161,30 @@ const TableDetailDrawer = ({
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
                             {confirmingId === order.id ? 'Tramitando...' : 'Tramitar pedido'}
+                          </Button>
+                        )}
+                        {order.order_status === 'confirmed' && onMarkReady && (
+                          <Button
+                            className="w-full border-green-500 text-green-500 hover:bg-green-500/10"
+                            variant="outline"
+                            size="sm"
+                            disabled={confirmingId === order.id}
+                            onClick={() => onMarkReady(order)}
+                          >
+                            <ChefHat className="w-4 h-4 mr-2" />
+                            {confirmingId === order.id ? 'Actualizando...' : '🍽️ Comida sale'}
+                          </Button>
+                        )}
+                        {order.order_status === 'ready' && onMarkDelivered && (
+                          <Button
+                            className="w-full"
+                            variant="default"
+                            size="sm"
+                            disabled={confirmingId === order.id}
+                            onClick={() => onMarkDelivered(order)}
+                          >
+                            <PackageCheck className="w-4 h-4 mr-2" />
+                            {confirmingId === order.id ? 'Actualizando...' : '✅ Entregado'}
                           </Button>
                         )}
                       </CardContent>

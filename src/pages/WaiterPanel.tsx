@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import FloorPlanView from '@/components/waiter/FloorPlanView';
@@ -160,6 +160,38 @@ const WaiterPanel = () => {
       toast.error('Error al confirmar el pedido');
     } else {
       toast.success(`Pedido ${order.order_number} tramitado ✅`);
+      fetchOrders();
+    }
+    setConfirmingId(null);
+  };
+
+  const handleMarkReady = async (order: Order) => {
+    setConfirmingId(order.id);
+    const { error } = await supabase
+      .from('orders')
+      .update({ order_status: 'ready' })
+      .eq('id', order.id);
+    if (error) {
+      console.error('Error marking ready:', error);
+      toast.error('Error al actualizar el pedido');
+    } else {
+      toast.success(`Mesa ${order.table_number ?? '?'} — Comida en camino ✅`);
+      fetchOrders();
+    }
+    setConfirmingId(null);
+  };
+
+  const handleMarkDelivered = async (order: Order) => {
+    setConfirmingId(order.id);
+    const { error } = await supabase
+      .from('orders')
+      .update({ order_status: 'delivered' })
+      .eq('id', order.id);
+    if (error) {
+      console.error('Error marking delivered:', error);
+      toast.error('Error al actualizar el pedido');
+    } else {
+      toast.success('Pedido entregado');
       fetchOrders();
     }
     setConfirmingId(null);
@@ -374,7 +406,7 @@ const WaiterPanel = () => {
                       <span>{order.total_amount.toFixed(2)}€</span>
                     </div>
 
-                    {/* Confirm button - only for unconfirmed orders */}
+                    {/* Action buttons by status */}
                     {isReceived && (
                       <Button
                         className="w-full mt-2"
@@ -385,6 +417,30 @@ const WaiterPanel = () => {
                       >
                         <CheckCircle className="w-5 h-5 mr-2" />
                         {confirmingId === order.id ? 'Tramitando...' : 'Pedido Tramitado'}
+                      </Button>
+                    )}
+                    {order.order_status === 'confirmed' && (
+                      <Button
+                        className="w-full mt-2 border-green-500 text-green-500 hover:bg-green-500/10"
+                        variant="outline"
+                        size="lg"
+                        disabled={confirmingId === order.id}
+                        onClick={() => handleMarkReady(order)}
+                      >
+                        <ChefHat className="w-5 h-5 mr-2" />
+                        {confirmingId === order.id ? 'Actualizando...' : '🍽️ Comida sale'}
+                      </Button>
+                    )}
+                    {order.order_status === 'ready' && (
+                      <Button
+                        className="w-full mt-2"
+                        variant="default"
+                        size="lg"
+                        disabled={confirmingId === order.id}
+                        onClick={() => handleMarkDelivered(order)}
+                      >
+                        <PackageCheck className="w-5 h-5 mr-2" />
+                        {confirmingId === order.id ? 'Actualizando...' : '✅ Entregado'}
                       </Button>
                     )}
                   </CardContent>
@@ -403,6 +459,8 @@ const WaiterPanel = () => {
         orders={orders.filter(o => o.order_type === 'dine_in' && o.table_number === selectedTable)}
         onClose={() => setSelectedTable(null)}
         onConfirmOrder={handleConfirmOrder}
+        onMarkReady={handleMarkReady}
+        onMarkDelivered={handleMarkDelivered}
         confirmingId={confirmingId}
       />
     </div>
