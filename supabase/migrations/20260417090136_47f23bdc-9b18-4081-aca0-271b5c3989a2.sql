@@ -1,0 +1,1 @@
+DELETE FROM public.orders WHERE created_at >= CURRENT_DATE AND created_at < CURRENT_DATE + INTERVAL '1 day';
