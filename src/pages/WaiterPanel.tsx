@@ -227,26 +227,58 @@ const WaiterPanel = () => {
           </Button>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-6">
-          {[
-            { key: 'all' as const, label: 'Todos', count: orders.length },
-            { key: 'dine_in' as const, label: '🍽️ Mesa', count: orders.filter(o => o.order_type === 'dine_in').length },
-            { key: 'pickup' as const, label: '🏪 Recoger', count: orders.filter(o => o.order_type === 'pickup').length },
-            { key: 'delivery' as const, label: '🚚 Domicilio', count: orders.filter(o => o.order_type === 'delivery').length },
-          ].map(tab => (
-            <Button
-              key={tab.key}
-              variant={filter === tab.key ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter(tab.key)}
-            >
-              {tab.label} ({tab.count})
-            </Button>
-          ))}
+        {/* View toggle */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={viewMode === 'floor' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('floor')}
+          >
+            <Map className="w-4 h-4 mr-2" />
+            🗺️ Plano
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="w-4 h-4 mr-2" />
+            📋 Lista
+          </Button>
         </div>
 
-        {/* Orders grid */}
+        {/* Filter tabs (only in list view) */}
+        {viewMode === 'list' && (
+          <div className="flex gap-2 mb-6">
+            {[
+              { key: 'all' as const, label: 'Todos', count: orders.length },
+              { key: 'dine_in' as const, label: '🍽️ Mesa', count: orders.filter(o => o.order_type === 'dine_in').length },
+              { key: 'pickup' as const, label: '🏪 Recoger', count: orders.filter(o => o.order_type === 'pickup').length },
+              { key: 'delivery' as const, label: '🚚 Domicilio', count: orders.filter(o => o.order_type === 'delivery').length },
+            ].map(tab => (
+              <Button
+                key={tab.key}
+                variant={filter === tab.key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter(tab.key)}
+              >
+                {tab.label} ({tab.count})
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {/* Floor plan view */}
+        {viewMode === 'floor' && !isLoading && (
+          <FloorPlanView
+            orders={orders}
+            onSelectTable={(n) => setSelectedTable(n)}
+          />
+        )}
+
+        {/* Orders grid (list view) */}
+        {viewMode === 'list' && (
+        <>
         {isLoading ? (
           <div className="flex justify-center py-12">
             <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
