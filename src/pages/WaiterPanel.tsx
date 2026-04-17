@@ -97,11 +97,14 @@ const WaiterPanel = () => {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'orders' },
-          () => {
+          (payload) => {
+            console.log('🔴 Realtime evento recibido:', payload);
             fetchOrders();
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('🟡 Realtime status:', status);
+        });
 
       return () => {
         supabase.removeChannel(channel);
