@@ -1,54 +1,73 @@
 
 
-## Plan: Connect TikTok Menu to Real Supabase Products
+## Plan: Comandero Visual por Mesas
 
-### Problem
-The TikTok-style menu currently shows generic mock data ("Arroz #1", "Arroz #2" with random prices). You want to see the actual dishes with their real names, descriptions, and prices from your database.
+### Archivos nuevos (4)
 
-### Approach
-Replace the mock data generator with real Supabase data. The `useProducts` hook already fetches all products from the `products` table. We need to wire it into `Index.tsx` and map the category IDs from the nav to the actual category names in the database.
+**1. `src/components/waiter/TableCard.tsx`** — Tarjeta 130×130px
+- Props: `tableNumber, status, ordersCount, total, latestTime, pendingCount, onClick`
+- Bordes y sombras según estado (free/received/confirmed/preparing/ready)
+- `received` añade `animate-pulse` + sombra roja neón
+- Número grande con `neon-text`, emoji estado, total €, hora, badge rojo si pendingCount > 0
+- `hover:scale-105` + `cursor-pointer`
 
-### Changes
+**2. `src/components/waiter/FloorPlanView.tsx`** — Plano agrupado
+- `useMemo` agrupa orders donde `order_type === 'dine_in'` por `table_number`
+- Estado peor gana: `received > confirmed > preparing > ready > free`
+- Suma total acumulado y cuenta `pendingCount` (received sin confirmar)
+- Sección Salón (1–5, grid 5 cols) + Terraza (6–14, grid responsive)
+- Leyenda de colores abajo
 
-**1. `src/pages/Index.tsx`**
-- Import and use the `useProducts` hook to fetch real products from Supabase
-- Create a mapping from nav category IDs (`arroz`, `tallarines`, `sopas`, etc.) to Supabase category names (`Arroces`, `Tallarines`, `Sopas`, `Pokes`, `Ensaladas`, `Currys`, `Postres`, `Entrantes`, `Bebidas`, `Otras del Mundo`)
-- Convert each real `SupabaseProduct` into the `FeaturedItem` format expected by `TikTokStyleMenu`, using the temporary video URL and the product's `image_url` as the poster
-- Remove the import of `getCategoryVideoItems` from mockVideoItems
-- Add a loading state while products load
+**3. `src/components/waiter/TableDetailDrawer.tsx`** — Drawer lateral
+- Shadcn `Sheet side="right"`, `max-w-lg`
+- Header con número mesa + total € + badge estado
+- Tabs: **Activos** (cards estilo WaiterPanel + botón Tramitar para `received`) y **Historial** (query a Supabase: delivered/cancelled últimos 20)
+- Query historial dentro de `useEffect([tableNumber])` solo cuando drawer abierto
 
-**2. `src/utils/mockVideoItems.ts`**
-- Can be kept as fallback or deleted. Will remove the import from Index.
+**4. `src/components/admin/TableQRCodes.tsx`** — Gestor QR (admin)
+- `qrcode.react` (nueva dependencia)
+- Grid 14 QRs (2 col móvil / 4 col desktop), cada uno apuntando a `https://www.thaiiexpress.es/?mesa=N`
+- Botón descarga PNG individual (canvas serialization)
+- Botón "Imprimir todos" con CSS `@media print` (A6, 2 cols)
+- Integración: nueva pestaña en `AdminPanel.tsx` con icono `QrCode`
 
-### Category ID to DB Mapping
-```text
-Nav ID        →  DB category
-─────────────────────────────
-entrantes     →  Entrantes
-arroz         →  Arroces
-tallarines    →  Tallarines
-sopas         →  Sopas
-pokes         →  Pokes
-ensaladas     →  Ensaladas
-postres       →  Postres
-otras         →  Otras del Mundo / Currys
-bebidas       →  Bebidas
+### Archivo modificado (1)
+
+**5. `src/pages/WaiterPanel.tsx`**
+- Añadir estado `viewMode: 'list' | 'floor'` (default `'floor'`) y `selectedTable: number | null`
+- Toggle de vista (botones 🗺️ Plano / 📋 Lista) tras el header, antes de filtros
+- Render condicional: `FloorPlanView` o el grid actual de cards (sin tocarlo)
+- Montar `TableDetailDrawer` al final, alimentado con orders filtradas por `selectedTable`
+- **No tocar**: `fetchOrders`, `playLoudAlarm`, `handleConfirmOrder`, canal realtime, alarma, lógica de roles
+
+### i18n (LanguageContext)
+
+Nuevas claves × 5 idiomas: `floor_plan, list_view, salon, terraza, table_free, table_busy, table_ready, view_history, active_orders, history, qr_codes_tab, print_qrs, scan_to_order, download_qr`
+
+### Dependencia nueva
+
+```
+qrcode.react  (~6KB gzip)
 ```
 
-Note: "Currys" exists in `menuData.ts` but the nav has "otras" (Otras del Mundo). We need to verify which categories actually exist in the DB. The plan will query all available categories and map accordingly.
+### Diff resumen (archivos tocados)
 
-### Data Flow
 ```text
-Supabase products table
-  → useProducts() hook (already exists)
-    → getProductsByCategory(mappedName)
-      → map to FeaturedItem[] with temp video + image_url as poster
-        → TikTokStyleMenu → VideoMenuCard
+NEW  src/components/waiter/TableCard.tsx              ~70 líneas
+NEW  src/components/waiter/FloorPlanView.tsx          ~110 líneas
+NEW  src/components/waiter/TableDetailDrawer.tsx      ~140 líneas
+NEW  src/components/admin/TableQRCodes.tsx            ~120 líneas
+MOD  src/pages/WaiterPanel.tsx                        +25 líneas (toggle + drawer mount)
+MOD  src/pages/AdminPanel.tsx                         +1 tab (QrCode + TableQRCodes)
+MOD  src/contexts/LanguageContext.tsx                 +14 keys × 5 langs
+MOD  package.json                                     +qrcode.react
 ```
 
-### Technical Detail
-- Each product gets the temporary video URL (same one used now)
-- The product's `image_url` from Supabase is used as the video `poster` (so users see the real dish photo before video plays)
-- The `addToCart` function continues to receive the real `SupabaseProduct` object, maintaining full cart functionality
-- Vegetarian/spicy badges come from the real `is_vegetarian`/`is_spicy` fields
+### Garantías
+
+- Realtime existente (`waiter-orders`) reutilizado — cualquier cambio refresca el plano automáticamente
+- Lista actual sigue intacta y accesible vía toggle
+- `handleConfirmOrder` se pasa al drawer sin modificar (misma firma)
+- Solo lee/escribe `orders` con políticas RLS ya existentes para `moderator`
+- Sin cambios de schema ni migraciones
 
