@@ -63,17 +63,36 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
       return;
     }
 
-    // Validate customer info - address not needed for pickup/dine_in
-    const infoToValidate = { ...customerInfo, address: 'N/A' };
-    const validation = validateCustomerInfo(infoToValidate);
-    
-    if (!validation.isValid) {
-      toast({
-        title: "Error",
-        description: validation.errors[0],
-        variant: "destructive",
-      });
-      return;
+    const isDineInQR = orderType === 'dine_in' && !!tableNumber;
+
+    // For dine_in via QR, skip validation - waiter knows the table
+    let validation;
+    if (isDineInQR) {
+      validation = {
+        isValid: true,
+        errors: [],
+        data: {
+          name: `Mesa ${tableNumber}`,
+          phone: "0000000000",
+          phonePrefix: "+34",
+          address: "N/A",
+          email: "",
+          notes: customerInfo.notes || ""
+        }
+      };
+    } else {
+      // Validate customer info - address not needed for pickup
+      const infoToValidate = { ...customerInfo, address: 'N/A' };
+      validation = validateCustomerInfo(infoToValidate);
+
+      if (!validation.isValid) {
+        toast({
+          title: "Error",
+          description: validation.errors[0],
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (items.length === 0) {
@@ -271,8 +290,8 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                 </Card>
               )}
 
-              {/* Customer Info Form */}
-              {orderType && (
+              {/* Customer Info Form - hidden for dine_in via QR */}
+              {orderType && !(orderType === 'dine_in' && tableNumber) && (
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle className="text-lg">{t('your_details')}</CardTitle>
@@ -377,6 +396,23 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                         rows={2}
                       />
                     </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Notes only - for dine_in via QR */}
+              {orderType === 'dine_in' && tableNumber && (
+                <Card className="mb-6">
+                  <CardContent className="p-4">
+                    <Label htmlFor="notes-dinein">{t('observations')}</Label>
+                    <Textarea
+                      id="notes-dinein"
+                      value={customerInfo.notes}
+                      onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
+                      placeholder="¿Alguna observación? (opcional)"
+                      rows={2}
+                      className="mt-2"
+                    />
                   </CardContent>
                 </Card>
               )}
