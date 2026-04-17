@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import TableCard, { TableStatus } from './TableCard';
 import { useTableLayout } from '@/hooks/useTableLayout';
 
@@ -23,7 +24,6 @@ interface FloorPlanViewProps {
 const SALON = [1, 2, 3, 4, 5];
 const TERRAZA = [6, 7, 8, 9, 10, 11, 12, 13, 14];
 
-// Worse status wins
 const STATUS_PRIORITY: Record<TableStatus, number> = {
   received: 5,
   confirmed: 4,
@@ -32,8 +32,55 @@ const STATUS_PRIORITY: Record<TableStatus, number> = {
   free: 1,
 };
 
+const playBillChime = () => {
+  try {
+    const audioCtx = new AudioContext();
+    const now = audioCtx.currentTime;
+    // Two ascending soft beeps
+    [0, 0.18].forEach((offset, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = i === 0 ? 880 : 1320;
+      const start = now + offset;
+      gain.gain.setValueAtTime(0.5, start);
+      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.35);
+      osc.start(start);
+      osc.stop(start + 0.35);
+    });
+  } catch {
+    // ignore
+  }
+};
+
 const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
-  const { getPosition } = useTableLayout();
+  const { layout, getPosition } = useTableLayout({ realtime: true });
+  const prevBillRef = useRef<Record<number, boolean>>({});
+
+  // Detect transitions false -> true on bill_requested
+  useEffect(() => {
+    if (!layout.length) return;
+    const prev = prevBillRef.current;
+    const next: Record<number, boolean> = {};
+    layout.forEach((p) => {
+      next[p.table_number] = p.bill_requested;
+      const wasRequested = prev[p.table_number];
+      if (p.bill_requested && wasRequested === false) {
+        toast.warning(`💳 Mesa ${p.table_number} solicita la cuenta`, {
+          duration: 8000,
+        });
+        playBillChime();
+      }
+    });
+    prevBillRef.current = next;
+  }, [layout]);
+
+  const billRequestedSet = useMemo(
+    () => new Set(layout.filter((p) => p.bill_requested).map((p) => p.table_number)),
+    [layout]
+  );
 
   const tableMap = useMemo(() => {
     const map = new Map<number, {
@@ -86,6 +133,7 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
       pendingCount: 0,
     };
     const pos = getPosition(n);
+    const billRequested = billRequestedSet.has(n);
     return (
       <div
         key={n}
@@ -96,15 +144,24 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <TableCard
-          tableNumber={n}
-          status={data.status}
-          ordersCount={data.ordersCount}
-          total={data.total}
-          latestTime={data.latestTime}
-          pendingCount={data.pendingCount}
-          onClick={() => onSelectTable(n)}
-        />
+        <div className="relative">
+          {billRequested && (
+            <div className="absolute -top-3 -left-3 z-10 animate-pulse">
+              <div className="bg-yellow-400 text-black rounded-full w-9 h-9 flex items-center justify-center text-lg shadow-[0_0_15px_rgba(250,204,21,0.7)] border-2 border-background">
+                💳
+              </div>
+            </div>
+          )}
+          <TableCard
+            tableNumber={n}
+            status={data.status}
+            ordersCount={data.ordersCount}
+            total={data.total}
+            latestTime={data.latestTime}
+            pendingCount={data.pendingCount}
+            onClick={() => onSelectTable(n)}
+          />
+        </div>
       </div>
     );
   };
@@ -141,6 +198,7 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
           <span className="flex items-center gap-1.5">🟡 <span className="text-muted-foreground">Confirmado</span></span>
           <span className="flex items-center gap-1.5">🔥 <span className="text-muted-foreground">Preparando</span></span>
           <span className="flex items-center gap-1.5">✅ <span className="text-muted-foreground">Listo</span></span>
+          <span className="flex items-center gap-1.5">💳 <span className="text-muted-foreground">Pide cuenta</span></span>
         </div>
       </section>
     </div>

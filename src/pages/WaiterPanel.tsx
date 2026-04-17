@@ -459,6 +459,8 @@ const WaiterPanel = () => {
         orders={orders.filter(o => o.order_type === 'dine_in' && o.table_number === selectedTable)}
         onClose={() => setSelectedTable(null)}
         onConfirmOrder={handleConfirmOrder}
+        onMarkReady={handleMarkReady}
+        onMarkDelivered={handleMarkDelivered}
         confirmingId={confirmingId}
       />
     </div>
