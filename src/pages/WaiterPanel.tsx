@@ -382,7 +382,18 @@ const WaiterPanel = () => {
             })}
           </div>
         )}
+        </>
+        )}
       </div>
+
+      {/* Table detail drawer */}
+      <TableDetailDrawer
+        tableNumber={selectedTable}
+        orders={orders.filter(o => o.order_type === 'dine_in' && o.table_number === selectedTable)}
+        onClose={() => setSelectedTable(null)}
+        onConfirmOrder={handleConfirmOrder}
+        confirmingId={confirmingId}
+      />
     </div>
   );
 };
