@@ -67,7 +67,7 @@ const FloorPlanView = ({ orders, onSelectTable }: FloorPlanViewProps) => {
     layout.forEach((p) => {
       next[p.table_number] = p.bill_requested;
       const wasRequested = prev[p.table_number];
-      if (p.bill_requested && wasRequested === false) {
+      if (p.bill_requested && !wasRequested) {
         toast.warning(`💳 Mesa ${p.table_number} solicita la cuenta`, {
           duration: 8000,
         });
