@@ -427,6 +427,9 @@ const WaiterPanel = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
                         🕐 Pedido: {format(new Date(order.created_at), 'HH:mm:ss', { locale: es })}
+                        <span className="ml-2 text-xs font-mono text-muted-foreground/70">
+                          (hace {formatElapsed(order.created_at)})
+                        </span>
                       </span>
                       <Badge className={`${statusInfo.color} text-white`}>{statusInfo.label}</Badge>
                     </div>
@@ -457,9 +460,19 @@ const WaiterPanel = () => {
 
                     {/* Notes */}
                     {order.notes && (
-                      <div className="bg-muted/50 rounded p-2 text-sm">
-                        <span className="font-medium">📝 </span>{order.notes}
-                      </div>
+                      hasCriticalNote(order.notes) ? (
+                        <div className="bg-red-50 border border-red-200 rounded p-2 text-sm">
+                          <p className="font-bold text-red-700">
+                            🚨 ⚠️ {order.notes}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-50 border border-amber-200 rounded p-2 text-sm">
+                          <p className="font-bold text-amber-800">
+                            ⚠️ 📝 {order.notes}
+                          </p>
+                        </div>
+                      )
                     )}
 
                     {/* Total */}
