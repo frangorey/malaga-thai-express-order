@@ -549,7 +549,13 @@ const translations = {
     'cancel_reason_other_placeholder': 'Describe el motivo...',
     'confirm_cancel_button': 'Confirmar cancelación',
     'back_button': 'Volver',
-    'order_cancelled_toast': 'Pedido cancelado'
+    'order_cancelled_toast': 'Pedido cancelado',
+    'new_order_action_title': '⚠️ NUEVO PEDIDO — ACCIÓN REQUERIDA',
+    'new_order_step_1': 'Revisa el pedido completo abajo',
+    'new_order_step_2': 'Anótalo en tu sistema TPV (caja)',
+    'new_order_step_3': 'Entrega el ticket en cocina',
+    'new_order_step_4': 'Confirma aquí cuando esté en cocina',
+    'confirm_in_kitchen_button': '✅ Pedido en cocina — Confirmar'
   },
   
   en: {
@@ -1047,7 +1053,13 @@ const translations = {
     'cancel_reason_other_placeholder': 'Describe the reason...',
     'confirm_cancel_button': 'Confirm cancellation',
     'back_button': 'Back',
-    'order_cancelled_toast': 'Order cancelled'
+    'order_cancelled_toast': 'Order cancelled',
+    'new_order_action_title': '⚠️ NEW ORDER — ACTION REQUIRED',
+    'new_order_step_1': 'Review the complete order below',
+    'new_order_step_2': 'Enter it in your POS system (cash register)',
+    'new_order_step_3': 'Hand the ticket to the kitchen',
+    'new_order_step_4': 'Confirm here when it is in the kitchen',
+    'confirm_in_kitchen_button': '✅ Order in kitchen — Confirm'
   },
   
   fr: {
@@ -1539,7 +1551,13 @@ const translations = {
     'cancel_reason_other_placeholder': 'Décrivez le motif...',
     'confirm_cancel_button': "Confirmer l'annulation",
     'back_button': 'Retour',
-    'order_cancelled_toast': 'Commande annulée'
+    'order_cancelled_toast': 'Commande annulée',
+    'new_order_action_title': '⚠️ NOUVELLE COMMANDE — ACTION REQUISE',
+    'new_order_step_1': 'Vérifiez la commande complète ci-dessous',
+    'new_order_step_2': 'Enregistrez-la dans votre caisse',
+    'new_order_step_3': 'Déposez le ticket en cuisine',
+    'new_order_step_4': 'Confirmez ici quand c\'est en cuisine',
+    'confirm_in_kitchen_button': '✅ Commande en cuisine — Confirmer'
   },
   
   de: {
@@ -2031,7 +2049,13 @@ const translations = {
     'cancel_reason_other_placeholder': 'Grund beschreiben...',
     'confirm_cancel_button': 'Stornierung bestätigen',
     'back_button': 'Zurück',
-    'order_cancelled_toast': 'Bestellung storniert'
+    'order_cancelled_toast': 'Bestellung storniert',
+    'new_order_action_title': '⚠️ NEUE BESTELLUNG — AKTION ERFORDERLICH',
+    'new_order_step_1': 'Überprüfen Sie die vollständige Bestellung unten',
+    'new_order_step_2': 'Tragen Sie es in Ihr Kassensystem ein',
+    'new_order_step_3': 'Geben Sie den Kassenbon an die Küche',
+    'new_order_step_4': 'Bestätigen Sie hier, wenn es in der Küche ist',
+    'confirm_in_kitchen_button': '✅ Bestellung in der Küche — Bestätigen'
   },
 
   ru: {
