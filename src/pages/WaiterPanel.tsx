@@ -44,6 +44,26 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-500' },
 };
 
+const formatElapsed = (createdAt: string): string => {
+  const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  return `${mins}m ${String(secs).padStart(2, '0')}s`;
+};
+
+const CRITICAL_WORDS = [
+  'alergia', 'alérgico', 'alergica', 'alergias',
+  'sin gluten', 'celíaco', 'celiaco', 'celiac',
+  'intoler', 'vegano', 'vegetariano',
+  'embarazo', 'embarazada', 'picante'
+];
+
+const hasCriticalNote = (notes: string | null): boolean => {
+  if (!notes) return false;
+  const lower = notes.toLowerCase();
+  return CRITICAL_WORDS.some(w => lower.includes(w));
+};
+
 const WaiterPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,6 +79,7 @@ const WaiterPanel = () => {
   const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelOtherText, setCancelOtherText] = useState('');
+  const [tick, setTick] = useState(0);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -75,6 +96,11 @@ const WaiterPanel = () => {
       navigate('/');
     }
   }, [user, isModerator, roleLoading, navigate]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Repeating loud alarm while there are unconfirmed orders
   useEffect(() => {
@@ -401,6 +427,9 @@ const WaiterPanel = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
                         🕐 Pedido: {format(new Date(order.created_at), 'HH:mm:ss', { locale: es })}
+                        <span className="ml-2 text-xs font-mono text-muted-foreground/70">
+                          (hace {formatElapsed(order.created_at)})
+                        </span>
                       </span>
                       <Badge className={`${statusInfo.color} text-white`}>{statusInfo.label}</Badge>
                     </div>
@@ -431,9 +460,19 @@ const WaiterPanel = () => {
 
                     {/* Notes */}
                     {order.notes && (
-                      <div className="bg-muted/50 rounded p-2 text-sm">
-                        <span className="font-medium">📝 </span>{order.notes}
-                      </div>
+                      hasCriticalNote(order.notes) ? (
+                        <div className="bg-red-50 border border-red-200 rounded p-2 text-sm">
+                          <p className="font-bold text-red-700">
+                            🚨 ⚠️ {order.notes}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-50 border border-amber-200 rounded p-2 text-sm">
+                          <p className="font-bold text-amber-800">
+                            ⚠️ 📝 {order.notes}
+                          </p>
+                        </div>
+                      )
                     )}
 
                     {/* Total */}
@@ -444,16 +483,29 @@ const WaiterPanel = () => {
 
                     {/* Action buttons by status */}
                     {isReceived && (
-                      <Button
-                        className="w-full mt-2"
-                        variant="neon"
-                        size="lg"
-                        disabled={confirmingId === order.id}
-                        onClick={() => handleConfirmOrder(order)}
-                      >
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        {confirmingId === order.id ? 'Tramitando...' : 'Pedido Tramitado'}
-                      </Button>
+                      <div className="mt-3 space-y-3">
+                        <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
+                          <p className="font-bold text-orange-800 text-sm mb-2">
+                            {t('new_order_action_title')}
+                          </p>
+                          <ol className="text-sm text-orange-700 space-y-1 list-decimal list-inside">
+                            <li>{t('new_order_step_1')}</li>
+                            <li>{t('new_order_step_2')}</li>
+                            <li>{t('new_order_step_3')}</li>
+                            <li>{t('new_order_step_4')}</li>
+                          </ol>
+                        </div>
+                        <Button
+                          className="w-full"
+                          variant="neon"
+                          size="lg"
+                          disabled={confirmingId === order.id}
+                          onClick={() => handleConfirmOrder(order)}
+                        >
+                          <CheckCircle className="w-5 h-5 mr-2" />
+                          {confirmingId === order.id ? 'Tramitando...' : t('confirm_in_kitchen_button')}
+                        </Button>
+                      </div>
                     )}
                     {order.order_status === 'confirmed' && (
                       <Button
