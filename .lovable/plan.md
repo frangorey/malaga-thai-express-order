@@ -1,69 +1,25 @@
-## Objetivo
+## Plan: Modal de cancelación de pedidos en WaiterPanel
 
-Reemplazar el toast actual de "Delivery no disponible" en el carrito por un modal multilingüe que redirige al usuario a Uber Eats (Thaii Express Málaga Centro), conservando el carrito si el usuario vuelve.
+Implementación literal del encargo, sin tocar otros archivos ni migrar strings existentes.
 
-Solo se tocan dos archivos: `src/components/Cart.tsx` y `src/contexts/LanguageContext.tsx`. Ningún cambio en lógica de pedidos, RLS, edge functions, tipos o estilos del resto del carrito.
+### 1. `src/contexts/LanguageContext.tsx`
+Añadir las 12 claves nuevas (`cancel_order_button`, `cancel_order_dialog_title`, `cancel_order_dialog_description`, `cancel_reason_select_label`, `cancel_reason_product_unavailable`, `cancel_reason_customer_no_show`, `cancel_reason_order_error`, `cancel_reason_other`, `cancel_reason_other_placeholder`, `confirm_cancel_button`, `back_button`, `order_cancelled_toast`) al final de cada uno de los 5 bloques de idioma (`es` línea 56, `en` 543, `fr` 1029, `de` 1509, `ru` 1989), con los textos exactos provistos.
 
-## Cambios
+### 2. `src/pages/WaiterPanel.tsx`
+- **Imports nuevos**: `Dialog`/`DialogContent`/`DialogHeader`/`DialogTitle`/`DialogDescription`/`DialogFooter`, `Select`/`SelectContent`/`SelectItem`/`SelectTrigger`/`SelectValue`, `Textarea`, `Label`, `useLanguage`.
+- **Hook**: `const { t } = useLanguage();` junto a los hooks existentes.
+- **Estado**: 4 nuevos `useState` — `showCancelModal`, `cancelTargetOrder` (tipado `Order | null`), `cancelReason`, `cancelOtherText`.
+- **Función `handleCancelOrder`**: actualiza la orden a `order_status='cancelled'` con `notes` concatenando `[CANCELADO: <motivo>]`. Toast con `t('order_cancelled_toast')`, refresca y limpia el estado del modal.
+- **Botón "Cancelar pedido"** dentro del map de cards (vista lista), DESPUÉS de los botones condicionales `isReceived` / `confirmed` / `ready`, mostrado cuando `order_status` no es `cancelled` ni `delivered`. Variante `outline` destructiva, abre el modal y setea `cancelTargetOrder`.
+- **`<Dialog>` de cancelación**: añadido al final del return tras `<TableDetailDrawer />`. Contiene `Select` con 4 motivos, `Textarea` condicional para "Otro", botón "Confirmar cancelación" (deshabilitado sin motivo o "Otro" sin texto) y botón "Volver". `onOpenChange` limpia el estado al cerrar.
 
-### 1. `src/contexts/LanguageContext.tsx` — añadir 5 claves en los 5 idiomas
+### Restricciones respetadas
+- No se modifica ningún otro archivo.
+- No se migran strings hardcodeados existentes a `t()`.
+- No se tocan `fetchOrders`, `handleConfirmOrder`, `handleMarkReady`, `handleMarkDelivered`, alarma, realtime ni polling.
+- El filtro de `fetchOrders` (`['received','confirmed','preparing','ready']`) ya excluye `cancelled`, por lo que la card desaparece tras cancelar — criterio cumplido sin cambios.
 
-Añadir, al final de cada bloque (`es`, `en`, `fr`, `de`, `ru`), antes del `}` de cierre (líneas 536, 1017, 1492, 1967, 2442 respectivamente):
-
-- `delivery_service_title`
-- `delivery_service_description`
-- `go_to_uber_eats`
-- `back_to_cart`
-- `via_uber_eats`
-
-Textos exactos (ES / EN / FR / DE / RU) tal y como los proporcionó el cerebro técnico. Sin tocar ninguna otra clave existente.
-
-### 2. `src/components/Cart.tsx`
-
-**a) Imports (línea 1-14):** añadir
-```ts
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-```
-
-**b) Estado (junto a `useState` existentes, ~línea 44):**
-```ts
-const [showDeliveryModal, setShowDeliveryModal] = useState(false);
-```
-
-**c) Botón Delivery (líneas 273-287):**
-- Quitar `opacity-60` del `className`.
-- Sustituir `onClick` (toast) por `onClick={() => setShowDeliveryModal(true)}`.
-- Sustituir `<span ...>{t('not_available')}</span>` por `<span className="text-xs opacity-80">{t('via_uber_eats')}</span>`.
-
-**d) Modal:** insertar un `<Dialog open={showDeliveryModal} onOpenChange={setShowDeliveryModal}>` con:
-- `DialogTitle` = `t('delivery_service_title')`
-- `DialogDescription` = `t('delivery_service_description')`
-- Botón `variant="neon"` con icono `Truck` (ya importado): abre `window.open(URL_UBER_EATS, "_blank")` y cierra el modal.
-- Botón `variant="outline"` con `t('back_to_cart')` que solo cierra el modal.
-
-URL exacta de Uber Eats (Thaii Express Málaga Plaza de la Solidaridad 9) según el encargo.
-
-Ubicación: justo antes del cierre del `return` del componente, fuera del flujo del carrito, para que funcione tanto si `tableNumber` está presente como no.
-
-## Optimización aplicada al encargo
-
-Una sola desviación respecto al prompt original, mínima y justificada:
-
-- El prompt indica colocar el `<Dialog>` "antes del último `</div>` del componente". Como `Dialog` de shadcn se renderiza en un portal, su posición en el árbol no afecta visualmente, pero lo coloco como hermano del root del componente (envuelto en un fragment) para evitar interferir con el layout flex/scroll del panel del carrito. Comportamiento idéntico al pedido.
-
-Todo lo demás (claves i18n, textos, URL, variantes de botón, criterios de aceptación) se mantiene literal.
-
-## Restricciones respetadas
-
-- Solo se modifican `Cart.tsx` y `LanguageContext.tsx`.
-- No se añaden dependencias (Dialog y Truck ya existen en el proyecto).
-- No se altera `handleOrder`, validaciones, ni la lógica de `orderType`.
-- El estado del carrito sobrevive a abrir/cerrar el modal.
-
-## Criterios de aceptación
-
-1. Pulsar "Delivery" abre el modal (no toast).
-2. Los textos del modal cambian con el idioma activo (es/en/fr/de/ru).
-3. "Ir a Uber Eats" abre nueva pestaña con la URL exacta y cierra el modal.
-4. "Volver al carrito" cierra el modal sin alterar items.
-5. `LanguageContext.tsx` contiene las 5 claves nuevas en los 5 bloques de idioma.
+### Notas técnicas (revisión / optimización)
+- El prompt original incluía bloques de JSX corruptos por el copy-paste (líneas vacías sin etiquetas). Se reconstruirán siguiendo la intención: `<Button variant="outline" className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10" size="lg" onClick={...}>` para el disparador, y `<Dialog open={showCancelModal} onOpenChange={...}>` con `<DialogContent>`, `<DialogHeader>`, contenedor `<div className="space-y-3 py-2">` con `<Label>` + `<Select value={cancelReason} onValueChange={setCancelReason}>` y los 4 `<SelectItem value="product_unavailable|customer_no_show|order_error|other">`, más el `<Textarea>` condicional y `<DialogFooter>` con los dos botones descritos.
+- `cancelTargetOrder` se tipará como `Order | null` para mantener type-safety con el resto del archivo.
+- Sin cambios de schema ni migraciones SQL: la columna `notes` y el valor `'cancelled'` en `order_status` ya existen.
