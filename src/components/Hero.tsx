@@ -65,21 +65,15 @@ export const Hero = ({ onOrderClick, compact }: HeroProps) => {
 
   return (
     <section className={compact ? "relative h-[25dvh] min-h-[200px] flex items-center justify-center overflow-hidden" : "relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden"}>
-      {/* BACKGROUND VIDEO - Optimizado para Web y Móvil */}
+      {/* BACKGROUND IMAGE (vídeo desactivado para reducir egress) */}
       <div className="absolute inset-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster={heroPosterImage}
-          className="w-full h-full object-cover">
-          
-          <source src={heroVideoUrl} type="video/mp4" />
-          {/* Fallback de seguridad si el navegador no soporta video */}
-          <img src={heroPosterImage} alt="Thaii Express Hero Background" className="w-full h-full object-cover" />
-        </video>
-        {/* Overlay oscuro para garantizar que el texto y los botones se lean perfectamente */}
+        <img
+          src={heroPosterImage}
+          alt="Thaii Express"
+          className="w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+        />
         <div className="absolute inset-0 bg-black/40"></div>
       </div>
 

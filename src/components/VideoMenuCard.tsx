@@ -1,27 +1,7 @@
-import { useRef, useState, useEffect, useCallback } from "react";
-import { Plus, Leaf, Flame, Sparkles } from "lucide-react";
+import { useRef, useState, useCallback } from "react";
+import { Plus, Leaf, Flame, Sparkles, Play } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-
-// --- Native IntersectionObserver hook (60% threshold for TikTok-style) ---
-function useInViewport<T extends HTMLElement>(threshold = 0.6): [React.RefObject<T>, boolean] {
-  const ref = useRef<T>(null!);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return [ref, isVisible];
-}
 
 export interface ProductVariant {
   product: SupabaseProduct;
@@ -34,13 +14,9 @@ interface VideoMenuCardProps {
   posterUrl: string;
   tags?: string[];
   onAddToCart: (product: SupabaseProduct) => void;
-  /** When provided, show variant buttons instead of single add button */
   variants?: ProductVariant[];
-  /** Display name override (for grouped cards) */
   displayName?: string;
-  /** When set, show a "Personalizar" button that calls this instead of add-to-cart */
   onCustomize?: () => void;
-  /** Label for the customize button */
   customizeLabel?: string;
 }
 
@@ -56,28 +32,33 @@ export const VideoMenuCard = ({
   customizeLabel,
 }: VideoMenuCardProps) => {
   const { t } = useLanguage();
-  const [cardRef, isVisible] = useInViewport<HTMLDivElement>(0.6);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoSrc, setVideoSrc] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Lazy-load src only once when first visible
-  useEffect(() => {
-    if (isVisible && !videoSrc) {
-      setVideoSrc(videoUrl);
-    }
-  }, [isVisible, videoSrc, videoUrl]);
-
-  // Play/pause based on visibility
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !videoSrc) return;
-
-    if (isVisible) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }, [isVisible, videoSrc]);
+  // TAP-TO-PLAY: video only loads when user taps play (saves egress)
+  const handlePlayTap = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!videoSrc) {
+        setVideoSrc(videoUrl);
+        setIsPlaying(true);
+        // Wait for src then play
+        setTimeout(() => {
+          videoRef.current?.play().catch(() => {});
+        }, 50);
+      } else {
+        if (videoRef.current?.paused) {
+          videoRef.current.play().catch(() => {});
+          setIsPlaying(true);
+        } else {
+          videoRef.current?.pause();
+          setIsPlaying(false);
+        }
+      }
+    },
+    [videoSrc, videoUrl]
+  );
 
   const handleAddToCart = useCallback(
     (e: React.MouseEvent) => {
@@ -98,29 +79,51 @@ export const VideoMenuCard = ({
   const hasVariants = variants && variants.length > 0;
 
   return (
-    <div
-      ref={cardRef}
-      className="relative h-full w-full overflow-hidden"
-    >
-      {/* Video background */}
-      <video
-        ref={videoRef}
+    <div className="relative h-full w-full overflow-hidden">
+      {/* Poster image always visible (no egress until play) */}
+      <img
+        src={posterUrl}
+        alt={displayName || product.name}
         className="absolute inset-0 w-full h-full object-cover"
-        muted
-        loop
-        playsInline
-        poster={posterUrl}
-        src={videoSrc || undefined}
-        preload="none"
+        loading="lazy"
+        decoding="async"
       />
 
-      {/* Gradient overlay – stronger at bottom for readability */}
+      {/* Video only renders once user tapped play */}
+      {videoSrc && (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          poster={posterUrl}
+          src={videoSrc}
+          preload="none"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+        />
+      )}
+
+      {/* Play button overlay (centered) */}
+      {!isPlaying && (
+        <button
+          onClick={handlePlayTap}
+          aria-label="Reproducir vídeo"
+          className="absolute inset-0 z-10 flex items-center justify-center group"
+        >
+          <span className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-transform">
+            <Play className="w-10 h-10 text-white fill-white ml-1" />
+          </span>
+        </button>
+      )}
+
+      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
       {/* Floating UI */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 pb-8 z-10">
+      <div className="absolute bottom-0 left-0 right-0 p-5 pb-8 z-20">
         <div className="flex items-end justify-between">
-          {/* Left: name, tags */}
           <div className="flex-1 min-w-0 mr-4 space-y-3">
             <h3 className="text-white font-extrabold text-xl sm:text-2xl leading-tight line-clamp-2 drop-shadow-lg">
               {displayName || product.name}
@@ -138,7 +141,6 @@ export const VideoMenuCard = ({
               </span>
             )}
 
-            {/* Tags / badges */}
             <div className="flex flex-wrap gap-2">
               {product.is_vegetarian && (
                 <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
@@ -164,7 +166,6 @@ export const VideoMenuCard = ({
             </div>
           </div>
 
-          {/* Right: customize button */}
           {onCustomize && (
             <button
               onClick={(e) => { e.stopPropagation(); onCustomize(); }}
@@ -174,7 +175,6 @@ export const VideoMenuCard = ({
             </button>
           )}
 
-          {/* Right: single add button (no variants, no customize) */}
           {!hasVariants && !onCustomize && (
             <button
               onClick={handleAddToCart}
@@ -186,7 +186,6 @@ export const VideoMenuCard = ({
           )}
         </div>
 
-        {/* Variant buttons */}
         {hasVariants && (
           <div className="mt-4 flex flex-col gap-2">
             {variants.map((v) => (
