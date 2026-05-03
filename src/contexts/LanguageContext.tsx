@@ -2547,6 +2547,12 @@ const translations = {
     'cancel_reason_other_placeholder': 'Опишите причину...',
     'confirm_cancel_button': 'Подтвердить отмену',
     'back_button': 'Назад',
-    'order_cancelled_toast': 'Заказ отменён'
+    'order_cancelled_toast': 'Заказ отменён',
+    'new_order_action_title': '⚠️ НОВЫЙ ЗАКАЗ — ТРЕБУЕТСЯ ДЕЙСТВИЕ',
+    'new_order_step_1': 'Проверьте полный заказ ниже',
+    'new_order_step_2': 'Внесите его в кассовую систему',
+    'new_order_step_3': 'Передайте чек на кухню',
+    'new_order_step_4': 'Подтвердите здесь, когда заказ на кухне',
+    'confirm_in_kitchen_button': '✅ Заказ на кухне — Подтвердить'
   }
 };
