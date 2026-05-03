@@ -532,7 +532,12 @@ const translations = {
     'noodles_finos_card': 'Noodles (Finos)',
     'noodles_glass_card': 'Glass',
     'noodles_udon_card': 'Udon',
-    'rice_fried_thai': 'Arroz Frito Thai'
+    'rice_fried_thai': 'Arroz Frito Thai',
+    'delivery_service_title': 'Servicio de domicilio',
+    'delivery_service_description': 'Los pedidos a domicilio se gestionan a través de Uber Eats. Pulsa para continuar tu pedido allí. Tu selección en Thaii quedará guardada si vuelves.',
+    'go_to_uber_eats': 'Ir a Uber Eats',
+    'back_to_cart': 'Volver al carrito',
+    'via_uber_eats': 'Uber Eats'
   },
   
   en: {
@@ -1013,7 +1018,12 @@ const translations = {
     'noodles_finos_card': 'Noodles (Thin)',
     'noodles_glass_card': 'Glass',
     'noodles_udon_card': 'Udon',
-    'rice_fried_thai': 'Thai Fried Rice'
+    'rice_fried_thai': 'Thai Fried Rice',
+    'delivery_service_title': 'Delivery service',
+    'delivery_service_description': 'Delivery orders are managed through Uber Eats. Tap to continue your order there. Your Thaii selection will be saved if you come back.',
+    'go_to_uber_eats': 'Go to Uber Eats',
+    'back_to_cart': 'Back to cart',
+    'via_uber_eats': 'Uber Eats'
   },
   
   fr: {
@@ -1488,7 +1498,12 @@ const translations = {
     'noodles_finos_card': 'Nouilles (Fines)',
     'noodles_glass_card': 'Glass',
     'noodles_udon_card': 'Udon',
-    'rice_fried_thai': 'Riz Frit Thaï'
+    'rice_fried_thai': 'Riz Frit Thaï',
+    'delivery_service_title': 'Service de livraison',
+    'delivery_service_description': 'Les commandes à domicile sont gérées via Uber Eats. Appuyez pour continuer votre commande là-bas. Votre sélection sur Thaii sera conservée si vous revenez.',
+    'go_to_uber_eats': 'Aller sur Uber Eats',
+    'back_to_cart': 'Retour au panier',
+    'via_uber_eats': 'Uber Eats'
   },
   
   de: {
@@ -1963,7 +1978,12 @@ const translations = {
     'noodles_finos_card': 'Nudeln (Dünn)',
     'noodles_glass_card': 'Glasnudeln',
     'noodles_udon_card': 'Udon',
-    'rice_fried_thai': 'Thai Bratreis'
+    'rice_fried_thai': 'Thai Bratreis',
+    'delivery_service_title': 'Lieferservice',
+    'delivery_service_description': 'Lieferbestellungen werden über Uber Eats abgewickelt. Tippen Sie, um Ihre Bestellung dort fortzusetzen. Ihre Auswahl bei Thaii bleibt erhalten, wenn Sie zurückkehren.',
+    'go_to_uber_eats': 'Zu Uber Eats',
+    'back_to_cart': 'Zurück zum Warenkorb',
+    'via_uber_eats': 'Uber Eats'
   },
 
   ru: {
@@ -2438,6 +2458,11 @@ const translations = {
     'noodles_finos_card': 'Лапша (Тонкая)',
     'noodles_glass_card': 'Стеклянная',
     'noodles_udon_card': 'Удон',
-    'rice_fried_thai': 'Тайский жареный рис'
+    'rice_fried_thai': 'Тайский жареный рис',
+    'delivery_service_title': 'Служба доставки',
+    'delivery_service_description': 'Заказы на доставку обрабатываются через Uber Eats. Нажмите, чтобы продолжить заказ там. Ваш выбор в Thaii будет сохранён, если вы вернётесь.',
+    'go_to_uber_eats': 'Перейти в Uber Eats',
+    'back_to_cart': 'Вернуться в корзину',
+    'via_uber_eats': 'Uber Eats'
   }
 };
