@@ -537,7 +537,19 @@ const translations = {
     'delivery_service_description': 'Los pedidos a domicilio se gestionan a través de Uber Eats. Pulsa para continuar tu pedido allí. Tu selección en Thaii quedará guardada si vuelves.',
     'go_to_uber_eats': 'Ir a Uber Eats',
     'back_to_cart': 'Volver al carrito',
-    'via_uber_eats': 'Uber Eats'
+    'via_uber_eats': 'Uber Eats',
+    'cancel_order_button': '❌ Cancelar pedido',
+    'cancel_order_dialog_title': 'Cancelar pedido',
+    'cancel_order_dialog_description': 'Esta acción no se puede deshacer. Selecciona el motivo de la cancelación.',
+    'cancel_reason_select_label': 'Motivo de cancelación',
+    'cancel_reason_product_unavailable': 'Producto agotado',
+    'cancel_reason_customer_no_show': 'Cliente no apareció',
+    'cancel_reason_order_error': 'Error en el pedido',
+    'cancel_reason_other': 'Otro',
+    'cancel_reason_other_placeholder': 'Describe el motivo...',
+    'confirm_cancel_button': 'Confirmar cancelación',
+    'back_button': 'Volver',
+    'order_cancelled_toast': 'Pedido cancelado'
   },
   
   en: {
@@ -1023,7 +1035,19 @@ const translations = {
     'delivery_service_description': 'Delivery orders are managed through Uber Eats. Tap to continue your order there. Your Thaii selection will be saved if you come back.',
     'go_to_uber_eats': 'Go to Uber Eats',
     'back_to_cart': 'Back to cart',
-    'via_uber_eats': 'Uber Eats'
+    'via_uber_eats': 'Uber Eats',
+    'cancel_order_button': '❌ Cancel order',
+    'cancel_order_dialog_title': 'Cancel order',
+    'cancel_order_dialog_description': 'This action cannot be undone. Please select the reason for cancellation.',
+    'cancel_reason_select_label': 'Cancellation reason',
+    'cancel_reason_product_unavailable': 'Product unavailable',
+    'cancel_reason_customer_no_show': 'Customer did not show up',
+    'cancel_reason_order_error': 'Order error',
+    'cancel_reason_other': 'Other',
+    'cancel_reason_other_placeholder': 'Describe the reason...',
+    'confirm_cancel_button': 'Confirm cancellation',
+    'back_button': 'Back',
+    'order_cancelled_toast': 'Order cancelled'
   },
   
   fr: {
@@ -1503,7 +1527,19 @@ const translations = {
     'delivery_service_description': 'Les commandes à domicile sont gérées via Uber Eats. Appuyez pour continuer votre commande là-bas. Votre sélection sur Thaii sera conservée si vous revenez.',
     'go_to_uber_eats': 'Aller sur Uber Eats',
     'back_to_cart': 'Retour au panier',
-    'via_uber_eats': 'Uber Eats'
+    'via_uber_eats': 'Uber Eats',
+    'cancel_order_button': '❌ Annuler la commande',
+    'cancel_order_dialog_title': 'Annuler la commande',
+    'cancel_order_dialog_description': "Cette action est irréversible. Sélectionnez le motif de l'annulation.",
+    'cancel_reason_select_label': "Motif d'annulation",
+    'cancel_reason_product_unavailable': 'Produit en rupture',
+    'cancel_reason_customer_no_show': 'Client absent',
+    'cancel_reason_order_error': 'Erreur de commande',
+    'cancel_reason_other': 'Autre',
+    'cancel_reason_other_placeholder': 'Décrivez le motif...',
+    'confirm_cancel_button': "Confirmer l'annulation",
+    'back_button': 'Retour',
+    'order_cancelled_toast': 'Commande annulée'
   },
   
   de: {
@@ -1983,7 +2019,19 @@ const translations = {
     'delivery_service_description': 'Lieferbestellungen werden über Uber Eats abgewickelt. Tippen Sie, um Ihre Bestellung dort fortzusetzen. Ihre Auswahl bei Thaii bleibt erhalten, wenn Sie zurückkehren.',
     'go_to_uber_eats': 'Zu Uber Eats',
     'back_to_cart': 'Zurück zum Warenkorb',
-    'via_uber_eats': 'Uber Eats'
+    'via_uber_eats': 'Uber Eats',
+    'cancel_order_button': '❌ Bestellung stornieren',
+    'cancel_order_dialog_title': 'Bestellung stornieren',
+    'cancel_order_dialog_description': 'Diese Aktion kann nicht rückgängig gemacht werden. Bitte wählen Sie den Grund für die Stornierung.',
+    'cancel_reason_select_label': 'Stornogrund',
+    'cancel_reason_product_unavailable': 'Produkt nicht verfügbar',
+    'cancel_reason_customer_no_show': 'Kunde nicht erschienen',
+    'cancel_reason_order_error': 'Bestellfehler',
+    'cancel_reason_other': 'Sonstiges',
+    'cancel_reason_other_placeholder': 'Grund beschreiben...',
+    'confirm_cancel_button': 'Stornierung bestätigen',
+    'back_button': 'Zurück',
+    'order_cancelled_toast': 'Bestellung storniert'
   },
 
   ru: {
@@ -2463,6 +2511,18 @@ const translations = {
     'delivery_service_description': 'Заказы на доставку обрабатываются через Uber Eats. Нажмите, чтобы продолжить заказ там. Ваш выбор в Thaii будет сохранён, если вы вернётесь.',
     'go_to_uber_eats': 'Перейти в Uber Eats',
     'back_to_cart': 'Вернуться в корзину',
-    'via_uber_eats': 'Uber Eats'
+    'via_uber_eats': 'Uber Eats',
+    'cancel_order_button': '❌ Отменить заказ',
+    'cancel_order_dialog_title': 'Отмена заказа',
+    'cancel_order_dialog_description': 'Это действие нельзя отменить. Пожалуйста, выберите причину отмены.',
+    'cancel_reason_select_label': 'Причина отмены',
+    'cancel_reason_product_unavailable': 'Товар закончился',
+    'cancel_reason_customer_no_show': 'Клиент не пришёл',
+    'cancel_reason_order_error': 'Ошибка в заказе',
+    'cancel_reason_other': 'Другое',
+    'cancel_reason_other_placeholder': 'Опишите причину...',
+    'confirm_cancel_button': 'Подтвердить отмену',
+    'back_button': 'Назад',
+    'order_cancelled_toast': 'Заказ отменён'
   }
 };
