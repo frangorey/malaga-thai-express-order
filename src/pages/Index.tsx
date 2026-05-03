@@ -104,9 +104,8 @@ const Index = () => {
     // TALLARINES: 4 cards, one per noodle type
     if (dbCategory === "Tallarines") {
       return NOODLE_CARDS.map((nc) => {
-        const firstProduct = categoryProducts.find((p) => p.subcategory === nc.type) || categoryProducts[0];
-        if (!firstProduct) return null;
-        const product = toSupabaseProduct(firstProduct);
+        const firstProduct = categoryProducts.find((p) => p.subcategory === nc.type);
+        const product = firstProduct ? toSupabaseProduct(firstProduct) : toSupabaseProduct(categoryProducts[0]);
         return {
           product,
           videoUrl: nc.videoUrl,
@@ -116,7 +115,7 @@ const Index = () => {
           onCustomize: () => setNoodleCustomizer({ open: true, type: nc.type }),
           customizeLabel: `${t('customize')} ${nc.emoji}`,
         } as FeaturedItem;
-      }).filter(Boolean) as FeaturedItem[];
+      }).filter(Boolean);
     }
 
     // SOPAS: 2 cards with protein variants
