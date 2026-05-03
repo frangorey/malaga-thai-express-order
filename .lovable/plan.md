@@ -1,73 +1,39 @@
+## Cambios a aplicar
 
+Dos ediciones aisladas, una línea cada una. Verificadas contra el código actual: las cadenas a sustituir aparecen exactamente una vez en cada archivo.
 
-## Plan: Comandero Visual por Mesas
+### 1. `src/pages/WaiterPanel.tsx` (línea 80)
 
-### Archivos nuevos (4)
+Reducir la frecuencia de repetición de la alarma sonora del panel de camarero de 12 a 30 segundos para evitar saturación acústica.
 
-**1. `src/components/waiter/TableCard.tsx`** — Tarjeta 130×130px
-- Props: `tableNumber, status, ordersCount, total, latestTime, pendingCount, onClick`
-- Bordes y sombras según estado (free/received/confirmed/preparing/ready)
-- `received` añade `animate-pulse` + sombra roja neón
-- Número grande con `neon-text`, emoji estado, total €, hora, badge rojo si pendingCount > 0
-- `hover:scale-105` + `cursor-pointer`
+- Antes: `}, 12000);`
+- Después: `}, 30000);`
 
-**2. `src/components/waiter/FloorPlanView.tsx`** — Plano agrupado
-- `useMemo` agrupa orders donde `order_type === 'dine_in'` por `table_number`
-- Estado peor gana: `received > confirmed > preparing > ready > free`
-- Suma total acumulado y cuenta `pendingCount` (received sin confirmar)
-- Sección Salón (1–5, grid 5 cols) + Terraza (6–14, grid responsive)
-- Leyenda de colores abajo
+El resto del `useEffect` (la primera llamada inmediata a `playLoudAlarm()` en la línea 77 y toda la lógica de cleanup) queda intacto.
 
-**3. `src/components/waiter/TableDetailDrawer.tsx`** — Drawer lateral
-- Shadcn `Sheet side="right"`, `max-w-lg`
-- Header con número mesa + total € + badge estado
-- Tabs: **Activos** (cards estilo WaiterPanel + botón Tramitar para `received`) y **Historial** (query a Supabase: delivered/cancelled últimos 20)
-- Query historial dentro de `useEffect([tableNumber])` solo cuando drawer abierto
+### 2. `supabase/functions/create-whatsapp-order/index.ts` (línea 270)
 
-**4. `src/components/admin/TableQRCodes.tsx`** — Gestor QR (admin)
-- `qrcode.react` (nueva dependencia)
-- Grid 14 QRs (2 col móvil / 4 col desktop), cada uno apuntando a `https://www.thaiiexpress.es/?mesa=N`
-- Botón descarga PNG individual (canvas serialization)
-- Botón "Imprimir todos" con CSS `@media print` (A6, 2 cols)
-- Integración: nueva pestaña en `AdminPanel.tsx` con icono `QrCode`
+Normalizar el origen del pedido a `'web'` dentro del `INSERT` en `orders`, ya que esta función procesa también pedidos web (mesa, recogida, domicilio) y no solo WhatsApp.
 
-### Archivo modificado (1)
+- Antes: `order_source: 'whatsapp',`
+- Después: `order_source: 'web',`
 
-**5. `src/pages/WaiterPanel.tsx`**
-- Añadir estado `viewMode: 'list' | 'floor'` (default `'floor'`) y `selectedTable: number | null`
-- Toggle de vista (botones 🗺️ Plano / 📋 Lista) tras el header, antes de filtros
-- Render condicional: `FloorPlanView` o el grid actual de cards (sin tocarlo)
-- Montar `TableDetailDrawer` al final, alimentado con orders filtradas por `selectedTable`
-- **No tocar**: `fetchOrders`, `playLoudAlarm`, `handleConfirmOrder`, canal realtime, alarma, lógica de roles
+Ninguna otra propiedad del insert, ninguna validación, ningún email ni el envío a Relevance AI se tocan.
 
-### i18n (LanguageContext)
+## Restricciones respetadas
 
-Nuevas claves × 5 idiomas: `floor_plan, list_view, salon, terraza, table_free, table_busy, table_ready, view_history, active_orders, history, qr_codes_tab, print_qrs, scan_to_order, download_qr`
+- No se modifica `Cart.tsx`, `Index.tsx`, ni ningún componente visual público.
+- No se cambian RLS, migraciones SQL, tipos generados ni `config.toml`.
+- No se añaden imports, exports ni dependencias.
+- No se altera la lógica de validación ni el flujo de la edge function.
 
-### Dependencia nueva
+## Notas técnicas
 
-```
-qrcode.react  (~6KB gzip)
-```
+- Tras desplegar, los pedidos nuevos creados vía `create-whatsapp-order` quedarán marcados con `order_source = 'web'`. Cualquier filtro/UI que distinga `'whatsapp'` (p. ej. `WaiterPanel.tsx:348` que muestra un badge si `order.order_source === 'whatsapp'`) dejará de marcar estos pedidos como WhatsApp. Esto es coherente con el cambio solicitado, pero es el único efecto colateral observable. Si quisieras conservar ese badge habría que tocar la lógica de UI; según las restricciones, no se hace.
+- El despliegue de la edge function es automático tras el cambio.
 
-### Diff resumen (archivos tocados)
+## Criterios de aceptación
 
-```text
-NEW  src/components/waiter/TableCard.tsx              ~70 líneas
-NEW  src/components/waiter/FloorPlanView.tsx          ~110 líneas
-NEW  src/components/waiter/TableDetailDrawer.tsx      ~140 líneas
-NEW  src/components/admin/TableQRCodes.tsx            ~120 líneas
-MOD  src/pages/WaiterPanel.tsx                        +25 líneas (toggle + drawer mount)
-MOD  src/pages/AdminPanel.tsx                         +1 tab (QrCode + TableQRCodes)
-MOD  src/contexts/LanguageContext.tsx                 +14 keys × 5 langs
-MOD  package.json                                     +qrcode.react
-```
-
-### Garantías
-
-- Realtime existente (`waiter-orders`) reutilizado — cualquier cambio refresca el plano automáticamente
-- Lista actual sigue intacta y accesible vía toggle
-- `handleConfirmOrder` se pasa al drawer sin modificar (misma firma)
-- Solo lee/escribe `orders` con políticas RLS ya existentes para `moderator`
-- Sin cambios de schema ni migraciones
-
+1. `WaiterPanel.tsx`: único `setInterval` que llama a `playLoudAlarm` con valor `30000`.
+2. `create-whatsapp-order/index.ts`: `order_source: 'web'` en el `INSERT`.
+3. Diff total: exactamente 2 líneas modificadas, 0 añadidas, 0 eliminadas.
