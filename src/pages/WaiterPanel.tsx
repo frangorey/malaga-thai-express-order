@@ -77,7 +77,7 @@ const WaiterPanel = () => {
       playLoudAlarm();
       alarmIntervalRef.current = setInterval(() => {
         playLoudAlarm();
-      }, 12000);
+      }, 30000);
     }
 
     return () => {

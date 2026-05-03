@@ -14,51 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      Arroz_frito_classic: {
-        Row: {
-          category: string
-          created_at: string | null
-          description: string | null
-          id: number
-          image_url: string | null
-          is_available: boolean | null
-          is_spicy: boolean | null
-          is_vegetarian: boolean | null
-          name: string
-          price: number
-          subcategory: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          category: string
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          image_url?: string | null
-          is_available?: boolean | null
-          is_spicy?: boolean | null
-          is_vegetarian?: boolean | null
-          name: string
-          price: number
-          subcategory?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          category?: string
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          image_url?: string | null
-          is_available?: boolean | null
-          is_spicy?: boolean | null
-          is_vegetarian?: boolean | null
-          name?: string
-          price?: number
-          subcategory?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       ingredients: {
         Row: {
           created_at: string | null

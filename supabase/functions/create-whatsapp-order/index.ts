@@ -267,7 +267,7 @@ serve(async (req) => {
       payment_method: 'cash',
       payment_status: 'pending',
       order_status: 'received',
-      order_source: 'whatsapp',
+      order_source: 'web',
       notes: customerInfo.notes || null
     }).select().single();
 
