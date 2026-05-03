@@ -12,6 +12,11 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import FloorPlanView from '@/components/waiter/FloorPlanView';
 import TableDetailDrawer from '@/components/waiter/TableDetailDrawer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Order {
   id: string;
@@ -42,6 +47,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 const WaiterPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { isModerator, isLoading: roleLoading } = useUserRole();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +55,10 @@ const WaiterPanel = () => {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelOtherText, setCancelOtherText] = useState('');
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -195,6 +205,32 @@ const WaiterPanel = () => {
       fetchOrders();
     }
     setConfirmingId(null);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelTargetOrder || !cancelReason) return;
+    const motivo = cancelReason === 'other' ? cancelOtherText.trim() : cancelReason;
+    if (!motivo) return;
+    const notasActuales = cancelTargetOrder.notes || '';
+    const notasNuevas = notasActuales
+      ? `${notasActuales} [CANCELADO: ${motivo}]`
+      : `[CANCELADO: ${motivo}]`;
+    setConfirmingId(cancelTargetOrder.id);
+    const { error } = await supabase
+      .from('orders')
+      .update({ order_status: 'cancelled', notes: notasNuevas })
+      .eq('id', cancelTargetOrder.id);
+    if (error) {
+      toast.error('Error al cancelar el pedido');
+    } else {
+      toast.success(t('order_cancelled_toast'));
+      fetchOrders();
+    }
+    setConfirmingId(null);
+    setShowCancelModal(false);
+    setCancelTargetOrder(null);
+    setCancelReason('');
+    setCancelOtherText('');
   };
 
   const fetchOrders = async () => {
@@ -443,6 +479,21 @@ const WaiterPanel = () => {
                         {confirmingId === order.id ? 'Actualizando...' : '✅ Entregado'}
                       </Button>
                     )}
+                    {order.order_status !== 'cancelled' && order.order_status !== 'delivered' && (
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          setCancelTargetOrder(order);
+                          setCancelReason('');
+                          setCancelOtherText('');
+                          setShowCancelModal(true);
+                        }}
+                      >
+                        {t('cancel_order_button')}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -463,6 +514,74 @@ const WaiterPanel = () => {
         onMarkDelivered={handleMarkDelivered}
         confirmingId={confirmingId}
       />
+
+      {/* Cancel order dialog */}
+      <Dialog
+        open={showCancelModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCancelModal(false);
+            setCancelTargetOrder(null);
+            setCancelReason('');
+            setCancelOtherText('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cancel_order_dialog_title')}</DialogTitle>
+            <DialogDescription>{t('cancel_order_dialog_description')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label>{t('cancel_reason_select_label')}</Label>
+            <Select value={cancelReason} onValueChange={setCancelReason}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="product_unavailable">{t('cancel_reason_product_unavailable')}</SelectItem>
+                <SelectItem value="customer_no_show">{t('cancel_reason_customer_no_show')}</SelectItem>
+                <SelectItem value="order_error">{t('cancel_reason_order_error')}</SelectItem>
+                <SelectItem value="other">{t('cancel_reason_other')}</SelectItem>
+              </SelectContent>
+            </Select>
+            {cancelReason === 'other' && (
+              <Textarea
+                value={cancelOtherText}
+                onChange={(e) => setCancelOtherText(e.target.value)}
+                placeholder={t('cancel_reason_other_placeholder')}
+                rows={2}
+              />
+            )}
+          </div>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-col">
+            <Button
+              variant="destructive"
+              className="w-full"
+              disabled={
+                !cancelReason ||
+                (cancelReason === 'other' && !cancelOtherText.trim()) ||
+                confirmingId === cancelTargetOrder?.id
+              }
+              onClick={handleCancelOrder}
+            >
+              {confirmingId === cancelTargetOrder?.id ? 'Cancelando...' : t('confirm_cancel_button')}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setShowCancelModal(false);
+                setCancelTargetOrder(null);
+                setCancelReason('');
+                setCancelOtherText('');
+              }}
+            >
+              {t('back_button')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
