@@ -1,25 +1,37 @@
-## Plan: Modal de cancelación de pedidos en WaiterPanel
+## Plan: Encargos 3-5 — Contador en vivo, notas críticas y bloque pedagógico
 
-Implementación literal del encargo, sin tocar otros archivos ni migrar strings existentes.
+Se modificarán únicamente dos archivos: `src/contexts/LanguageContext.tsx` y `src/pages/WaiterPanel.tsx`. La especificación recibida es coherente con el código actual (verificado: `useLanguage`/`t` ya están importados, los bloques de notas y el botón `isReceived` con `variant="neon"` existen tal como se describen). No se requiere ninguna optimización adicional.
 
-### 1. `src/contexts/LanguageContext.tsx`
-Añadir las 12 claves nuevas (`cancel_order_button`, `cancel_order_dialog_title`, `cancel_order_dialog_description`, `cancel_reason_select_label`, `cancel_reason_product_unavailable`, `cancel_reason_customer_no_show`, `cancel_reason_order_error`, `cancel_reason_other`, `cancel_reason_other_placeholder`, `confirm_cancel_button`, `back_button`, `order_cancelled_toast`) al final de cada uno de los 5 bloques de idioma (`es` línea 56, `en` 543, `fr` 1029, `de` 1509, `ru` 1989), con los textos exactos provistos.
+### PASO 1 — `src/contexts/LanguageContext.tsx`
+Añadir 6 claves nuevas al final de cada uno de los 5 bloques de idioma (`es`, `en`, `fr`, `de`, `ru`):
+- `new_order_action_title`
+- `new_order_step_1` … `new_order_step_4`
+- `confirm_in_kitchen_button`
 
-### 2. `src/pages/WaiterPanel.tsx`
-- **Imports nuevos**: `Dialog`/`DialogContent`/`DialogHeader`/`DialogTitle`/`DialogDescription`/`DialogFooter`, `Select`/`SelectContent`/`SelectItem`/`SelectTrigger`/`SelectValue`, `Textarea`, `Label`, `useLanguage`.
-- **Hook**: `const { t } = useLanguage();` junto a los hooks existentes.
-- **Estado**: 4 nuevos `useState` — `showCancelModal`, `cancelTargetOrder` (tipado `Order | null`), `cancelReason`, `cancelOtherText`.
-- **Función `handleCancelOrder`**: actualiza la orden a `order_status='cancelled'` con `notes` concatenando `[CANCELADO: <motivo>]`. Toast con `t('order_cancelled_toast')`, refresca y limpia el estado del modal.
-- **Botón "Cancelar pedido"** dentro del map de cards (vista lista), DESPUÉS de los botones condicionales `isReceived` / `confirmed` / `ready`, mostrado cuando `order_status` no es `cancelled` ni `delivered`. Variante `outline` destructiva, abre el modal y setea `cancelTargetOrder`.
-- **`<Dialog>` de cancelación**: añadido al final del return tras `<TableDetailDrawer />`. Contiene `Select` con 4 motivos, `Textarea` condicional para "Otro", botón "Confirmar cancelación" (deshabilitado sin motivo o "Otro" sin texto) y botón "Volver". `onOpenChange` limpia el estado al cerrar.
+Textos exactos según lo facilitado por el cerebro técnico (incluyendo emojis ⚠️ y ✅).
 
-### Restricciones respetadas
-- No se modifica ningún otro archivo.
-- No se migran strings hardcodeados existentes a `t()`.
-- No se tocan `fetchOrders`, `handleConfirmOrder`, `handleMarkReady`, `handleMarkDelivered`, alarma, realtime ni polling.
-- El filtro de `fetchOrders` (`['received','confirmed','preparing','ready']`) ya excluye `cancelled`, por lo que la card desaparece tras cancelar — criterio cumplido sin cambios.
+### PASO 2 — `src/pages/WaiterPanel.tsx`: contador en vivo (Encargo 3)
+- Añadir helper **fuera** del componente:
+  ```ts
+  const formatElapsed = (createdAt: string): string => { ... }
+  ```
+- Dentro del componente: estado `tick` + `useEffect` con `setInterval(1000)` para forzar re-render cada segundo.
+- En el `CardHeader` de cada pedido, junto a `📅 Pedido: HH:mm:ss`, añadir `(hace Xm YYs)` usando `formatElapsed(order.created_at)`.
 
-### Notas técnicas (revisión / optimización)
-- El prompt original incluía bloques de JSX corruptos por el copy-paste (líneas vacías sin etiquetas). Se reconstruirán siguiendo la intención: `<Button variant="outline" className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10" size="lg" onClick={...}>` para el disparador, y `<Dialog open={showCancelModal} onOpenChange={...}>` con `<DialogContent>`, `<DialogHeader>`, contenedor `<div className="space-y-3 py-2">` con `<Label>` + `<Select value={cancelReason} onValueChange={setCancelReason}>` y los 4 `<SelectItem value="product_unavailable|customer_no_show|order_error|other">`, más el `<Textarea>` condicional y `<DialogFooter>` con los dos botones descritos.
-- `cancelTargetOrder` se tipará como `Order | null` para mantener type-safety con el resto del archivo.
-- Sin cambios de schema ni migraciones SQL: la columna `notes` y el valor `'cancelled'` en `order_status` ya existen.
+### PASO 3 — `src/pages/WaiterPanel.tsx`: notas críticas (Encargo 4)
+- Añadir **fuera** del componente la constante `CRITICAL_WORDS` (alergias, gluten, celiaco, intolerancias, vegano/vegetariano, embarazo, picante) y el helper `hasCriticalNote(notes)`.
+- Sustituir el bloque actual de notas por una versión con dos estilos:
+  - Crítica → fondo rojo (`bg-red-50`/`border-red-200`/`text-red-700`) con `🚨 ⚠️`.
+  - Normal → fondo ámbar (`bg-amber-50`/`border-amber-200`/`text-amber-800`) con `⚠️ 📝`.
+
+### PASO 4 — `src/pages/WaiterPanel.tsx`: bloque pedagógico (Encargo 5)
+Sustituir el botón único actual del estado `isReceived` por:
+- Un panel naranja con el título `t('new_order_action_title')` y una lista numerada con los 4 pasos (`new_order_step_1..4`).
+- El botón `variant="neon"` mantiene `handleConfirmOrder`, pero su label pasa a `t('confirm_in_kitchen_button')` (manteniendo `'Tramitando...'` durante la operación).
+
+### Restricciones que se respetarán
+- Solo se tocan los dos archivos indicados.
+- No se migran strings hardcodeados existentes a `t()` (solo se usan las 6 claves nuevas).
+- No se altera `fetchOrders`, `handleCancelOrder`, `handleMarkReady`, `handleMarkDelivered`, ni la lógica de alarma/realtime/polling.
+- `formatElapsed`, `hasCriticalNote` y `CRITICAL_WORDS` se declaran fuera del componente.
+- `tick` se usa exclusivamente para forzar el re-render por segundo.
