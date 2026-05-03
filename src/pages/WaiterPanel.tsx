@@ -207,6 +207,32 @@ const WaiterPanel = () => {
     setConfirmingId(null);
   };
 
+  const handleCancelOrder = async () => {
+    if (!cancelTargetOrder || !cancelReason) return;
+    const motivo = cancelReason === 'other' ? cancelOtherText.trim() : cancelReason;
+    if (!motivo) return;
+    const notasActuales = cancelTargetOrder.notes || '';
+    const notasNuevas = notasActuales
+      ? `${notasActuales} [CANCELADO: ${motivo}]`
+      : `[CANCELADO: ${motivo}]`;
+    setConfirmingId(cancelTargetOrder.id);
+    const { error } = await supabase
+      .from('orders')
+      .update({ order_status: 'cancelled', notes: notasNuevas })
+      .eq('id', cancelTargetOrder.id);
+    if (error) {
+      toast.error('Error al cancelar el pedido');
+    } else {
+      toast.success(t('order_cancelled_toast'));
+      fetchOrders();
+    }
+    setConfirmingId(null);
+    setShowCancelModal(false);
+    setCancelTargetOrder(null);
+    setCancelReason('');
+    setCancelOtherText('');
+  };
+
   const fetchOrders = async () => {
     setIsLoading(true);
     const { data, error } = await supabase
