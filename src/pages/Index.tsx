@@ -116,7 +116,7 @@ const Index = () => {
           onCustomize: () => setNoodleCustomizer({ open: true, type: nc.type }),
           customizeLabel: `${t('customize')} ${nc.emoji}`,
         } as FeaturedItem;
-      }).filter(Boolean);
+      }).filter(Boolean) as FeaturedItem[];
     }
 
     // SOPAS: 2 cards with protein variants
