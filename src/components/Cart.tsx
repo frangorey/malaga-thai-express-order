@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { CartItem, SupabaseProduct } from "@/types/menu";
 import { validateCustomerInfo } from "@/lib/security";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
     notes: ""
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
   const { toast } = useToast();
 
   // Auto-select dine_in when table number is present
@@ -272,18 +274,12 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                       </Button>
                       <Button
                         variant="outline"
-                        className="h-auto py-6 flex flex-col gap-2 opacity-60"
-                        onClick={() => {
-                          toast({
-                            title: t('service_unavailable'),
-                            description: t('service_unavailable_desc'),
-                            variant: "destructive",
-                          });
-                        }}
+                        className="h-auto py-6 flex flex-col gap-2"
+                        onClick={() => setShowDeliveryModal(true)}
                       >
                         <Truck className="w-6 h-6" />
                         <span className="font-semibold">{t('delivery')}</span>
-                        <span className="text-xs opacity-80">{t('not_available')}</span>
+                        <span className="text-xs opacity-80">{t('via_uber_eats')}</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -443,6 +439,40 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
           )}
         </div>
       </div>
+
+      <Dialog open={showDeliveryModal} onOpenChange={setShowDeliveryModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t('delivery_service_title')}</DialogTitle>
+            <DialogDescription>
+              {t('delivery_service_description')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-col">
+            <Button
+              variant="neon"
+              className="w-full"
+              onClick={() => {
+                window.open(
+                  "https://www.ubereats.com/es/store/thaii-express-malaga-plaza-de-la-solidaridad-9/iMYfkrfuQoqgIIFUED6V1A?diningMode=DELIVERY&pl=JTdCJTIyYWRkcmVzcyUyMiUzQSUyMlRoYWlpJTIwRXhwcmVzcyUyME0lQzMlQTFsYWdhJTIwQ2VudHJvJTIyJTJDJTIycmVmZXJlbmNlJTIyJTNBJTIyQ2hJSlJhaktjd0QzY2cwUmhPRTR3bU9GQ2RVJTIyJTJDJTIycmVmZXJlbmNlVHlwZSUyMiUzQSUyMmdvb2dsZV9wbGFjZXMlMjIlMkMlMjJsYXRpdHVkZSUyMiUzQTM2LjcxNDAyMDk5OTk5OTk5NSUyQyUyMmxvbmdpdHVkZSUyMiUzQS00LjQzMTE1NDElN0Q%3D",
+                  "_blank"
+                );
+                setShowDeliveryModal(false);
+              }}
+            >
+              <Truck className="w-4 h-4 mr-2" />
+              {t('go_to_uber_eats')}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowDeliveryModal(false)}
+            >
+              {t('back_to_cart')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
