@@ -538,7 +538,7 @@ const WaiterPanel = () => {
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="z-[9999]" sideOffset={4}>
                 <SelectItem value="product_unavailable">{t('cancel_reason_product_unavailable')}</SelectItem>
                 <SelectItem value="customer_no_show">{t('cancel_reason_customer_no_show')}</SelectItem>
                 <SelectItem value="order_error">{t('cancel_reason_order_error')}</SelectItem>
