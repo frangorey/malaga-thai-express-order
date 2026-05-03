@@ -17,15 +17,45 @@ export interface Product {
   updated_at: string;
 }
 
+const CACHE_KEY = 'thaii_menu_v1';
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+interface CacheEntry {
+  data: Product[];
+  timestamp: number;
+}
+
+function readCache(): Product[] | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed: CacheEntry = JSON.parse(raw);
+    if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
+    return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(data: Product[]) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    // ignore quota errors
+  }
+}
+
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(() => readCache() || []);
+  const [loading, setLoading] = useState(() => readCache() === null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const cached = readCache();
+
     const fetchProducts = async () => {
       try {
-        setLoading(true);
         const { data, error } = await supabase
           .from('products')
           .select('*')
@@ -34,35 +64,30 @@ export const useProducts = () => {
           .order('subcategory', { ascending: true })
           .order('name', { ascending: true });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
+        if (cancelled) return;
 
-        setProducts(data || []);
+        const fresh = data || [];
+        setProducts(fresh);
+        writeCache(fresh);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar productos');
+        if (cancelled) return;
+        // Si hay cache, no pisar la UI con error
+        if (!cached) {
+          setError(err instanceof Error ? err.message : 'Error al cargar productos');
+        }
         console.error('Error fetching products:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchProducts();
+    return () => { cancelled = true; };
   }, []);
 
-  // Obtener categorías únicas
   const categories = [...new Set(products.map(product => product.category))];
+  const getProductsByCategory = (category: string) => products.filter(p => p.category === category);
 
-  // Obtener productos por categoría
-  const getProductsByCategory = (category: string) => {
-    return products.filter(product => product.category === category);
-  };
-
-  return {
-    products,
-    categories,
-    loading,
-    error,
-    getProductsByCategory,
-  };
+  return { products, categories, loading, error, getProductsByCategory };
 };
