@@ -44,6 +44,26 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-500' },
 };
 
+const formatElapsed = (createdAt: string): string => {
+  const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  return `${mins}m ${String(secs).padStart(2, '0')}s`;
+};
+
+const CRITICAL_WORDS = [
+  'alergia', 'alérgico', 'alergica', 'alergias',
+  'sin gluten', 'celíaco', 'celiaco', 'celiac',
+  'intoler', 'vegano', 'vegetariano',
+  'embarazo', 'embarazada', 'picante'
+];
+
+const hasCriticalNote = (notes: string | null): boolean => {
+  if (!notes) return false;
+  const lower = notes.toLowerCase();
+  return CRITICAL_WORDS.some(w => lower.includes(w));
+};
+
 const WaiterPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,6 +79,7 @@ const WaiterPanel = () => {
   const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelOtherText, setCancelOtherText] = useState('');
+  const [tick, setTick] = useState(0);
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -75,6 +96,11 @@ const WaiterPanel = () => {
       navigate('/');
     }
   }, [user, isModerator, roleLoading, navigate]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Repeating loud alarm while there are unconfirmed orders
   useEffect(() => {
