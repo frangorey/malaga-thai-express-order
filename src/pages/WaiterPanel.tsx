@@ -12,6 +12,11 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import FloorPlanView from '@/components/waiter/FloorPlanView';
 import TableDetailDrawer from '@/components/waiter/TableDetailDrawer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Order {
   id: string;
@@ -42,6 +47,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 const WaiterPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { isModerator, isLoading: roleLoading } = useUserRole();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +55,10 @@ const WaiterPanel = () => {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelOtherText, setCancelOtherText] = useState('');
   const orderCountRef = useRef(0);
   const alarmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
