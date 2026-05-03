@@ -479,6 +479,21 @@ const WaiterPanel = () => {
                         {confirmingId === order.id ? 'Actualizando...' : '✅ Entregado'}
                       </Button>
                     )}
+                    {order.order_status !== 'cancelled' && order.order_status !== 'delivered' && (
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          setCancelTargetOrder(order);
+                          setCancelReason('');
+                          setCancelOtherText('');
+                          setShowCancelModal(true);
+                        }}
+                      >
+                        {t('cancel_order_button')}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -499,6 +514,74 @@ const WaiterPanel = () => {
         onMarkDelivered={handleMarkDelivered}
         confirmingId={confirmingId}
       />
+
+      {/* Cancel order dialog */}
+      <Dialog
+        open={showCancelModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCancelModal(false);
+            setCancelTargetOrder(null);
+            setCancelReason('');
+            setCancelOtherText('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cancel_order_dialog_title')}</DialogTitle>
+            <DialogDescription>{t('cancel_order_dialog_description')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label>{t('cancel_reason_select_label')}</Label>
+            <Select value={cancelReason} onValueChange={setCancelReason}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="product_unavailable">{t('cancel_reason_product_unavailable')}</SelectItem>
+                <SelectItem value="customer_no_show">{t('cancel_reason_customer_no_show')}</SelectItem>
+                <SelectItem value="order_error">{t('cancel_reason_order_error')}</SelectItem>
+                <SelectItem value="other">{t('cancel_reason_other')}</SelectItem>
+              </SelectContent>
+            </Select>
+            {cancelReason === 'other' && (
+              <Textarea
+                value={cancelOtherText}
+                onChange={(e) => setCancelOtherText(e.target.value)}
+                placeholder={t('cancel_reason_other_placeholder')}
+                rows={2}
+              />
+            )}
+          </div>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-col">
+            <Button
+              variant="destructive"
+              className="w-full"
+              disabled={
+                !cancelReason ||
+                (cancelReason === 'other' && !cancelOtherText.trim()) ||
+                confirmingId === cancelTargetOrder?.id
+              }
+              onClick={handleCancelOrder}
+            >
+              {confirmingId === cancelTargetOrder?.id ? 'Cancelando...' : t('confirm_cancel_button')}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setShowCancelModal(false);
+                setCancelTargetOrder(null);
+                setCancelReason('');
+                setCancelOtherText('');
+              }}
+            >
+              {t('back_button')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
