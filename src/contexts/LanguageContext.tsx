@@ -555,7 +555,17 @@ const translations = {
     'new_order_step_2': 'Anótalo en tu sistema TPV (caja)',
     'new_order_step_3': 'Entrega el ticket en cocina',
     'new_order_step_4': 'Confirma aquí cuando esté en cocina',
-    'confirm_in_kitchen_button': '✅ Pedido en cocina — Confirmar'
+    'confirm_in_kitchen_button': '✅ Pedido en cocina — Confirmar',
+    'priority_received_normal': 'Recién recibido',
+    'priority_received_attention': 'Pendiente de tramitar',
+    'priority_received_urgent': 'Atender ahora',
+    'priority_received_critical': 'Cliente esperando demasiado',
+    'priority_kitchen_on_time': 'En tiempo',
+    'priority_kitchen_delayed': 'Retraso ligero',
+    'priority_kitchen_critical': 'Retraso importante',
+    'priority_ready_recent': 'Listo',
+    'priority_ready_waiting': 'Esperando recogida',
+    'priority_ready_too_long': 'Pedido frío - urgente'
   },
   
   en: {
@@ -1059,7 +1069,17 @@ const translations = {
     'new_order_step_2': 'Enter it in your POS system (cash register)',
     'new_order_step_3': 'Hand the ticket to the kitchen',
     'new_order_step_4': 'Confirm here when it is in the kitchen',
-    'confirm_in_kitchen_button': '✅ Order in kitchen — Confirm'
+    'confirm_in_kitchen_button': '✅ Order in kitchen — Confirm',
+    'priority_received_normal': 'Just received',
+    'priority_received_attention': 'Pending processing',
+    'priority_received_urgent': 'Attend now',
+    'priority_received_critical': 'Customer waiting too long',
+    'priority_kitchen_on_time': 'On time',
+    'priority_kitchen_delayed': 'Slight delay',
+    'priority_kitchen_critical': 'Major delay',
+    'priority_ready_recent': 'Ready',
+    'priority_ready_waiting': 'Awaiting pickup',
+    'priority_ready_too_long': 'Order getting cold - urgent'
   },
   
   fr: {
@@ -1557,7 +1577,17 @@ const translations = {
     'new_order_step_2': 'Enregistrez-la dans votre caisse',
     'new_order_step_3': 'Déposez le ticket en cuisine',
     'new_order_step_4': 'Confirmez ici quand c\'est en cuisine',
-    'confirm_in_kitchen_button': '✅ Commande en cuisine — Confirmer'
+    'confirm_in_kitchen_button': '✅ Commande en cuisine — Confirmer',
+    'priority_received_normal': "Vient d'arriver",
+    'priority_received_attention': 'À traiter',
+    'priority_received_urgent': 'À traiter immédiatement',
+    'priority_received_critical': 'Client attend depuis trop longtemps',
+    'priority_kitchen_on_time': 'Dans les temps',
+    'priority_kitchen_delayed': 'Léger retard',
+    'priority_kitchen_critical': 'Retard important',
+    'priority_ready_recent': 'Prêt',
+    'priority_ready_waiting': 'En attente de retrait',
+    'priority_ready_too_long': 'Commande froide - urgent'
   },
   
   de: {
@@ -2055,7 +2085,17 @@ const translations = {
     'new_order_step_2': 'Tragen Sie es in Ihr Kassensystem ein',
     'new_order_step_3': 'Geben Sie den Kassenbon an die Küche',
     'new_order_step_4': 'Bestätigen Sie hier, wenn es in der Küche ist',
-    'confirm_in_kitchen_button': '✅ Bestellung in der Küche — Bestätigen'
+    'confirm_in_kitchen_button': '✅ Bestellung in der Küche — Bestätigen',
+    'priority_received_normal': 'Gerade eingegangen',
+    'priority_received_attention': 'Bearbeitung ausstehend',
+    'priority_received_urgent': 'Sofort bearbeiten',
+    'priority_received_critical': 'Kunde wartet zu lange',
+    'priority_kitchen_on_time': 'Im Zeitplan',
+    'priority_kitchen_delayed': 'Leichte Verzögerung',
+    'priority_kitchen_critical': 'Erhebliche Verzögerung',
+    'priority_ready_recent': 'Fertig',
+    'priority_ready_waiting': 'Wartet auf Abholung',
+    'priority_ready_too_long': 'Bestellung wird kalt - dringend'
   },
 
   ru: {
@@ -2553,6 +2593,16 @@ const translations = {
     'new_order_step_2': 'Внесите его в кассовую систему',
     'new_order_step_3': 'Передайте чек на кухню',
     'new_order_step_4': 'Подтвердите здесь, когда заказ на кухне',
-    'confirm_in_kitchen_button': '✅ Заказ на кухне — Подтвердить'
+    'confirm_in_kitchen_button': '✅ Заказ на кухне — Подтвердить',
+    'priority_received_normal': 'Только что получен',
+    'priority_received_attention': 'Ожидает обработки',
+    'priority_received_urgent': 'Срочно обработать',
+    'priority_received_critical': 'Клиент слишком долго ждёт',
+    'priority_kitchen_on_time': 'В срок',
+    'priority_kitchen_delayed': 'Небольшая задержка',
+    'priority_kitchen_critical': 'Серьёзная задержка',
+    'priority_ready_recent': 'Готов',
+    'priority_ready_waiting': 'Ожидает выдачи',
+    'priority_ready_too_long': 'Заказ остывает - срочно'
   }
 };
