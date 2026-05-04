@@ -43,13 +43,13 @@ const WaiterDashboard = ({ orders, onNavigate, calculatePriority }: WaiterDashbo
 
   const getCardClasses = (count: number, priority: number): string => {
     if (count === 0) {
-      return 'border-l-neutral-300 dark:border-l-neutral-700 bg-neutral-100/50 dark:bg-neutral-900/40';
+      return 'border-l-neutral-400 dark:border-l-neutral-600 bg-muted/40';
     }
     const byPriority = [
-      'border-l-emerald-500 bg-emerald-50 dark:bg-emerald-950/30',
-      'border-l-amber-500 bg-amber-50 dark:bg-amber-950/30',
-      'border-l-orange-500 bg-orange-100 dark:bg-orange-950/40',
-      'border-l-red-600 bg-red-100 dark:bg-red-950/50 animate-pulse',
+      'border-l-emerald-500 bg-card',
+      'border-l-amber-500 bg-card',
+      'border-l-orange-500 bg-card',
+      'border-l-red-600 bg-card animate-pulse',
     ];
     return byPriority[priority] ?? byPriority[0];
   };
@@ -96,7 +96,7 @@ const WaiterDashboard = ({ orders, onNavigate, calculatePriority }: WaiterDashbo
               {t(titleKey)}
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
+          <p className="text-sm text-muted-foreground/90">{t(subtitleKey)}</p>
         </div>
 
         <div className="flex flex-col items-center justify-center flex-1 gap-3 py-6">
@@ -112,7 +112,7 @@ const WaiterDashboard = ({ orders, onNavigate, calculatePriority }: WaiterDashbo
               <span className={`text-7xl font-bold leading-none ${getTimerColor(count, maxPriority)}`}>
                 {count}
               </span>
-              <span className="text-base text-foreground/80">
+              <span className="text-base text-muted-foreground">
                 {pendingText}
               </span>
               {oldestMinutes > 0 && (
