@@ -565,7 +565,10 @@ const translations = {
     'priority_kitchen_critical': 'Retraso importante',
     'priority_ready_recent': 'Listo',
     'priority_ready_waiting': 'Esperando recogida',
-    'priority_ready_too_long': 'Pedido frío - urgente'
+    'priority_ready_too_long': 'Pedido frío - urgente',
+    'waiter.card.instructions.toggle': '¿Primera vez? Ver los 4 pasos',
+    'waiter.card.time.now': 'ahora',
+    'waiter.card.time.minutesAgo': 'hace {{minutes}}m'
   },
   
   en: {
@@ -1079,7 +1082,10 @@ const translations = {
     'priority_kitchen_critical': 'Major delay',
     'priority_ready_recent': 'Ready',
     'priority_ready_waiting': 'Awaiting pickup',
-    'priority_ready_too_long': 'Order getting cold - urgent'
+    'priority_ready_too_long': 'Order getting cold - urgent',
+    'waiter.card.instructions.toggle': 'First time? See the 4 steps',
+    'waiter.card.time.now': 'just now',
+    'waiter.card.time.minutesAgo': '{{minutes}}m ago'
   },
   
   fr: {
@@ -1587,7 +1593,10 @@ const translations = {
     'priority_kitchen_critical': 'Retard important',
     'priority_ready_recent': 'Prêt',
     'priority_ready_waiting': 'En attente de retrait',
-    'priority_ready_too_long': 'Commande froide - urgent'
+    'priority_ready_too_long': 'Commande froide - urgent',
+    'waiter.card.instructions.toggle': 'Première fois ? Voir les 4 étapes',
+    'waiter.card.time.now': "à l'instant",
+    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min'
   },
   
   de: {
@@ -2095,7 +2104,10 @@ const translations = {
     'priority_kitchen_critical': 'Erhebliche Verzögerung',
     'priority_ready_recent': 'Fertig',
     'priority_ready_waiting': 'Wartet auf Abholung',
-    'priority_ready_too_long': 'Bestellung wird kalt - dringend'
+    'priority_ready_too_long': 'Bestellung wird kalt - dringend',
+    'waiter.card.instructions.toggle': 'Zum ersten Mal? Die 4 Schritte ansehen',
+    'waiter.card.time.now': 'gerade eben',
+    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.'
   },
 
   ru: {
@@ -2603,6 +2615,9 @@ const translations = {
     'priority_kitchen_critical': 'Серьёзная задержка',
     'priority_ready_recent': 'Готов',
     'priority_ready_waiting': 'Ожидает выдачи',
-    'priority_ready_too_long': 'Заказ остывает - срочно'
+    'priority_ready_too_long': 'Заказ остывает - срочно',
+    'waiter.card.instructions.toggle': 'Первый раз? Посмотреть 4 шага',
+    'waiter.card.time.now': 'только что',
+    'waiter.card.time.minutesAgo': '{{minutes}} мин назад'
   }
 };

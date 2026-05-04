@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck, AlertTriangle, StickyNote, HelpCircle, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import FloorPlanView from '@/components/waiter/FloorPlanView';
@@ -44,11 +45,11 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-500' },
 };
 
-const formatElapsed = (createdAt: string): string => {
-  const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
-  const mins = Math.floor(elapsed / 60);
-  const secs = elapsed % 60;
-  return `${mins}m ${String(secs).padStart(2, '0')}s`;
+const formatElapsed = (createdAt: string, t: (k: string) => string): string => {
+  const elapsedMs = Date.now() - new Date(createdAt).getTime();
+  const mins = Math.floor(elapsedMs / 60000);
+  if (mins < 1) return t('waiter.card.time.now');
+  return t('waiter.card.time.minutesAgo').replace('{{minutes}}', String(mins));
 };
 
 const CRITICAL_WORDS = [
@@ -177,7 +178,7 @@ const WaiterPanel = () => {
   }, [user, isModerator, roleLoading, navigate]);
 
   useEffect(() => {
-    const timer = setInterval(() => setTick(t => t + 1), 1000);
+    const timer = setInterval(() => setTick(t => t + 1), 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -484,133 +485,106 @@ const WaiterPanel = () => {
               const statusInfo = STATUS_LABELS[order.order_status] || { label: order.order_status, color: 'bg-muted' };
               const items = Array.isArray(order.items) ? order.items : [];
               const isReceived = order.order_status === 'received' && !order.confirmed_at;
+              const priority = calculatePriority(order);
+              const leftBorderClass = [
+                'border-l-emerald-500 dark:border-l-emerald-400',
+                'border-l-amber-400 dark:border-l-amber-300',
+                'border-l-orange-500 dark:border-l-orange-400',
+                'border-l-red-600 dark:border-l-red-500',
+              ][priority] ?? 'border-l-emerald-500 dark:border-l-emerald-400';
+              const pulseClass = priority === 3 ? 'animate-pulse' : '';
+              const timerColorClass = [
+                'text-emerald-600 dark:text-emerald-400',
+                'text-amber-600 dark:text-amber-400',
+                'text-orange-600 dark:text-orange-400',
+                'text-red-600 dark:text-red-400 font-bold',
+              ][priority] ?? 'text-emerald-600 dark:text-emerald-400';
+              const criticalNote = hasCriticalNote(order.notes);
 
               return (
-                <Card key={order.id} className={`border-2 transition-colors ${getPriorityClassName(calculatePriority(order))}`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-mono">{order.order_number}</CardTitle>
-                      <div className="flex items-center gap-1">
-                        {order.order_source === 'whatsapp' ? (
-                          <Badge className="bg-green-600 text-white flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
-                            WhatsApp
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-blue-600 text-white flex items-center gap-1">
-                            <Globe className="w-3 h-3" />
-                            Web
-                          </Badge>
-                        )}
-                        <Badge className={`${typeInfo.className} flex items-center gap-1`}>
-                          {typeInfo.icon}
-                          {typeInfo.label}
-                        </Badge>
-                      </div>
+                <Card key={order.id} className={`border border-l-[12px] ${leftBorderClass} ${pulseClass} transition-colors overflow-hidden`}>
+                  {order.notes && criticalNote && (
+                    <div className="bg-red-600 text-white px-4 py-2 flex items-center gap-2 text-sm font-bold">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Alergia: {order.notes}</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        🕐 Pedido: {format(new Date(order.created_at), 'HH:mm:ss', { locale: es })}
-                        <span className="ml-2 text-xs font-mono text-muted-foreground/70">
-                          (hace {formatElapsed(order.created_at)})
-                        </span>
-                        {(() => {
-                          const _p = calculatePriority(order);
-                          const _mk = getPriorityMessageKey(order, _p);
-                          if (_p < 1 || !_mk) return null;
-                          const colorMap: Record<number, string> = {
-                            1: 'text-yellow-600',
-                            2: 'text-orange-500',
-                            3: 'text-red-600 font-bold',
-                          };
-                          return (
-                            <span className={`ml-2 text-xs ${colorMap[_p] ?? ''}`}>
-                              · {t(_mk)}
-                            </span>
-                          );
-                        })()}
-                      </span>
-                      <Badge className={`${statusInfo.color} text-white`}>{statusInfo.label}</Badge>
-                    </div>
-                    {order.confirmed_at && (
-                      <div className="text-sm text-green-600 font-medium">
-                        ✅ Tramitado: {format(new Date(order.confirmed_at), 'HH:mm:ss', { locale: es })}
+                  )}
+
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-2xl">{typeInfo.icon}</span>
+                        <span className="text-xl font-bold truncate">{typeInfo.label}</span>
                       </div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="pt-0 space-y-3">
-                    {/* Customer */}
-                    <div className="text-sm">
-                      <p className="font-medium">{order.customer_name}</p>
-                      <p className="text-muted-foreground">{order.customer_phone}</p>
+                      <div className={`text-2xl font-mono tabular-nums ${timerColorClass}`}>
+                        {formatElapsed(order.created_at, t)}
+                      </div>
                     </div>
 
-                    {/* Items */}
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
+                      <span className="font-mono">{order.order_number}</span>
+                      <span>·</span>
+                      {order.order_source === 'whatsapp' ? (
+                        <span className="inline-flex items-center gap-1">
+                          <MessageCircle className="w-3 h-3" /> WhatsApp
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1">
+                          <Globe className="w-3 h-3" /> Web
+                        </span>
+                      )}
+                      <span>·</span>
+                      <span>{format(new Date(order.created_at), 'HH:mm', { locale: es })}</span>
+                      {order.customer_name && (<><span>·</span><span>{order.customer_name}</span></>)}
+                      {order.customer_phone && (<><span>·</span><span>{order.customer_phone}</span></>)}
+                      <Badge className={`${statusInfo.color} text-white ml-auto`}>{statusInfo.label}</Badge>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="pt-0 space-y-3">
                     <div className="border-t pt-2">
                       <ul className="text-sm space-y-1">
                         {items.map((item: any, i: number) => (
-                          <li key={i} className="flex justify-between">
-                            <span>{item.quantity}x {item.name}</span>
-                            <span className="text-muted-foreground">{(item.price * item.quantity).toFixed(2)}€</span>
+                          <li key={i} className="flex justify-between gap-2">
+                            <span className="min-w-0">
+                              <span className="font-bold mr-1">{item.quantity}×</span>
+                              <span>{item.name}</span>
+                            </span>
+                            <span className="text-muted-foreground tabular-nums shrink-0">
+                              {(item.price * item.quantity).toFixed(2)}€
+                            </span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    {/* Notes */}
-                    {order.notes && (
-                      hasCriticalNote(order.notes) ? (
-                        <div className="bg-red-50 border border-red-200 rounded p-2 text-sm">
-                          <p className="font-bold text-red-700">
-                            🚨 ⚠️ {order.notes}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="bg-amber-50 border border-amber-200 rounded p-2 text-sm">
-                          <p className="font-bold text-amber-800">
-                            ⚠️ 📝 {order.notes}
-                          </p>
-                        </div>
-                      )
+                    {order.notes && !criticalNote && (
+                      <div className="flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded px-2 py-1">
+                        <StickyNote className="w-4 h-4 mt-0.5 shrink-0" />
+                        <span>{order.notes}</span>
+                      </div>
                     )}
 
-                    {/* Total */}
-                    <div className="border-t pt-2 flex justify-between font-bold">
-                      <span>Total</span>
-                      <span>{order.total_amount.toFixed(2)}€</span>
+                    <div className="border-t pt-2 flex justify-between items-baseline">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-xl font-bold tabular-nums">{order.total_amount.toFixed(2)}€</span>
                     </div>
 
-                    {/* Action buttons by status */}
                     {isReceived && (
-                      <div className="mt-3 space-y-3">
-                        <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
-                          <p className="font-bold text-orange-800 text-sm mb-2">
-                            {t('new_order_action_title')}
-                          </p>
-                          <ol className="text-sm text-orange-700 space-y-1 list-decimal list-inside">
-                            <li>{t('new_order_step_1')}</li>
-                            <li>{t('new_order_step_2')}</li>
-                            <li>{t('new_order_step_3')}</li>
-                            <li>{t('new_order_step_4')}</li>
-                          </ol>
-                        </div>
-                        <Button
-                          className="w-full"
-                          variant="neon"
-                          size="lg"
-                          disabled={confirmingId === order.id}
-                          onClick={() => handleConfirmOrder(order)}
-                        >
-                          <CheckCircle className="w-5 h-5 mr-2" />
-                          {confirmingId === order.id ? 'Tramitando...' : t('confirm_in_kitchen_button')}
-                        </Button>
-                      </div>
+                      <Button
+                        className="w-full h-14 text-base"
+                        variant="neon"
+                        disabled={confirmingId === order.id}
+                        onClick={() => handleConfirmOrder(order)}
+                      >
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        {confirmingId === order.id ? 'Tramitando...' : t('confirm_in_kitchen_button')}
+                      </Button>
                     )}
                     {order.order_status === 'confirmed' && (
                       <Button
-                        className="w-full mt-2 border-green-500 text-green-500 hover:bg-green-500/10"
+                        className="w-full h-14 text-base border-green-500 text-green-500 hover:bg-green-500/10"
                         variant="outline"
-                        size="lg"
                         disabled={confirmingId === order.id}
                         onClick={() => handleMarkReady(order)}
                       >
@@ -620,9 +594,8 @@ const WaiterPanel = () => {
                     )}
                     {order.order_status === 'ready' && (
                       <Button
-                        className="w-full mt-2"
+                        className="w-full h-14 text-base"
                         variant="default"
-                        size="lg"
                         disabled={confirmingId === order.id}
                         onClick={() => handleMarkDelivered(order)}
                       >
@@ -630,20 +603,47 @@ const WaiterPanel = () => {
                         {confirmingId === order.id ? 'Actualizando...' : '✅ Entregado'}
                       </Button>
                     )}
+
+                    {isReceived && (
+                      <Collapsible>
+                        <CollapsibleTrigger asChild>
+                          <button className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground py-2 group">
+                            <span className="inline-flex items-center gap-1">
+                              <HelpCircle className="w-3 h-3" />
+                              {t('waiter.card.instructions.toggle')}
+                            </span>
+                            <ChevronDown className="w-3 h-3 transition-transform group-data-[state=open]:rotate-180" />
+                          </button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 rounded p-3">
+                            <ol className="text-sm text-orange-800 dark:text-orange-300 space-y-1 list-decimal list-inside">
+                              <li>{t('new_order_step_1')}</li>
+                              <li>{t('new_order_step_2')}</li>
+                              <li>{t('new_order_step_3')}</li>
+                              <li>{t('new_order_step_4')}</li>
+                            </ol>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    )}
+
                     {order.order_status !== 'cancelled' && order.order_status !== 'delivered' && (
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full mt-2 border-destructive text-destructive hover:bg-destructive/10"
-                        onClick={() => {
-                          setCancelTargetOrder(order);
-                          setCancelReason('');
-                          setCancelOtherText('');
-                          setShowCancelModal(true);
-                        }}
-                      >
-                        {t('cancel_order_button')}
-                      </Button>
+                      <div className="flex justify-end pt-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-muted-foreground hover:text-destructive"
+                          onClick={() => {
+                            setCancelTargetOrder(order);
+                            setCancelReason('');
+                            setCancelOtherText('');
+                            setShowCancelModal(true);
+                          }}
+                        >
+                          {t('cancel_order_button')}
+                        </Button>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
