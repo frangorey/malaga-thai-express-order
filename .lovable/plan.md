@@ -1,44 +1,74 @@
-# Refactor Fase 2A — SoupCustomizer desacoplado de IDs hardcoded
+## Refactor NoodleCustomizerDrawer.tsx — Fase 2B
 
-## Verificaciones BD (ya completadas)
-- `dish_templates`: `sopa_miso` y `sopa_tom_yam` activos, ambos con `video_url` y `image_url=NULL`.
-- 6 productos (127–132) vinculados por `template_id`. Veggie con `is_vegetarian=true`; resto contiene "pollo"/"langostino" en `name`.
-- `SoupCustomizer` no tiene consumidores externos actualmente → refactor sin riesgo de romper imports.
-- `@tanstack/react-query`, `QueryClientProvider` y `sonner` ya disponibles.
+Único archivo modificado: `src/components/NoodleCustomizerDrawer.tsx`. Mismo patrón ya validado en `SoupCustomizer.tsx` (Fase 2A).
 
-## Cambios
+### Cambios
 
-### 1. CREAR `src/hooks/useDishTemplate.ts`
-Hook + helpers exactamente como en el prompt:
-- `useDishTemplate(slug)` con `staleTime` 1h, `gcTime` 2h, `enabled: !!slug`.
-- Tipos: `DishTemplate`, `ProteinKey = "pollo" | "langostino" | "veggie"`, `DishTemplateBundle`.
-- `resolveVariant(bundle, protein)`: veggie → `is_vegetarian=true`; resto → match case-insensitive en `name`.
-- `resolveMedia(bundle)`: `template.image_url` ?? primer `products[].image_url` ?? null; `template.video_url` ?? null.
+**1. Imports**
+- Eliminar `useProducts`.
+- Añadir `useDishTemplate, resolveMedia` desde `@/hooks/useDishTemplate`.
+- Añadir `Loader2, ImageOff` al import existente de `lucide-react`.
 
-### 2. REEMPLAZAR `src/components/SoupCustomizer.tsx`
-Versión nueva con optimizaciones sobre el prompt original:
-- `selectedSoupType: SoupSlug | ""` y `selectedProtein: ProteinKey | ""` (tipado estricto, evita casts).
-- Reset de `selectedProtein` al cambiar de sopa.
-- `useDishTemplate(selectedSoupType || null)`.
-- Imagen de cabecera: `imageUrl` desde `resolveMedia`; placeholder `ImageOff` centrado sobre `bg-muted` cuando es null.
-- Step 2: muestra mensaje de error con clave `error_loading_variants` cuando `isError`.
-- Botón "Añadir": `disabled` si `isLoading` o variante no resuelta; muestra `Loader2` mientras carga.
-- `handleAddToCart`: si `resolvedProduct` es null → `toast.error(t("error_variant_not_found") || "No encontramos esa variante. Inténtalo de nuevo.")`.
-- Precio: `resolvedProduct.price` (real de BD) con fallback al estático del array `proteins`.
-- Reset completo tras añadir al carrito.
+**2. Mapa slug**
+Junto a `NOODLE_LABELS`:
+```ts
+const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
+  Anchos: "tallarines_anchos",
+  Finos:  "tallarines_finos",
+  Glass:  "tallarines_glass",
+  Udon:   "tallarines_udon",
+};
+```
 
-### 3. ACTUALIZAR `src/contexts/LanguageContext.tsx`
-Añadir 2 claves nuevas en los 5 idiomas (es, en, fr, de, ru):
-- `error_variant_not_found`
-- `error_loading_variants`
+**3. Sustitución del fetch en el componente**
+Reemplazar `const { products } = useProducts();` por:
+```ts
+const slug = NOODLE_SLUG_MAP[noodleType];
+const { data: bundle, isLoading, isError } = useDishTemplate(slug);
+const { imageUrl, videoUrl } = useMemo(() => resolveMedia(bundle), [bundle]);
+const templateProducts = bundle?.products ?? [];
+```
 
-Textos exactos según los proporcionados por el usuario. El componente mantiene fallback string inline como salvaguarda defensiva.
+**4. `findMatchingProduct` sin filtros category/subcategory**
+Mantengo el `proteinMap` REAL del archivo actual (literal, sin el typo "tenera" del ejemplo del Arquitecto):
+```ts
+const proteinMap: Record<string, string> = {
+  pollo: "con pollo",
+  ternera: "con ternera",
+  gambas: "con gambas",
+  pollo_ternera: "MIX 2 con pollo y ternera",
+  pollo_gambas: "MIX 2 con pollo y gambas",
+  ternera_gambas: "MIX 2 con ternera y gambas",
+  pollo_ternera_gambas: "MIX 3 con pollo, ternera y gambas",
+};
+```
+Lookup pasa a `templateProducts.find(...)` solo por nombre (proteinPattern + saucePattern). Guard `templateProducts.length === 0 → return null`.
 
-## Lo que NO se toca
-- BD, RLS, migraciones (Fase 0/1 ya aplicadas).
-- `src/integrations/supabase/types.ts` (autogenerado).
-- Otros customizers (Rice/Noodle/Poke/Salad) — fases posteriores.
-- `Index.tsx`, `VideoMenuCard`, `VideoMenuItemCard`, `TikTokStyleMenu`.
+**5. Hero multimedia**
+Insertar antes del bloque de progress steps (`<div className="flex items-center gap-1 px-4 py-3 ...">`):
+- Si `videoUrl`: `<video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-contain bg-black" src={videoUrl} />` dentro de un wrapper `relative aspect-video bg-black overflow-hidden`.
+- Si solo `imageUrl`: `<img src={imageUrl} alt={...} className="absolute inset-0 w-full h-full object-contain bg-black" loading="lazy" />`.
+- Fallback: `ImageOff` centrado sobre `bg-muted`.
 
-## Resultado esperado
-SoupCustomizer deja de depender de IDs hardcoded (127–132). Si en BD se añade una nueva variante de sopa, se renombra un producto, o se actualiza precio/media en `dish_templates`, el componente lo refleja sin tocar código.
+Convención `object-contain bg-black` respeta la regla aplicada anteriormente en `VideoMenuCard` / `VideoMenuItemCard`.
+
+**6. Estados loading / error / empty en el scroll**
+Al inicio del contenedor scroll, antes de los bloques `currentStep === ...`:
+- `isLoading`: spinner `Loader2` centrado.
+- `isError`: mensaje `t("error_loading_variants") || "No pudimos cargar las variantes. Recarga la página."`.
+- `!isLoading && !isError && templateProducts.length === 0`: `t("error_no_variants_available") || "No hay variantes disponibles ahora mismo."`.
+
+Envolver los bloques actuales `currentStep === "protein" | "sauce" | "vegetables" | "extras" | "summary"` con la condición combinada `!isLoading && !isError && templateProducts.length > 0`.
+
+**7. Botón Add to cart**
+Añadir `disabled={isLoading || isError || templateProducts.length === 0}` al botón final del summary.
+
+### NO se toca
+- `src/pages/Index.tsx`, `NoodleCustomizer.tsx` (legacy), `useDishTemplate.ts`, otros customizers.
+- Firma del componente, export `NoodleType`, lógica de pasos, vegetales, extras, `handleAddToCart` (excepto la nueva `findMatchingProduct`).
+- i18n: solo se usan claves existentes con fallback inline. No se añaden claves nuevas (la clave `error_no_variants_available` puede no existir aún → cae al fallback string, que es seguro).
+
+### Notas
+- Se conserva el `proteinMap` real del archivo. Ignoro deliberadamente el typo "tenera" del ejemplo ilustrativo del Arquitecto.
+- `useProducts` queda totalmente eliminado del archivo (no quedan imports muertos).
+- TS estricto: `templateProducts` tipado vía `bundle?.products` que ya es `SupabaseProduct[]`.

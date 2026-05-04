@@ -1,10 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Check, ShoppingCart, X } from "lucide-react";
+import { Check, ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { useProducts } from "@/hooks/useProducts";
+import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { allExtras } from "@/data/extrasData";
 import { cn } from "@/lib/utils";
@@ -48,9 +48,19 @@ const NOODLE_LABELS: Record<NoodleType, string> = {
   Udon: "Udon",
 };
 
+const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
+  Anchos: "tallarines_anchos",
+  Finos: "tallarines_finos",
+  Glass: "tallarines_glass",
+  Udon: "tallarines_udon",
+};
+
 export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType }: NoodleCustomizerDrawerProps) => {
   const { t } = useLanguage();
-  const { products } = useProducts();
+  const slug = NOODLE_SLUG_MAP[noodleType];
+  const { data: bundle, isLoading, isError } = useDishTemplate(slug);
+  const { imageUrl, videoUrl } = useMemo(() => resolveMedia(bundle), [bundle]);
+  const templateProducts = bundle?.products ?? [];
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState<Step>("protein");
@@ -159,6 +169,7 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
 
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedProtein || !selectedSauce) return null;
+    if (templateProducts.length === 0) return null;
 
     const proteinMap: Record<string, string> = {
       pollo: "con pollo",
@@ -174,14 +185,12 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
     const saucePattern = selectedSauceData?.dbName || "classic";
 
     return (
-      products.find(
+      templateProducts.find(
         (p) =>
-          p.category === "Tallarines" &&
-          p.subcategory === noodleType &&
           p.name.toLowerCase().includes(proteinPattern.toLowerCase()) &&
           p.name.toLowerCase().includes(saucePattern.toLowerCase())
-      ) as SupabaseProduct | null
-    ) || null;
+      ) ?? null
+    );
   };
 
   const handleAddToCart = () => {
@@ -229,6 +238,31 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
           </button>
         </DrawerHeader>
 
+        {/* Hero multimedia */}
+        <div className="relative aspect-video bg-black overflow-hidden">
+          {videoUrl ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+              src={videoUrl}
+            />
+          ) : imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`Tallarines ${NOODLE_LABELS[noodleType]}`}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted">
+              <ImageOff className="w-10 h-10 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
         {/* Progress steps */}
         <div className="flex items-center gap-1 px-4 py-3 overflow-x-auto">
           {STEP_ORDER.map((step, i) => {
@@ -253,6 +287,26 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ maxHeight: "60dvh" }}>
+          {isLoading && (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          )}
+
+          {isError && !isLoading && (
+            <div className="mt-4 p-3 rounded-md border border-destructive/50 bg-destructive/10 text-sm text-destructive">
+              {t("error_loading_variants") || "No pudimos cargar las variantes. Recarga la página."}
+            </div>
+          )}
+
+          {!isLoading && !isError && templateProducts.length === 0 && (
+            <div className="mt-4 p-3 rounded-md border border-border bg-muted text-sm text-muted-foreground">
+              {t("error_no_variants_available") || "No hay variantes disponibles ahora mismo."}
+            </div>
+          )}
+
+          {!isLoading && !isError && templateProducts.length > 0 && (
+            <>
           {currentStep === "protein" && (
             <div className="space-y-2 pt-2">
               <p className="text-sm text-muted-foreground mb-3">Elige tu proteína favorita</p>
@@ -400,12 +454,14 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={goBack} className="flex-1">← {t("step_extras")}</Button>
-                <Button onClick={handleAddToCart} className="flex-1 gap-2">
+                <Button onClick={handleAddToCart} className="flex-1 gap-2" disabled={isLoading || isError || templateProducts.length === 0}>
                   <ShoppingCart className="w-4 h-4" />
                   {t("add_to_cart")}
                 </Button>
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
 
