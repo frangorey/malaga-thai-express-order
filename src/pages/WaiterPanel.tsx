@@ -64,6 +64,85 @@ const hasCriticalNote = (notes: string | null): boolean => {
   return CRITICAL_WORDS.some(w => lower.includes(w));
 };
 
+const CATEGORY_ETA_MINUTES: Record<string, number> = {
+  'Tallarines': 15, 'Arroces': 15, 'Ensaladas': 10, 'Entrantes': 10,
+  'Otras del Mundo': 15, 'Sopas': 15, 'Pokes': 10, 'Bebidas': 2, 'Postres': 5,
+};
+
+const calculateOrderETA = (items: any[]): number => {
+  if (!items || items.length === 0) return 20;
+  const maxETA = Math.max(...items.map(item => CATEGORY_ETA_MINUTES[item.category as string] ?? 15));
+  return maxETA + 5 + (items.length >= 8 ? 5 : 0);
+};
+
+const calculatePriority = (order: {
+  order_status: string; order_type: string; created_at: string; items: any;
+}): number => {
+  const items = Array.isArray(order.items) ? order.items : [];
+  const elapsedMin = (Date.now() - new Date(order.created_at).getTime()) / 60000;
+  const { order_status: status, order_type: type } = order;
+  if (status === 'received') {
+    if (elapsedMin < 2)  return 0;
+    if (elapsedMin < 5)  return 1;
+    if (elapsedMin < 10) return 2;
+    return 3;
+  }
+  if (status === 'confirmed' || status === 'preparing') {
+    const eta = calculateOrderETA(items);
+    const over = elapsedMin - eta;
+    if (over <= 0) return 0;
+    if (over <= 5) return 1;
+    return 3;
+  }
+  if (status === 'ready') {
+    const eta = calculateOrderETA(items);
+    const timeInReady = Math.max(0, elapsedMin - eta);
+    if (type === 'dine_in') {
+      if (timeInReady < 3) return 0;
+      if (timeInReady < 5) return 1;
+      return 3;
+    } else {
+      if (timeInReady < 3)  return 0;
+      if (timeInReady < 10) return 1;
+      return 3;
+    }
+  }
+  return 0;
+};
+
+const getPriorityClassName = (priority: number): string => {
+  switch (priority) {
+    case 1:  return 'border-yellow-400';
+    case 2:  return 'border-orange-400';
+    case 3:  return 'border-red-500 animate-pulse';
+    default: return 'border-green-300';
+  }
+};
+
+const getPriorityMessageKey = (
+  order: { order_status: string; order_type: string },
+  priority: number
+): string | null => {
+  const { order_status: status } = order;
+  if (status === 'received') {
+    return ['priority_received_normal','priority_received_attention',
+            'priority_received_urgent','priority_received_critical'][priority] ?? null;
+  }
+  if (status === 'confirmed' || status === 'preparing') {
+    if (priority === 0) return 'priority_kitchen_on_time';
+    if (priority === 1) return 'priority_kitchen_delayed';
+    if (priority === 3) return 'priority_kitchen_critical';
+    return null;
+  }
+  if (status === 'ready') {
+    if (priority === 0) return 'priority_ready_recent';
+    if (priority === 1) return 'priority_ready_waiting';
+    if (priority === 3) return 'priority_ready_too_long';
+    return null;
+  }
+  return null;
+};
+
 const WaiterPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -281,9 +360,14 @@ const WaiterPanel = () => {
     setIsLoading(false);
   };
 
-  const filteredOrders = filter === 'all'
-    ? orders
-    : orders.filter(o => o.order_type === filter);
+  const filteredOrders = (
+    filter === 'all' ? orders : orders.filter(o => o.order_type === filter)
+  ).slice().sort((a, b) => {
+    const pa = calculatePriority(a);
+    const pb = calculatePriority(b);
+    if (pb !== pa) return pb - pa;
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  });
 
   const getOrderTypeInfo = (order: Order) => {
     if (order.order_type === 'dine_in') {
@@ -402,7 +486,7 @@ const WaiterPanel = () => {
               const isReceived = order.order_status === 'received' && !order.confirmed_at;
 
               return (
-                <Card key={order.id} className={`border-2 transition-colors ${isReceived ? 'border-destructive animate-pulse' : 'hover:border-primary/50'}`}>
+                <Card key={order.id} className={`border-2 transition-colors ${getPriorityClassName(calculatePriority(order))}`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-mono">{order.order_number}</CardTitle>
@@ -430,6 +514,21 @@ const WaiterPanel = () => {
                         <span className="ml-2 text-xs font-mono text-muted-foreground/70">
                           (hace {formatElapsed(order.created_at)})
                         </span>
+                        {(() => {
+                          const _p = calculatePriority(order);
+                          const _mk = getPriorityMessageKey(order, _p);
+                          if (_p < 1 || !_mk) return null;
+                          const colorMap: Record<number, string> = {
+                            1: 'text-yellow-600',
+                            2: 'text-orange-500',
+                            3: 'text-red-600 font-bold',
+                          };
+                          return (
+                            <span className={`ml-2 text-xs ${colorMap[_p] ?? ''}`}>
+                              · {t(_mk)}
+                            </span>
+                          );
+                        })()}
                       </span>
                       <Badge className={`${statusInfo.color} text-white`}>{statusInfo.label}</Badge>
                     </div>
