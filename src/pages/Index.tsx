@@ -49,7 +49,7 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
   const [isViewingFeed, setIsViewingFeed] = useState(false);
-  const [isRiceCustomizerOpen, setIsRiceCustomizerOpen] = useState(false);
+  const [riceCustomizer, setRiceCustomizer] = useState<{ open: boolean; type: RiceType }>({ open: false, type: "frito" });
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
