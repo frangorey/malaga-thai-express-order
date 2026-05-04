@@ -154,7 +154,7 @@ const WaiterPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup' | 'delivery'>('all');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'list' | 'floor'>('dashboard');
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
