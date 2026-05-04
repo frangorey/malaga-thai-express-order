@@ -211,7 +211,7 @@ const Index = () => {
       imageUrl: p.image_url,
       tags: [] as string[],
     }));
-  }, [products, activeCategory, t]);
+  }, [products, activeCategory, t, templatesBySlug]);
 
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
