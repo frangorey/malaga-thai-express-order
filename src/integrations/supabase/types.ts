@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      dish_templates: {
+        Row: {
+          category: string
+          created_at: string
+          customizer_key: string | null
+          description: string | null
+          display_name: string
+          display_name_en: string | null
+          display_order: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          slug: string
+          subcategory: string | null
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          customizer_key?: string | null
+          description?: string | null
+          display_name: string
+          display_name_en?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          slug: string
+          subcategory?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          customizer_key?: string | null
+          description?: string | null
+          display_name?: string
+          display_name_en?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          slug?: string
+          subcategory?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       ingredients: {
         Row: {
           created_at: string | null
@@ -195,6 +246,7 @@ export type Database = {
           name: string
           price: number
           subcategory: string | null
+          template_id: string | null
           updated_at: string | null
           video_url: string | null
         }
@@ -210,6 +262,7 @@ export type Database = {
           name: string
           price: number
           subcategory?: string | null
+          template_id?: string | null
           updated_at?: string | null
           video_url?: string | null
         }
@@ -225,10 +278,19 @@ export type Database = {
           name?: string
           price?: number
           subcategory?: string | null
+          template_id?: string | null
           updated_at?: string | null
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "dish_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
