@@ -1,121 +1,68 @@
-# Fase 3 — Refactor bloque Sopas en Index.tsx (BD-driven)
+## Fase 4 — Ensaladas (frontend)
 
-Eliminar IDs hardcoded `[127..132]` del bloque Sopas y centralizar media (`video_url`, `image_url`) en `dish_templates`, resolviendo variantes por `template_id` en lugar de por id numérico.
+Asume que el seed SQL (6 `dish_templates` + UPDATE `products.template_id`) ya está aplicado, según la verificación previa. Si la BD aún no está sembrada, primero ejecutamos esa migración antes del frontend.
 
-## Archivos
+### 1) Nuevo archivo: `src/components/SaladCustomizerDrawer.tsx`
 
-1. **NUEVO** `src/hooks/useDishTemplates.ts` (plural)
-2. **MODIFICADO** `src/pages/Index.tsx`
+Replica simplificada del patrón `NoodleCustomizerDrawer` (mismo layout: hero + zona scroll + sticky total), reducida a un único paso "proteína" + summary.
 
-No se toca: BD, RLS, edge functions, `useDishTemplate.ts` singular, `types.ts`, NOODLE_CARDS, RICE_CARDS, VARIANT_GROUPS (Entrantes), `SoupCustomizer.tsx`, ni i18n (las claves `soup_chicken_label/soup_prawn_label/soup_veggie_label` ya existen en es/en/fr/de/ru).
+- Imports: `useState`, `useMemo`, `Drawer*`, `Button`, `ShoppingCart`, `X`, `Loader2`, `ImageOff`, `useLanguage`, `SupabaseProduct`, `useDishTemplate`, `resolveMedia`, `useToast`, `cn`.
+- Exports: `type SaladType = "cesar" | "classic" | "crispy" | "fruta" | "malaysia" | "thailandia"` + componente.
+- Constantes módulo: `SALAD_LABELS`, `SALAD_SLUG_MAP` (slugs `ensalada_<type>`), `SALAD_EMOJI = "🥗"`.
+- Estado: `selectedProtein: ProteinId | ""`.
+- 4 opciones proteína: `normal` (10.40, 🌱), `pollo` (11.40, 🍗), `langostino` (12.90, 🦐), `mixta` (14.40, 🍗🦐). Labels vía `t("salad_protein_*")`.
+- Hero: solo imagen (no `<video>`, los templates de ensaladas tienen `video_url=NULL`). Fallback `<ImageOff>` si no hay imagen.
+- Estados: `isLoading` (spinner), `isError` (`error_loading_variants`), `templateProducts.length===0` (`error_no_variants_available`).
+- Render proteínas: grid 1 col (sm:2). Botón seleccionado con `border-primary bg-primary/10`. Tras seleccionar, summary card con tipo/proteína/total y CTA full-width "Añadir al carrito".
+- Sticky bottom con total cuando hay selección.
 
-## 1) `src/hooks/useDishTemplates.ts`
-
-Hook eager que cachea todos los templates activos (1h stale, 2h gc) y reutiliza el tipo `DishTemplate` exportado por `useDishTemplate.ts`:
+**Matching (`findMatchingProduct`)** — único punto delicado, orden por especificidad:
 
 ```ts
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import type { DishTemplate } from "@/hooks/useDishTemplate";
-
-export function useDishTemplates() {
-  return useQuery({
-    queryKey: ["dish_templates", "all"],
-    queryFn: async (): Promise<DishTemplate[]> => {
-      const { data, error } = await supabase
-        .from("dish_templates")
-        .select("*")
-        .eq("is_active", true);
-      if (error) throw error;
-      return (data ?? []) as DishTemplate[];
-    },
-    staleTime: 1000 * 60 * 60,
-    gcTime: 1000 * 60 * 60 * 2,
-  });
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const isMixta = (n: string) => /\bmixta\b/.test(n);
+switch (selectedProtein) {
+  case "mixta":      return isMixta(n);
+  case "normal":     return p.is_vegetarian === true;
+  case "pollo":      return !isMixta(n) && /\bcon pollo\b/.test(n);
+  case "langostino": return !isMixta(n) && /\bcon langostino\b/.test(n);
 }
 ```
 
-## 2) `src/pages/Index.tsx`
+La exclusión explícita de "mixta" en pollo/langostino evita el falso positivo (el nombre de la mixta contiene también "con pollo y langostino").
 
-**Imports** (junto a los existentes):
-```ts
-import { useDishTemplates } from "@/hooks/useDishTemplates";
-import type { DishTemplate } from "@/hooks/useDishTemplate";
-```
+`handleAddToCart`: llama a `findMatchingProduct()`, si null → toast error; si OK → `onAddToCart(base)`, reset `selectedProtein`, `onClose()`, toast éxito. Sin customizations (no hay verduras/extras).
 
-**Dentro del componente**, tras `const { products, loading } = useProducts();`:
-```ts
-const { data: dishTemplates } = useDishTemplates();
-const templatesBySlug = useMemo(() => {
-  const map = new Map<string, DishTemplate>();
-  (dishTemplates ?? []).forEach((tpl) => map.set(tpl.slug, tpl));
-  return map;
-}, [dishTemplates]);
-```
+### 2) Modificar `src/pages/Index.tsx`
 
-**Eliminar** la constante `SOUP_GROUPS` (líneas ~80-83) y reemplazar por:
-```ts
-const SOUP_CARDS: { slug: string; displayNameKey: string; emoji: string }[] = [
-  { slug: "sopa_tom_yam", displayNameKey: "soup_tom_yam", emoji: "🍲" },
-  { slug: "sopa_miso",    displayNameKey: "soup_miso",    emoji: "🍜" },
-];
-```
+- Añadir import `SaladCustomizerDrawer`, `SaladType`.
+- Añadir state: `const [saladCustomizer, setSaladCustomizer] = useState<{open:boolean; type:SaladType}>({open:false, type:"cesar"})`.
+- Añadir constante `SALAD_CARDS` (6 entradas en orden cesar → classic → crispy → fruta → malaysia → thailandia, todas con emoji 🥗 y `displayNameKey: "salad_<type>_card"`).
+- Dentro de `videoItems` useMemo, **antes** del bloque Default y junto al bloque `Sopas`, añadir rama `if (dbCategory === "Ensaladas")` que itera `SALAD_CARDS`, resuelve `templatesBySlug.get(sc.slug)`, filtra `categoryProducts.filter(p => p.template_id === template.id)`, elige `primary = group.find(p=>p.is_vegetarian) ?? group[0]`, y push de `FeaturedItem` con `videoUrl: null`, `posterUrl/imageUrl` desde el template, `onCustomize: () => setSaladCustomizer({open:true, type:sc.type})`, `customizeLabel: \`${t("customize")} 🥗\``.
+- Añadir `<SaladCustomizerDrawer ... />` junto a los otros drawers, antes del cierre de `<main>`.
 
-**Reescribir** el bloque `if (dbCategory === "Sopas")` dentro del `useMemo videoItems`:
-```ts
-if (dbCategory === "Sopas") {
-  const items: FeaturedItem[] = [];
-  for (const sc of SOUP_CARDS) {
-    const template = templatesBySlug.get(sc.slug);
-    if (!template) continue;
-    const groupProducts = categoryProducts.filter((p) => p.template_id === template.id);
-    if (groupProducts.length === 0) continue;
-    const primary = groupProducts[0];
-    items.push({
-      product: toSupabaseProduct(primary),
-      videoUrl: template.video_url ?? primary.video_url ?? null,
-      posterUrl: template.image_url || primary.image_url || PLACEHOLDER_POSTER,
-      imageUrl: template.image_url ?? primary.image_url,
-      tags: [],
-      displayName: `${sc.emoji} ${t(sc.displayNameKey)}`,
-      variants: groupProducts.map((p) => {
-        let proteinKey = "";
-        if (p.is_vegetarian === true) proteinKey = "soup_veggie_label";
-        else if (p.name.toLowerCase().includes("langostino")) proteinKey = "soup_prawn_label";
-        else if (p.name.toLowerCase().includes("pollo")) proteinKey = "soup_chicken_label";
-        return {
-          product: toSupabaseProduct(p),
-          label: `${t(proteinKey)} — ${p.price.toFixed(2)}€`,
-        };
-      }),
-    });
-  }
-  return items;
-}
-```
-Orden de detección: **veggie → langostino → pollo** (langostino antes que pollo blinda contra futuros nombres tipo "pollo y langostino").
+Resultado UX: la categoría Ensaladas pasa de 24 cards sueltas a 6 cards agrupadas con drawer.
 
-**Actualizar** el dependency array del `useMemo videoItems` añadiendo `templatesBySlug`:
-```ts
-}, [products, activeCategory, t, templatesBySlug]);
-```
+### 3) Modificar `src/contexts/LanguageContext.tsx`
 
-## Optimización propuesta sobre el prompt original
+Añadir 11 claves nuevas en cada uno de los 5 bloques (`es / en / fr / de / ru`, **NO italiano**):
 
-El prompt está bien dimensionado y los tipos ya existen. Una única mejora menor opcional: el campo `proteinKey` puede quedar `""` si un producto no matchea ninguna heurística, lo que renderizaría un label `" — 8.90€"`. Hoy no ocurre con productos 127-132, pero como salvaguarda defensiva podemos hacer fallback al nombre del producto:
-```ts
-label: proteinKey ? `${t(proteinKey)} — ${p.price.toFixed(2)}€` : `${p.name} — ${p.price.toFixed(2)}€`,
-```
-Lo incluyo en la implementación. Sin cambios adicionales sobre el prompt.
+- 6 cards: `salad_cesar_card`, `salad_classic_card`, `salad_crispy_card`, `salad_fruta_card`, `salad_malaysia_card`, `salad_thailandia_card` (traducciones según tabla del prompt).
+- 5 auxiliares drawer: `salad_choose_protein`, `salad_protein_veggie`, `salad_protein_chicken`, `salad_protein_shrimp`, `salad_protein_mix`.
 
-## Validación
+**Atención — colisión detectada**: ya existen claves `salad_protein_chicken` y `salad_protein_shrimp` (líneas 394–397, 929–932, etc.) usadas por el legacy `SaladCustomizer.tsx` con valores como "Añadir Pollo". El spec las quiere sobrescribir a "Con pollo" / "Con langostino". Como `SaladCustomizer.tsx` es código muerto (confirmado por el spec, limpieza en Fase 6), **sobrescribimos** los valores existentes en lugar de duplicar la clave. Las claves auxiliares restantes (`salad_choose_protein`, `salad_protein_veggie`, `salad_protein_mix`) se añaden nuevas.
 
-- TS build limpio (sin imports muertos, sin `any`).
-- Categoría Sopas → 2 cards (Tom Yam, Miso) con 3 variantes cada una y precios desde BD.
-- Add to cart de cada variante → producto con id correcto (130/131/132, 127/128/129).
-- Una sola llamada `dish_templates?is_active=eq.true` cacheada 1h.
-- Si `dishTemplates` no ha resuelto, el bloque devuelve `[]` sin crashear.
+Reutilizamos sin tocar: `add_to_cart`, `customize`, `step_protein`, `order_summary`, `error_loading_variants`, `error_no_variants_available` (ya existen en los 5 idiomas).
 
-## Fuera de scope
+### Restricciones
 
-NOODLE_CARDS, RICE_CARDS, VARIANT_GROUPS, `SoupCustomizer.tsx`, BD/RLS/edge functions, regeneración de `types.ts`, columna `products.protein_key` (Fase 5/6).
+- No tocar: `SoupCustomizer.tsx`, `NoodleCustomizerDrawer.tsx`, `RiceCustomizerDrawer.tsx`, `PokeCustomizer.tsx`, `SaladCustomizer.tsx` (legacy), `useDishTemplate.ts`, `useDishTemplates.ts`, `useProducts.tsx`.
+- No añadir italiano.
+- No modificar el bloque Default de `videoItems`.
+
+### Validación
+
+1. `SaladCustomizerDrawer.tsx` existe, no importa `SaladCustomizer.tsx`.
+2. `Index.tsx`: import + state + `SALAD_CARDS` (6 entradas, orden correcto) + rama `Ensaladas` antes del Default + `<SaladCustomizerDrawer />` montado.
+3. `tsc` limpio.
+4. QA manual con los 4 tests del checklist (especialmente Test 4 — Mixta — para verificar prioridad del regex sobre los substrings "con pollo"/"con langostino").
