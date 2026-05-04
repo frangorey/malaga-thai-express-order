@@ -1099,7 +1099,21 @@ const translations = {
     'priority_ready_too_long': 'Order getting cold - urgent',
     'waiter.card.instructions.toggle': 'First time? See the 4 steps',
     'waiter.card.time.now': 'just now',
-    'waiter.card.time.minutesAgo': '{{minutes}}m ago'
+    'waiter.card.time.minutesAgo': '{{minutes}}m ago',
+    'dashboard_title': 'Dashboard',
+    'dashboard_pickup_title': 'Web Pickup',
+    'dashboard_pickup_subtitle': 'In-store collection',
+    'dashboard_dine_in_title': 'QR Tables',
+    'dashboard_dine_in_subtitle': 'Dine-in orders',
+    'dashboard_oldest_label': 'Oldest',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'No pending orders',
+    'dashboard_view_list': 'View list',
+    'dashboard_view_floor': 'View tables',
+    'dashboard_pending_count': '{{count}} pending',
+    'nav_dashboard': 'Dashboard',
+    'nav_list': 'List',
+    'nav_floor': 'Floor'
   },
   
   fr: {
