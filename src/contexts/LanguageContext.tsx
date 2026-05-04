@@ -2104,7 +2104,10 @@ const translations = {
     'priority_kitchen_critical': 'Erhebliche Verzögerung',
     'priority_ready_recent': 'Fertig',
     'priority_ready_waiting': 'Wartet auf Abholung',
-    'priority_ready_too_long': 'Bestellung wird kalt - dringend'
+    'priority_ready_too_long': 'Bestellung wird kalt - dringend',
+    'waiter.card.instructions.toggle': 'Zum ersten Mal? Die 4 Schritte ansehen',
+    'waiter.card.time.now': 'gerade eben',
+    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.'
   },
 
   ru: {
