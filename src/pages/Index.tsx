@@ -86,10 +86,10 @@ const Index = () => {
     pinchito_pollo: { displayNameKey: "variant_pinchito_chicken", ids: [192, 193], labelKeys: { 192: "variant_1_unit", 193: "variant_2_units" } },
   };
 
-  const SOUP_GROUPS: Record<string, { displayNameKey: string; emoji: string; ids: number[]; proteinKeys: Record<number, string> }> = {
-    tom_yam: { displayNameKey: "soup_tom_yam", emoji: "🍲", ids: [130, 131, 132], proteinKeys: { 130: "soup_chicken_label", 131: "soup_prawn_label", 132: "soup_veggie_label" } },
-    miso: { displayNameKey: "soup_miso", emoji: "🍜", ids: [127, 128, 129], proteinKeys: { 127: "soup_chicken_label", 128: "soup_prawn_label", 129: "soup_veggie_label" } },
-  };
+  const SOUP_CARDS: { slug: string; displayNameKey: string; emoji: string }[] = [
+    { slug: "sopa_tom_yam", displayNameKey: "soup_tom_yam", emoji: "🍲" },
+    { slug: "sopa_miso",    displayNameKey: "soup_miso",    emoji: "🍜" },
+  ];
 
   const videoItems = useMemo(() => {
     const dbCategory = CATEGORY_MAP[activeCategory];
