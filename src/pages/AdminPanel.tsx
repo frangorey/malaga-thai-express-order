@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map } from 'lucide-react';
+import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map, Film, Info } from 'lucide-react';
 import TableQRCodes from '@/components/admin/TableQRCodes';
 import TableLayoutEditor from '@/components/admin/TableLayoutEditor';
 import { format } from 'date-fns';
@@ -42,6 +42,7 @@ interface Product {
   category: string;
   price: number;
   image_url: string | null;
+  video_url: string | null;
   is_available: boolean | null;
 }
 
