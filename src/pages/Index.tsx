@@ -12,6 +12,8 @@ import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomize
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
+import { useDishTemplates } from "@/hooks/useDishTemplates";
+import type { DishTemplate } from "@/hooks/useDishTemplate";
 
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
@@ -53,6 +55,13 @@ const Index = () => {
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
+  const { data: dishTemplates } = useDishTemplates();
+
+  const templatesBySlug = useMemo(() => {
+    const map = new Map<string, DishTemplate>();
+    (dishTemplates ?? []).forEach((tpl) => map.set(tpl.slug, tpl));
+    return map;
+  }, [dishTemplates]);
 
   const mesaParam = searchParams.get('mesa');
   const tableNumber = mesaParam ? parseInt(mesaParam, 10) : null;
@@ -77,10 +86,10 @@ const Index = () => {
     pinchito_pollo: { displayNameKey: "variant_pinchito_chicken", ids: [192, 193], labelKeys: { 192: "variant_1_unit", 193: "variant_2_units" } },
   };
 
-  const SOUP_GROUPS: Record<string, { displayNameKey: string; emoji: string; ids: number[]; proteinKeys: Record<number, string> }> = {
-    tom_yam: { displayNameKey: "soup_tom_yam", emoji: "🍲", ids: [130, 131, 132], proteinKeys: { 130: "soup_chicken_label", 131: "soup_prawn_label", 132: "soup_veggie_label" } },
-    miso: { displayNameKey: "soup_miso", emoji: "🍜", ids: [127, 128, 129], proteinKeys: { 127: "soup_chicken_label", 128: "soup_prawn_label", 129: "soup_veggie_label" } },
-  };
+  const SOUP_CARDS: { slug: string; displayNameKey: string; emoji: string }[] = [
+    { slug: "sopa_tom_yam", displayNameKey: "soup_tom_yam", emoji: "🍲" },
+    { slug: "sopa_miso",    displayNameKey: "soup_miso",    emoji: "🍜" },
+  ];
 
   const videoItems = useMemo(() => {
     const dbCategory = CATEGORY_MAP[activeCategory];
@@ -127,21 +136,31 @@ const Index = () => {
     // SOPAS: 2 cards with protein variants
     if (dbCategory === "Sopas") {
       const items: FeaturedItem[] = [];
-      for (const group of Object.values(SOUP_GROUPS)) {
-        const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
+      for (const sc of SOUP_CARDS) {
+        const template = templatesBySlug.get(sc.slug);
+        if (!template) continue;
+        const groupProducts = categoryProducts.filter((p) => p.template_id === template.id);
         if (groupProducts.length === 0) continue;
         const primary = groupProducts[0];
         items.push({
           product: toSupabaseProduct(primary),
-          videoUrl: primary.video_url ?? null,
-          posterUrl: primary.image_url || PLACEHOLDER_POSTER,
-          imageUrl: primary.image_url,
+          videoUrl: template.video_url ?? primary.video_url ?? null,
+          posterUrl: template.image_url || primary.image_url || PLACEHOLDER_POSTER,
+          imageUrl: template.image_url ?? primary.image_url,
           tags: [],
-          displayName: `${group.emoji} ${t(group.displayNameKey)}`,
-          variants: groupProducts.map((p) => ({
-            product: toSupabaseProduct(p),
-            label: `${t(group.proteinKeys[p.id] || '')} — ${p.price.toFixed(2)}€`,
-          })),
+          displayName: `${sc.emoji} ${t(sc.displayNameKey)}`,
+          variants: groupProducts.map((p) => {
+            let proteinKey = "";
+            if (p.is_vegetarian === true) proteinKey = "soup_veggie_label";
+            else if (p.name.toLowerCase().includes("langostino")) proteinKey = "soup_prawn_label";
+            else if (p.name.toLowerCase().includes("pollo")) proteinKey = "soup_chicken_label";
+            return {
+              product: toSupabaseProduct(p),
+              label: proteinKey
+                ? `${t(proteinKey)} — ${p.price.toFixed(2)}€`
+                : `${p.name} — ${p.price.toFixed(2)}€`,
+            };
+          }),
         });
       }
       return items;
@@ -192,7 +211,7 @@ const Index = () => {
       imageUrl: p.image_url,
       tags: [] as string[],
     }));
-  }, [products, activeCategory, t]);
+  }, [products, activeCategory, t, templatesBySlug]);
 
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
