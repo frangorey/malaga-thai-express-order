@@ -1593,7 +1593,10 @@ const translations = {
     'priority_kitchen_critical': 'Retard important',
     'priority_ready_recent': 'Prêt',
     'priority_ready_waiting': 'En attente de retrait',
-    'priority_ready_too_long': 'Commande froide - urgent'
+    'priority_ready_too_long': 'Commande froide - urgent',
+    'waiter.card.instructions.toggle': 'Première fois ? Voir les 4 étapes',
+    'waiter.card.time.now': "à l'instant",
+    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min'
   },
   
   de: {
