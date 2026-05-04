@@ -48,6 +48,13 @@ const NOODLE_LABELS: Record<NoodleType, string> = {
   Udon: "Udon",
 };
 
+const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
+  Anchos: "tallarines_anchos",
+  Finos: "tallarines_finos",
+  Glass: "tallarines_glass",
+  Udon: "tallarines_udon",
+};
+
 export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType }: NoodleCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const { products } = useProducts();
