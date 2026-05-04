@@ -1,74 +1,113 @@
-## Refactor NoodleCustomizerDrawer.tsx — Fase 2B
+# Refactor Fase 2C — RiceCustomizerDrawer (Opción B)
 
-Único archivo modificado: `src/components/NoodleCustomizerDrawer.tsx`. Mismo patrón ya validado en `SoupCustomizer.tsx` (Fase 2A).
+Replicar en `RiceCustomizerDrawer` el patrón ya consolidado en Fase 2B (`NoodleCustomizerDrawer`). La card única de Arroces se divide en dos: "🍚 Arroz Frito" y "🍛 Arroz Curry", cada una abriendo el Drawer con su `riceType`.
 
-### Cambios
+## Archivos modificados
 
-**1. Imports**
-- Eliminar `useProducts`.
-- Añadir `useDishTemplate, resolveMedia` desde `@/hooks/useDishTemplate`.
-- Añadir `Loader2, ImageOff` al import existente de `lucide-react`.
+1. `src/components/RiceCustomizerDrawer.tsx` (reescrito)
+2. `src/pages/Index.tsx` (state + RICE_CARDS + montaje del Drawer)
+3. `src/contexts/LanguageContext.tsx` (+2 claves en es/en/fr/de/ru)
 
-**2. Mapa slug**
-Junto a `NOODLE_LABELS`:
-```ts
-const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
-  Anchos: "tallarines_anchos",
-  Finos:  "tallarines_finos",
-  Glass:  "tallarines_glass",
-  Udon:   "tallarines_udon",
-};
-```
+NO se tocan: `RiceCustomizer.tsx` (legacy), `NoodleCustomizerDrawer.tsx`, `SoupCustomizer.tsx`, `useDishTemplate.ts`, `types.ts`, ni la BD.
 
-**3. Sustitución del fetch en el componente**
-Reemplazar `const { products } = useProducts();` por:
-```ts
-const slug = NOODLE_SLUG_MAP[noodleType];
-const { data: bundle, isLoading, isError } = useDishTemplate(slug);
-const { imageUrl, videoUrl } = useMemo(() => resolveMedia(bundle), [bundle]);
-const templateProducts = bundle?.products ?? [];
-```
+## 1) `RiceCustomizerDrawer.tsx`
 
-**4. `findMatchingProduct` sin filtros category/subcategory**
-Mantengo el `proteinMap` REAL del archivo actual (literal, sin el typo "tenera" del ejemplo del Arquitecto):
-```ts
-const proteinMap: Record<string, string> = {
-  pollo: "con pollo",
-  ternera: "con ternera",
-  gambas: "con gambas",
-  pollo_ternera: "MIX 2 con pollo y ternera",
-  pollo_gambas: "MIX 2 con pollo y gambas",
-  ternera_gambas: "MIX 2 con ternera y gambas",
-  pollo_ternera_gambas: "MIX 3 con pollo, ternera y gambas",
-};
-```
-Lookup pasa a `templateProducts.find(...)` solo por nombre (proteinPattern + saucePattern). Guard `templateProducts.length === 0 → return null`.
+- Exporta `export type RiceType = "frito" | "curry";`
+- Props: añade `riceType: RiceType`.
+- Constantes top-level:
+  ```ts
+  const RICE_LABELS: Record<RiceType, string> = { frito: "Arroz Frito", curry: "Arroz Curry" };
+  const RICE_EMOJI:  Record<RiceType, string> = { frito: "🍚", curry: "🍛" };
+  const RICE_SLUG_MAP: Record<RiceType, string> = { frito: "arroz_frito", curry: "arroz_curry" };
+  ```
+- Sustituye `useProducts()` por:
+  ```ts
+  const slug = RICE_SLUG_MAP[riceType];
+  const { data: bundle, isLoading, isError } = useDishTemplate(slug);
+  const { imageUrl, videoUrl } = useMemo(() => resolveMedia(bundle), [bundle]);
+  const templateProducts = bundle?.products ?? [];
+  ```
+  Eliminar el import `useProducts`. Añadir `Loader2, ImageOff` desde `lucide-react`.
+- Salsas filtradas por riceType:
+  ```ts
+  const SAUCES_BY_RICE_TYPE: Record<RiceType, SauceOption[]> = {
+    frito: [
+      { id: "classic",  name: t("sauce_classic"),  dbSubcategory: "Classic",  color: "bg-amber-500" },
+      { id: "original", name: t("sauce_original"), dbSubcategory: "Original", color: "bg-green-600" },
+    ],
+    curry: [
+      { id: "curry-amarillo", name: t("yellow_curry_sauce"), dbSubcategory: "Curry Amarillo", color: "bg-yellow-400" },
+      { id: "curry-verde",    name: t("green_curry_sauce"),  dbSubcategory: "Curry Verde",    color: "bg-emerald-500" },
+      { id: "curry-rojo",     name: t("red_curry_sauce"),    dbSubcategory: "Curry Rojo",     color: "bg-red-500" },
+    ],
+  };
+  const sauces = SAUCES_BY_RICE_TYPE[riceType];
+  ```
+- `useEffect([riceType])` → llama `handleReset()` para limpiar selecciones y volver a paso `protein` al cambiar de tipo.
+- `findMatchingProduct` reescrito sobre `templateProducts` con dos `proteinMap` (frito usa "con pollo/ternera/gambas", curry usa "y pollo/ternera/gambas" para mono-proteínas; los MIX comparten patrón). Match final:
+  ```ts
+  templateProducts.find(p =>
+    p.subcategory === subcategory &&
+    p.name.toLowerCase().includes(pattern.toLowerCase())
+  ) ?? null
+  ```
+- Hero multimedia (idéntico patrón a NoodleCustomizerDrawer): `relative aspect-video bg-black overflow-hidden` con video `object-contain bg-black` → fallback img → fallback `ImageOff`.
+- Estados loading / error / empty (con i18n `error_loading_variants`, `error_no_variants_available` + fallbacks inline) envolviendo el switch de pasos.
+- `DrawerTitle`: `{RICE_EMOJI[riceType]} {RICE_LABELS[riceType]}`.
+- En el bloque `summary`, fila Tipo: `Arroz {RICE_LABELS[riceType]}`.
+- Botón final con `disabled={isLoading || isError || templateProducts.length === 0}`.
+- Resto intacto: stepper, vegetales, extras (sauceExtras + complementExtras), sticky total, `handleAddToCart`, toast, tokens shadcn.
 
-**5. Hero multimedia**
-Insertar antes del bloque de progress steps (`<div className="flex items-center gap-1 px-4 py-3 ...">`):
-- Si `videoUrl`: `<video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-contain bg-black" src={videoUrl} />` dentro de un wrapper `relative aspect-video bg-black overflow-hidden`.
-- Si solo `imageUrl`: `<img src={imageUrl} alt={...} className="absolute inset-0 w-full h-full object-contain bg-black" loading="lazy" />`.
-- Fallback: `ImageOff` centrado sobre `bg-muted`.
+## 2) `src/pages/Index.tsx`
 
-Convención `object-contain bg-black` respeta la regla aplicada anteriormente en `VideoMenuCard` / `VideoMenuItemCard`.
+- `import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";`
+- Eliminar `const RICE_VIDEO_URL = ...`.
+- Reemplazar state:
+  ```ts
+  const [riceCustomizer, setRiceCustomizer] = useState<{ open: boolean; type: RiceType }>({ open: false, type: "frito" });
+  ```
+- Añadir junto a `NOODLE_CARDS`:
+  ```ts
+  const RICE_CARDS: { type: RiceType; subcategoryAnchor: string; displayNameKey: string; emoji: string; videoUrl: string | null }[] = [
+    { type: "frito", subcategoryAnchor: "Classic",        displayNameKey: "rice_fried_card", emoji: "🍚",
+      videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-video.mp4" },
+    { type: "curry", subcategoryAnchor: "Curry Amarillo", displayNameKey: "rice_curry_card", emoji: "🍛", videoUrl: null },
+  ];
+  ```
+- Reemplazar el bloque `if (dbCategory === "Arroces")` del `useMemo` por un map sobre `RICE_CARDS` (anchor por subcategory, `onCustomize` abre `setRiceCustomizer({ open: true, type: rc.type })`, `displayName` = `${emoji} ${t(displayNameKey)}`).
+- Montaje del Drawer:
+  ```tsx
+  <RiceCustomizerDrawer
+    open={riceCustomizer.open}
+    onClose={() => setRiceCustomizer((prev) => ({ ...prev, open: false }))}
+    onAddToCart={addToCart}
+    riceType={riceCustomizer.type}
+  />
+  ```
 
-**6. Estados loading / error / empty en el scroll**
-Al inicio del contenedor scroll, antes de los bloques `currentStep === ...`:
-- `isLoading`: spinner `Loader2` centrado.
-- `isError`: mensaje `t("error_loading_variants") || "No pudimos cargar las variantes. Recarga la página."`.
-- `!isLoading && !isError && templateProducts.length === 0`: `t("error_no_variants_available") || "No hay variantes disponibles ahora mismo."`.
+## 3) `LanguageContext.tsx` — claves nuevas (5 idiomas, NO italiano)
 
-Envolver los bloques actuales `currentStep === "protein" | "sauce" | "vegetables" | "extras" | "summary"` con la condición combinada `!isLoading && !isError && templateProducts.length > 0`.
+Añadir junto a las claves `rice_*` existentes en cada bloque de idioma:
 
-**7. Botón Add to cart**
-Añadir `disabled={isLoading || isError || templateProducts.length === 0}` al botón final del summary.
+| key | es | en | fr | de | ru |
+|---|---|---|---|---|---|
+| `rice_fried_card` | Arroz Frito | Fried Rice | Riz Sauté | Gebratener Reis | Жареный рис |
+| `rice_curry_card` | Arroz Curry | Curry Rice | Riz au Curry | Curry-Reis | Рис с карри |
 
-### NO se toca
-- `src/pages/Index.tsx`, `NoodleCustomizer.tsx` (legacy), `useDishTemplate.ts`, otros customizers.
-- Firma del componente, export `NoodleType`, lógica de pasos, vegetales, extras, `handleAddToCart` (excepto la nueva `findMatchingProduct`).
-- i18n: solo se usan claves existentes con fallback inline. No se añaden claves nuevas (la clave `error_no_variants_available` puede no existir aún → cae al fallback string, que es seguro).
+Idiomas activos confirmados en el archivo: **es, en, fr, de, ru**. Se ignora deliberadamente la mención a `it` del prompt original (es un error del Arquitecto).
 
-### Notas
-- Se conserva el `proteinMap` real del archivo. Ignoro deliberadamente el typo "tenera" del ejemplo ilustrativo del Arquitecto.
-- `useProducts` queda totalmente eliminado del archivo (no quedan imports muertos).
-- TS estricto: `templateProducts` tipado vía `bundle?.products` que ya es `SupabaseProduct[]`.
+## Validación post-cambio
+
+1. TypeScript build limpio.
+2. Categoría Arroces muestra exactamente 2 cards.
+3. Drawer "Frito" → vídeo `arroz-video.mp4`, salsas Classic/Original.
+4. Drawer "Curry" → fallback `ImageOff` (videoUrl=null, image_url posiblemente null), salsas Amarillo/Verde/Rojo.
+5. Cambiar de "Frito" a "Curry" resetea selección y vuelve a paso protein.
+6. Add to cart genera SupabaseProduct con id real de BD.
+7. Sin imports muertos (`useProducts` fuera del Drawer).
+
+## Notas
+
+- `rice_customizer_title` queda obsoleto en el Drawer pero no se elimina del contexto (puede usarse en otros sitios; no es esta fase).
+- Teriyaki sigue oculto (no está en `SAUCES_BY_RICE_TYPE`, sus productos tienen `is_available=false` y el hook ya filtra).
+- Sin cambios de schema ni regeneración de `types.ts`.
