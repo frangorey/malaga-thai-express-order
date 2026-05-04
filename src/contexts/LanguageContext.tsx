@@ -2149,7 +2149,21 @@ const translations = {
     'priority_ready_too_long': 'Bestellung wird kalt - dringend',
     'waiter.card.instructions.toggle': 'Zum ersten Mal? Die 4 Schritte ansehen',
     'waiter.card.time.now': 'gerade eben',
-    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.'
+    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.',
+    'dashboard_title': 'Dashboard',
+    'dashboard_pickup_title': 'Web-Abholung',
+    'dashboard_pickup_subtitle': 'Abholung im Lokal',
+    'dashboard_dine_in_title': 'QR-Tische',
+    'dashboard_dine_in_subtitle': 'Tischbestellungen',
+    'dashboard_oldest_label': 'Älteste',
+    'dashboard_minutes_short': 'Min',
+    'dashboard_empty': 'Keine offenen Bestellungen',
+    'dashboard_view_list': 'Liste ansehen',
+    'dashboard_view_floor': 'Tische ansehen',
+    'dashboard_pending_count': '{{count}} offen',
+    'nav_dashboard': 'Übersicht',
+    'nav_list': 'Liste',
+    'nav_floor': 'Plan'
   },
 
   ru: {
