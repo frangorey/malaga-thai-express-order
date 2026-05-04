@@ -45,11 +45,11 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-500' },
 };
 
-const formatElapsed = (createdAt: string): string => {
-  const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
-  const mins = Math.floor(elapsed / 60);
-  const secs = elapsed % 60;
-  return `${mins}m ${String(secs).padStart(2, '0')}s`;
+const formatElapsed = (createdAt: string, t: (k: string) => string): string => {
+  const elapsedMs = Date.now() - new Date(createdAt).getTime();
+  const mins = Math.floor(elapsedMs / 60000);
+  if (mins < 1) return t('waiter.card.time.now');
+  return t('waiter.card.time.minutesAgo').replace('{{minutes}}', String(mins));
 };
 
 const CRITICAL_WORDS = [
