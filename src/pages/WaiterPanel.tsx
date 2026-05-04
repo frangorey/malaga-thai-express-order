@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import FloorPlanView from '@/components/waiter/FloorPlanView';
 import TableDetailDrawer from '@/components/waiter/TableDetailDrawer';
+import WaiterDashboard from '@/components/waiter/WaiterDashboard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
