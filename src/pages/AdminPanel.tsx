@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map } from 'lucide-react';
+import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map, Film, Info } from 'lucide-react';
 import TableQRCodes from '@/components/admin/TableQRCodes';
 import TableLayoutEditor from '@/components/admin/TableLayoutEditor';
 import { format } from 'date-fns';
@@ -42,6 +42,7 @@ interface Product {
   category: string;
   price: number;
   image_url: string | null;
+  video_url: string | null;
   is_available: boolean | null;
 }
 
@@ -64,6 +65,7 @@ const AdminPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [uploadingProductId, setUploadingProductId] = useState<number | null>(null);
+  const [uploadingVideoProductId, setUploadingVideoProductId] = useState<number | null>(null);
   const [productSearch, setProductSearch] = useState('');
 
   useEffect(() => {
@@ -110,7 +112,7 @@ const AdminPanel = () => {
   const fetchProducts = async () => {
     const { data, error } = await supabase
       .from('products')
-      .select('id, name, category, price, image_url, is_available')
+      .select('id, name, category, price, image_url, video_url, is_available')
       .order('category')
       .order('name');
 
@@ -174,6 +176,48 @@ const AdminPanel = () => {
       toast.error('Error al subir la foto');
     } finally {
       setUploadingProductId(null);
+    }
+  };
+
+  const handleVideoUpload = async (productId: number, file: File) => {
+    if (file.type !== 'video/mp4') {
+      toast.error('Solo se aceptan archivos MP4');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El vídeo no puede superar 5 MB');
+      return;
+    }
+
+    setUploadingVideoProductId(productId);
+
+    try {
+      const filePath = `videos/${productId}-${Date.now()}.mp4`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true, contentType: 'video/mp4' });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('products')
+        .update({ video_url: urlData.publicUrl })
+        .eq('id', productId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Vídeo subido correctamente');
+      fetchProducts();
+    } catch (error) {
+      console.error('Video upload error:', error);
+      toast.error('Error al subir el vídeo');
+    } finally {
+      setUploadingVideoProductId(null);
     }
   };
 
@@ -358,6 +402,10 @@ const AdminPanel = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <p className="text-xs text-muted-foreground mb-4 px-4 flex items-center gap-2">
+                  <Info className="w-4 h-4 flex-shrink-0" />
+                  💡 Sube vídeos optimizados ya recortados sin marca de agua. Formato MP4 máximo 5 MB.
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filteredProducts.map(product => (
                     <Card key={product.id} className="overflow-hidden">
@@ -379,6 +427,29 @@ const AdminPanel = () => {
                           </div>
                         )}
                       </div>
+                      <div className="aspect-square bg-muted relative border-t border-border">
+                        {product.video_url ? (
+                          <video
+                            src={product.video_url}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            controls={false}
+                            poster={product.image_url || undefined}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Film className="w-12 h-12 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        {uploadingVideoProductId === product.id && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <RefreshCw className="w-8 h-8 animate-spin text-white" />
+                          </div>
+                        )}
+                      </div>
                       <CardContent className="p-3">
                         <p className="font-medium text-sm truncate">{product.name}</p>
                         <p className="text-xs text-muted-foreground">{product.category} · {product.price.toFixed(2)}€</p>
@@ -394,6 +465,20 @@ const AdminPanel = () => {
                               if (file) handlePhotoUpload(product.id, file);
                             }}
                             disabled={uploadingProductId !== null}
+                          />
+                        </label>
+                        <label className="mt-2 flex items-center justify-center gap-2 cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary rounded-md py-2 px-3 text-sm transition-colors">
+                          <Upload className="w-4 h-4" />
+                          {product.video_url ? 'Cambiar vídeo' : 'Subir vídeo'}
+                          <input
+                            type="file"
+                            accept="video/mp4"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleVideoUpload(product.id, file);
+                            }}
+                            disabled={uploadingVideoProductId !== null}
                           />
                         </label>
                       </CardContent>
