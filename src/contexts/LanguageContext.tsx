@@ -1082,7 +1082,10 @@ const translations = {
     'priority_kitchen_critical': 'Major delay',
     'priority_ready_recent': 'Ready',
     'priority_ready_waiting': 'Awaiting pickup',
-    'priority_ready_too_long': 'Order getting cold - urgent'
+    'priority_ready_too_long': 'Order getting cold - urgent',
+    'waiter.card.instructions.toggle': 'First time? See the 4 steps',
+    'waiter.card.time.now': 'just now',
+    'waiter.card.time.minutesAgo': '{{minutes}}m ago'
   },
   
   fr: {
