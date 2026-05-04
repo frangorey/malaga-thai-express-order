@@ -214,6 +214,29 @@ const Index = () => {
       return items;
     }
 
+    // ENSALADAS: 6 cards (one per subcategoría) con drawer de proteína
+    if (dbCategory === "Ensaladas") {
+      const items: FeaturedItem[] = [];
+      for (const sc of SALAD_CARDS) {
+        const template = templatesBySlug.get(sc.slug);
+        if (!template) continue;
+        const groupProducts = categoryProducts.filter((p) => p.template_id === template.id);
+        if (groupProducts.length === 0) continue;
+        const primary = groupProducts.find((p) => p.is_vegetarian === true) ?? groupProducts[0];
+        items.push({
+          product: toSupabaseProduct(primary),
+          videoUrl: null,
+          posterUrl: template.image_url || primary.image_url || PLACEHOLDER_POSTER,
+          imageUrl: template.image_url ?? primary.image_url,
+          tags: [],
+          displayName: `${sc.emoji} ${t(sc.displayNameKey)}`,
+          onCustomize: () => setSaladCustomizer({ open: true, type: sc.type }),
+          customizeLabel: `${t("customize")} ${sc.emoji}`,
+        } as FeaturedItem);
+      }
+      return items;
+    }
+
     // Default: one card per product
     return categoryProducts.map((p) => ({
       product: toSupabaseProduct(p),
@@ -330,6 +353,13 @@ const Index = () => {
         onClose={() => setNoodleCustomizer((prev) => ({ ...prev, open: false }))}
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
+      />
+
+      <SaladCustomizerDrawer
+        open={saladCustomizer.open}
+        onClose={() => setSaladCustomizer((prev) => ({ ...prev, open: false }))}
+        onAddToCart={addToCart}
+        saladType={saladCustomizer.type}
       />
 
       {validTableNumber && (
