@@ -1,10 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Check, ShoppingCart, X } from "lucide-react";
+import { Check, ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { useProducts } from "@/hooks/useProducts";
+import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { allExtras } from "@/data/extrasData";
 import { cn } from "@/lib/utils";
