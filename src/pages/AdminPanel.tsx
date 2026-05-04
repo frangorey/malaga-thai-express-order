@@ -65,6 +65,7 @@ const AdminPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [uploadingProductId, setUploadingProductId] = useState<number | null>(null);
+  const [uploadingVideoProductId, setUploadingVideoProductId] = useState<number | null>(null);
   const [productSearch, setProductSearch] = useState('');
 
   useEffect(() => {
@@ -175,6 +176,48 @@ const AdminPanel = () => {
       toast.error('Error al subir la foto');
     } finally {
       setUploadingProductId(null);
+    }
+  };
+
+  const handleVideoUpload = async (productId: number, file: File) => {
+    if (file.type !== 'video/mp4') {
+      toast.error('Solo se aceptan archivos MP4');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El vídeo no puede superar 5 MB');
+      return;
+    }
+
+    setUploadingVideoProductId(productId);
+
+    try {
+      const filePath = `videos/${productId}-${Date.now()}.mp4`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true, contentType: 'video/mp4' });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('products')
+        .update({ video_url: urlData.publicUrl })
+        .eq('id', productId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Vídeo subido correctamente');
+      fetchProducts();
+    } catch (error) {
+      console.error('Video upload error:', error);
+      toast.error('Error al subir el vídeo');
+    } finally {
+      setUploadingVideoProductId(null);
     }
   };
 
