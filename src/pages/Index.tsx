@@ -94,6 +94,7 @@ const Index = () => {
         product: toSupabaseProduct(firstRice),
         videoUrl: RICE_VIDEO_URL,
         posterUrl: firstRice.image_url || PLACEHOLDER_POSTER,
+        imageUrl: firstRice.image_url,
         tags: [],
         displayName: `🍚 ${t('rice_fried_thai')}`,
         onCustomize: () => setIsRiceCustomizerOpen(true),
@@ -110,6 +111,7 @@ const Index = () => {
           product,
           videoUrl: nc.videoUrl,
           posterUrl: firstProduct?.image_url || PLACEHOLDER_POSTER,
+          imageUrl: firstProduct?.image_url ?? null,
           tags: [],
           displayName: `${nc.emoji} ${t('tallarines')} ${t(nc.displayNameKey)}`,
           onCustomize: () => setNoodleCustomizer({ open: true, type: nc.type }),
@@ -127,8 +129,9 @@ const Index = () => {
         const primary = groupProducts[0];
         items.push({
           product: toSupabaseProduct(primary),
-          videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
+          videoUrl: primary.video_url ?? null,
           posterUrl: primary.image_url || PLACEHOLDER_POSTER,
+          imageUrl: primary.image_url,
           tags: [],
           displayName: `${group.emoji} ${t(group.displayNameKey)}`,
           variants: groupProducts.map((p) => ({
@@ -152,8 +155,9 @@ const Index = () => {
         const primary = groupProducts[0];
         items.push({
           product: toSupabaseProduct(primary),
-          videoUrl: primary.video_url || FALLBACK_VIDEO_URL,
+          videoUrl: primary.video_url ?? null,
           posterUrl: primary.image_url || PLACEHOLDER_POSTER,
+          imageUrl: primary.image_url,
           tags: [],
           displayName: t(group.displayNameKey),
           variants: groupProducts.map((p) => ({
@@ -167,8 +171,9 @@ const Index = () => {
         if (processedIds.has(p.id)) continue;
         items.push({
           product: toSupabaseProduct(p),
-          videoUrl: p.video_url || FALLBACK_VIDEO_URL,
+          videoUrl: p.video_url ?? null,
           posterUrl: p.image_url || PLACEHOLDER_POSTER,
+          imageUrl: p.image_url,
           tags: [],
         });
       }
@@ -178,8 +183,9 @@ const Index = () => {
     // Default: one card per product
     return categoryProducts.map((p) => ({
       product: toSupabaseProduct(p),
-      videoUrl: p.video_url || FALLBACK_VIDEO_URL,
+      videoUrl: p.video_url ?? null,
       posterUrl: p.image_url || PLACEHOLDER_POSTER,
+      imageUrl: p.image_url,
       tags: [] as string[],
     }));
   }, [products, activeCategory, t]);
