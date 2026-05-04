@@ -1,37 +1,48 @@
-## Bloque 1 — i18n keys + WaiterDashboard (sin tocar WaiterPanel)
+# Fix dark-mode legibility in WaiterDashboard
 
-Solo 2 archivos afectados. No se toca lógica existente, ni `WaiterPanel.tsx`, ni BD/RLS, ni edge functions.
+Single file: `src/components/waiter/WaiterDashboard.tsx`. No logic changes.
 
-### Archivo 1 — `src/contexts/LanguageContext.tsx` (modificar)
+## Note on the prompt vs. real code
 
-Añadir las 14 keys planas al final de cada uno de los 5 bloques de idioma (`es` línea 572, `en` ~1089, `fr` ~1600, `de` ~2111, `ru` ~2621), justo antes del `},` que cierra cada idioma. Se inserta una coma tras la última key existente y se añaden las 14 nuevas con los textos exactos del prompt:
+The prompt from the technical brain references some Tailwind classes that don't exist verbatim in the current file (e.g. `text-[9rem]`, `opacity-70` on title, `opacity-80 -mt-2` on count label). The current file already uses `text-foreground` on the title and `text-7xl` for the number. I'll apply the **intent** of the brief (remove pastel backgrounds, ensure dark-mode contrast) mapped onto the real classes — without inventing changes.
 
-`dashboard_title`, `dashboard_pickup_title`, `dashboard_pickup_subtitle`, `dashboard_dine_in_title`, `dashboard_dine_in_subtitle`, `dashboard_oldest_label`, `dashboard_minutes_short`, `dashboard_empty`, `dashboard_view_list`, `dashboard_view_floor`, `dashboard_pending_count` (con `{{count}}`), `nav_dashboard`, `nav_list`, `nav_floor`.
+## Changes
 
-Total: 14 × 5 = 70 entradas nuevas. No se renombra ni elimina ninguna key existente. No se toca `t()` ni el Provider.
+### 1. `getCardClasses` — drop pastel fills, keep semaphore on the left strip
 
-### Archivo 2 — `src/components/waiter/WaiterDashboard.tsx` (nuevo)
+```ts
+if (count === 0) {
+  return 'border-l-neutral-400 dark:border-l-neutral-600 bg-muted/40';
+}
+const byPriority = [
+  'border-l-emerald-500 bg-card',
+  'border-l-amber-500 bg-card',
+  'border-l-orange-500 bg-card',
+  'border-l-red-600 bg-card animate-pulse',
+];
+```
 
-Componente standalone que recibe `orders`, `onNavigate(view)` y `calculatePriority` por props. No importa Supabase ni hooks de datos.
+Urgency is now communicated only via the 12px left border + `animate-pulse` on priority 3 + the timer/number color from `getTimerColor` (unchanged).
 
-**Nota técnica:** el código TSX que envió el Cerebro Técnico llegó con el JSX corrompido (sin etiquetas entre `>` y los contenidos: `{t(titleKey)}`, `{count}`, etc. quedaron sueltos). Reconstruyo la estructura JSX descrita por la lógica y los className visibles, manteniendo intacto:
+### 2. Text class touch-ups (current → new)
 
-- La interfaz `Order` y `WaiterDashboardProps` exactamente como en el prompt.
-- `ACTIVE_STATES = ['received','confirmed','preparing','ready']`.
-- `computeMetrics(orderType)` idéntica: filtra por `order_type` ∈ {`pickup`,`dine_in`} y status activo, calcula `count`, `maxPriority` (vía `calculatePriority` inyectada) y `oldestMinutes`.
-- `getCardClasses` y `getTimerColor` con la paleta de 4 niveles (emerald/amber/orange/red, `animate-pulse` sólo en nivel 3) y rama vacía neutral.
-- `renderCard(titleKey, subtitleKey, Icon, metrics, ctaKey, targetView)` que renderiza una `Card` clickable con `border-l-[12px]`, `min-h-[420px]`, padding 8, layout flex column entre cabecera (Icon + título + subtítulo) y bloque central (estado vacío con `CheckCircle2` + `dashboard_empty`, o `count` grande + `dashboard_pending_count` + línea `Clock` con `dashboard_oldest_label: X dashboard_minutes_short` solo si `oldestMinutes > 0`), y footer con `Button` que dispara `onNavigate(targetView)` con `stopPropagation` y muestra `t(ctaKey)` + `ArrowRight`.
-- Render final: grid responsive de 2 columnas con la card de Pickup (`ShoppingBag`, `dashboard_view_list`, `'list'`) y la de Dine-In (`UtensilsCrossed`, `dashboard_view_floor`, `'floor'`).
-- `export default WaiterDashboard`.
+- Title `h2` (currently `text-2xl font-semibold tracking-tight text-foreground`) → **unchanged** (already correct).
+- Subtitle `<p>` `text-sm text-muted-foreground` → `text-sm text-muted-foreground/90`.
+- Big number `<span>` keeps `text-7xl font-bold leading-none ${getTimerColor(...)}` → **unchanged** (color comes from semaphore, already high-contrast in dark mode).
+- Pending-count label `<span class="text-base text-foreground/80">` → `text-base text-muted-foreground`.
+- Empty state (`CheckCircle2` + "Sin pedidos pendientes") → **unchanged**.
+- Action `Button` currently `variant="outline"` for both cards → keep as-is (shadcn outline has correct contrast in both themes).
 
-Imports: `useLanguage`, `Card`, `Button`, y de `lucide-react`: `ShoppingBag`, `UtensilsCrossed`, `Clock`, `CheckCircle2`, `ArrowRight`.
+## Out of scope (explicitly not touched)
 
-### Fuera de alcance (Bloque 2)
+- `computeMetrics`, `calculatePriority`, props, JSX structure.
+- `border-l-[12px]`, `animate-pulse` for priority 3.
+- `getTimerColor` palette.
+- i18n keys.
 
-`WaiterPanel.tsx` no se modifica en este bloque: el cableado de la nueva vista `dashboard` y el paso de props se hará en el siguiente encargo.
+## Acceptance
 
-### Verificación
-
-- Build TypeScript limpio.
-- `t('dashboard_title')` etc. resuelven en los 5 idiomas.
-- Sin nuevas dependencias, sin tocar BD/RLS/edge functions.
+- Dark mode: number "2", "{n} pendientes" and "Más antiguo: …" read clearly over `bg-card`.
+- Empty card retains contrast via `bg-muted/40` + existing muted text.
+- Light mode unaffected (`bg-card` / `bg-muted` are theme tokens).
+- Red urgency still obvious via thick left strip + pulse.
