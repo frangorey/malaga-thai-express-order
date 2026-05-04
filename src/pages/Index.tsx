@@ -63,7 +63,7 @@ const Index = () => {
 
   const NOODLE_CARDS: { type: NoodleType; displayNameKey: string; videoUrl: string | null; emoji: string }[] = [
     { type: "Anchos", displayNameKey: "noodles_pad_thai", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/padthaii-video.mp4", emoji: "🍜" },
-    { type: "Finos", displayNameKey: "noodles_finos_card", videoUrl: null, emoji: "🥢" },
+    { type: "Finos", displayNameKey: "noodles_finos_card", videoUrl: FALLBACK_VIDEO_URL, emoji: "🥢" },
     { type: "Glass", displayNameKey: "noodles_glass_card", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/glass-videotiktok.mp4", emoji: "✨" },
     { type: "Udon", displayNameKey: "noodles_udon_card", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/udon-video.mp4", emoji: "🍲" },
   ];
