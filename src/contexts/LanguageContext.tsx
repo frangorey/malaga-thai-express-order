@@ -568,7 +568,21 @@ const translations = {
     'priority_ready_too_long': 'Pedido frío - urgente',
     'waiter.card.instructions.toggle': '¿Primera vez? Ver los 4 pasos',
     'waiter.card.time.now': 'ahora',
-    'waiter.card.time.minutesAgo': 'hace {{minutes}}m'
+    'waiter.card.time.minutesAgo': 'hace {{minutes}}m',
+    'dashboard_title': 'Panel de control',
+    'dashboard_pickup_title': 'Pickup Web',
+    'dashboard_pickup_subtitle': 'Recogida en local',
+    'dashboard_dine_in_title': 'Mesas QR',
+    'dashboard_dine_in_subtitle': 'Pedidos en mesa',
+    'dashboard_oldest_label': 'Más antiguo',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'Sin pedidos pendientes',
+    'dashboard_view_list': 'Ver lista',
+    'dashboard_view_floor': 'Ver mesas',
+    'dashboard_pending_count': '{{count}} pendientes',
+    'nav_dashboard': 'Panel',
+    'nav_list': 'Lista',
+    'nav_floor': 'Plano'
   },
   
   en: {
