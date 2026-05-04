@@ -57,7 +57,10 @@ const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
 
 export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType }: NoodleCustomizerDrawerProps) => {
   const { t } = useLanguage();
-  const { products } = useProducts();
+  const slug = NOODLE_SLUG_MAP[noodleType];
+  const { data: bundle, isLoading, isError } = useDishTemplate(slug);
+  const { imageUrl, videoUrl } = useMemo(() => resolveMedia(bundle), [bundle]);
+  const templateProducts = bundle?.products ?? [];
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState<Step>("protein");
