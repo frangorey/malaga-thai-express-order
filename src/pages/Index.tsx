@@ -88,20 +88,22 @@ const Index = () => {
 
     const categoryProducts = products.filter((p) => p.category === dbCategory);
 
-    // ARROCES: single customizable card
+    // ARROCES: 2 cards (Frito, Curry) — patrón análogo a NOODLE_CARDS
     if (dbCategory === "Arroces") {
-      const firstRice = categoryProducts[0];
-      if (!firstRice) return [];
-      return [{
-        product: toSupabaseProduct(firstRice),
-        videoUrl: RICE_VIDEO_URL,
-        posterUrl: firstRice.image_url || PLACEHOLDER_POSTER,
-        imageUrl: firstRice.image_url,
-        tags: [],
-        displayName: `🍚 ${t('rice_fried_thai')}`,
-        onCustomize: () => setIsRiceCustomizerOpen(true),
-        customizeLabel: `${t('customize')} 🍚`,
-      }] as FeaturedItem[];
+      return RICE_CARDS.map((rc) => {
+        const anchor = categoryProducts.find((p) => p.subcategory === rc.subcategoryAnchor);
+        if (!anchor) return null;
+        return {
+          product: toSupabaseProduct(anchor),
+          videoUrl: rc.videoUrl,
+          posterUrl: anchor.image_url || PLACEHOLDER_POSTER,
+          imageUrl: anchor.image_url,
+          tags: [] as string[],
+          displayName: `${rc.emoji} ${t(rc.displayNameKey)}`,
+          onCustomize: () => setRiceCustomizer({ open: true, type: rc.type }),
+          customizeLabel: `${t("customize")} ${rc.emoji}`,
+        } as FeaturedItem;
+      }).filter(Boolean) as FeaturedItem[];
     }
 
     // TALLARINES: 4 cards, one per noodle type
