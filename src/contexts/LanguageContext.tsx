@@ -2674,6 +2674,20 @@ const translations = {
     'priority_ready_too_long': 'Заказ остывает - срочно',
     'waiter.card.instructions.toggle': 'Первый раз? Посмотреть 4 шага',
     'waiter.card.time.now': 'только что',
-    'waiter.card.time.minutesAgo': '{{minutes}} мин назад'
+    'waiter.card.time.minutesAgo': '{{minutes}} мин назад',
+    'dashboard_title': 'Панель управления',
+    'dashboard_pickup_title': 'Самовывоз Web',
+    'dashboard_pickup_subtitle': 'Забрать в ресторане',
+    'dashboard_dine_in_title': 'QR-столы',
+    'dashboard_dine_in_subtitle': 'Заказы за столом',
+    'dashboard_oldest_label': 'Самый старый',
+    'dashboard_minutes_short': 'мин',
+    'dashboard_empty': 'Нет ожидающих заказов',
+    'dashboard_view_list': 'К списку',
+    'dashboard_view_floor': 'К столам',
+    'dashboard_pending_count': '{{count}} в ожидании',
+    'nav_dashboard': 'Панель',
+    'nav_list': 'Список',
+    'nav_floor': 'План'
   }
 };
