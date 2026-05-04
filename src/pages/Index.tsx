@@ -55,6 +55,13 @@ const Index = () => {
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
+  const { data: dishTemplates } = useDishTemplates();
+
+  const templatesBySlug = useMemo(() => {
+    const map = new Map<string, DishTemplate>();
+    (dishTemplates ?? []).forEach((tpl) => map.set(tpl.slug, tpl));
+    return map;
+  }, [dishTemplates]);
 
   const mesaParam = searchParams.get('mesa');
   const tableNumber = mesaParam ? parseInt(mesaParam, 10) : null;
