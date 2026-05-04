@@ -16,9 +16,6 @@ import { useProducts } from "@/hooks/useProducts";
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
 
-const RICE_VIDEO_URL =
-  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-video.mp4";
-
 const CATEGORY_MAP: Record<string, string> = {
   entrantes: "Entrantes",
   arroz: "Arroces",
