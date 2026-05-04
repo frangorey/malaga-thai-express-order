@@ -110,7 +110,7 @@ export const VideoMenuCard = ({
       {videoUrl ? (
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain bg-black"
           muted
           loop
           playsInline
@@ -123,7 +123,7 @@ export const VideoMenuCard = ({
           src={imageUrl}
           alt={product.name}
           loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain bg-black"
         />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
