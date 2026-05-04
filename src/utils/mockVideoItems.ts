@@ -1,13 +1,12 @@
 import { SupabaseProduct } from "@/types/menu";
 
-const TEMP_VIDEO_URL =
-  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
 const TEMP_POSTER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23222'/%3E%3C/svg%3E";
 
 interface FeaturedItem {
   product: SupabaseProduct;
-  videoUrl: string;
+  videoUrl: string | null;
   posterUrl: string;
+  imageUrl?: string | null;
   tags?: string[];
 }
 
@@ -43,7 +42,8 @@ export function getCategoryVideoItems(categoryName: string): FeaturedItem[] {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
-    videoUrl: TEMP_VIDEO_URL,
+    videoUrl: null,
+    imageUrl: null,
     posterUrl: TEMP_POSTER,
     tags: i === 0 ? ["⭐ Novedades"] : [],
   }));
