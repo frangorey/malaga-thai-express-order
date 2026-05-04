@@ -10,6 +10,7 @@ export interface Product {
   video_url: string | null;
   category: string;
   subcategory: string | null;
+  template_id: string | null;
   is_vegetarian: boolean;
   is_spicy: boolean;
   is_available: boolean;
