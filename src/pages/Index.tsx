@@ -289,9 +289,10 @@ const Index = () => {
       )}
 
       <RiceCustomizerDrawer
-        open={isRiceCustomizerOpen}
-        onClose={() => setIsRiceCustomizerOpen(false)}
+        open={riceCustomizer.open}
+        onClose={() => setRiceCustomizer((prev) => ({ ...prev, open: false }))}
         onAddToCart={addToCart}
+        riceType={riceCustomizer.type}
       />
 
       <NoodleCustomizerDrawer
