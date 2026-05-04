@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck, AlertTriangle, StickyNote, HelpCircle, ChevronDown } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck, AlertTriangle, StickyNote, HelpCircle, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
+import WaiterDashboard from '@/components/waiter/WaiterDashboard';
 
 interface Order {
   id: string;
@@ -153,7 +154,7 @@ const WaiterPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'dine_in' | 'pickup' | 'delivery'>('all');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'floor'>('floor');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'list' | 'floor'>('dashboard');
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelTargetOrder, setCancelTargetOrder] = useState<Order | null>(null);
@@ -417,28 +418,45 @@ const WaiterPanel = () => {
           </Button>
         </div>
 
-        {/* View toggle */}
+        {/* View toggle — 3 vistas: Panel | Lista | Plano */}
         <div className="flex gap-2 mb-4">
           <Button
-            variant={viewMode === 'floor' ? 'default' : 'outline'}
+            variant={currentView === 'dashboard' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setViewMode('floor')}
+            onClick={() => setCurrentView('dashboard')}
           >
-            <Map className="w-4 h-4 mr-2" />
-            🗺️ Plano
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            {t('nav_dashboard')}
           </Button>
           <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
+            variant={currentView === 'list' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setViewMode('list')}
+            onClick={() => setCurrentView('list')}
           >
             <List className="w-4 h-4 mr-2" />
-            📋 Lista
+            {t('nav_list')}
+          </Button>
+          <Button
+            variant={currentView === 'floor' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setCurrentView('floor')}
+          >
+            <Map className="w-4 h-4 mr-2" />
+            {t('nav_floor')}
           </Button>
         </div>
 
+        {/* Dashboard home view */}
+        {currentView === 'dashboard' && !isLoading && (
+          <WaiterDashboard
+            orders={orders as any}
+            onNavigate={setCurrentView}
+            calculatePriority={calculatePriority}
+          />
+        )}
+        
         {/* Filter tabs (only in list view) */}
-        {viewMode === 'list' && (
+        {currentView === 'list' && (
           <div className="flex gap-2 mb-6">
             {[
               { key: 'all' as const, label: 'Todos', count: orders.length },
@@ -459,7 +477,7 @@ const WaiterPanel = () => {
         )}
 
         {/* Floor plan view */}
-        {viewMode === 'floor' && !isLoading && (
+        {currentView === 'floor' && !isLoading && (
           <FloorPlanView
             orders={orders}
             onSelectTable={(n) => setSelectedTable(n)}
@@ -467,7 +485,7 @@ const WaiterPanel = () => {
         )}
 
         {/* Orders grid (list view) */}
-        {viewMode === 'list' && (
+        {currentView === 'list' && (
         <>
         {isLoading ? (
           <div className="flex justify-center py-12">
