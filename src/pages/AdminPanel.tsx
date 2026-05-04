@@ -111,7 +111,7 @@ const AdminPanel = () => {
   const fetchProducts = async () => {
     const { data, error } = await supabase
       .from('products')
-      .select('id, name, category, price, image_url, is_available')
+      .select('id, name, category, price, image_url, video_url, is_available')
       .order('category')
       .order('name');
 
