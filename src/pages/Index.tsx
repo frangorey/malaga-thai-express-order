@@ -9,6 +9,7 @@ import { Cart, SupabaseCartItem } from "@/components/Cart";
 // import { Footer } from "@/components/Footer";
 import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
+import { SaladCustomizerDrawer, SaladType } from "@/components/SaladCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -53,6 +54,7 @@ const Index = () => {
   const [isViewingFeed, setIsViewingFeed] = useState(false);
   const [riceCustomizer, setRiceCustomizer] = useState<{ open: boolean; type: RiceType }>({ open: false, type: "frito" });
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
+  const [saladCustomizer, setSaladCustomizer] = useState<{ open: boolean; type: SaladType }>({ open: false, type: "cesar" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { data: dishTemplates } = useDishTemplates();
@@ -89,6 +91,15 @@ const Index = () => {
   const SOUP_CARDS: { slug: string; displayNameKey: string; emoji: string }[] = [
     { slug: "sopa_tom_yam", displayNameKey: "soup_tom_yam", emoji: "🍲" },
     { slug: "sopa_miso",    displayNameKey: "soup_miso",    emoji: "🍜" },
+  ];
+
+  const SALAD_CARDS: { type: SaladType; slug: string; displayNameKey: string; emoji: string }[] = [
+    { type: "cesar",      slug: "ensalada_cesar",      displayNameKey: "salad_cesar_card",      emoji: "🥗" },
+    { type: "classic",    slug: "ensalada_classic",    displayNameKey: "salad_classic_card",    emoji: "🥗" },
+    { type: "crispy",     slug: "ensalada_crispy",     displayNameKey: "salad_crispy_card",     emoji: "🥗" },
+    { type: "fruta",      slug: "ensalada_fruta",      displayNameKey: "salad_fruta_card",      emoji: "🥗" },
+    { type: "malaysia",   slug: "ensalada_malaysia",   displayNameKey: "salad_malaysia_card",   emoji: "🥗" },
+    { type: "thailandia", slug: "ensalada_thailandia", displayNameKey: "salad_thailandia_card", emoji: "🥗" },
   ];
 
   const videoItems = useMemo(() => {
