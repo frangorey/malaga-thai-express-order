@@ -1624,7 +1624,21 @@ const translations = {
     'priority_ready_too_long': 'Commande froide - urgent',
     'waiter.card.instructions.toggle': 'Première fois ? Voir les 4 étapes',
     'waiter.card.time.now': "à l'instant",
-    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min'
+    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min',
+    'dashboard_title': 'Tableau de bord',
+    'dashboard_pickup_title': 'Pickup Web',
+    'dashboard_pickup_subtitle': 'À emporter sur place',
+    'dashboard_dine_in_title': 'Tables QR',
+    'dashboard_dine_in_subtitle': 'Commandes en salle',
+    'dashboard_oldest_label': 'Plus ancien',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'Aucune commande en attente',
+    'dashboard_view_list': 'Voir la liste',
+    'dashboard_view_floor': 'Voir les tables',
+    'dashboard_pending_count': '{{count}} en attente',
+    'nav_dashboard': 'Panneau',
+    'nav_list': 'Liste',
+    'nav_floor': 'Plan'
   },
   
   de: {
