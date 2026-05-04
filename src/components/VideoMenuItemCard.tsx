@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Plus, Leaf, Flame } from "lucide-react";
+import { Plus, Leaf, Flame, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 // --- Native IntersectionObserver hook ---
@@ -26,8 +26,9 @@ function useInViewport<T extends HTMLElement>(threshold = 0.3): [React.RefObject
 interface VideoMenuItemCardProps {
   name: string;
   price: number;
-  videoUrl: string;
+  videoUrl: string | null;
   posterUrl: string;
+  imageUrl?: string | null;
   isVegetarian?: boolean;
   isSpicy?: boolean;
   onAddToCart: () => void;
@@ -38,6 +39,7 @@ export const VideoMenuItemCard = ({
   price,
   videoUrl,
   posterUrl,
+  imageUrl,
   isVegetarian,
   isSpicy,
   onAddToCart,
@@ -49,6 +51,7 @@ export const VideoMenuItemCard = ({
 
   // Lazy-load src only once when first visible
   useEffect(() => {
+    if (!videoUrl) return;
     if (isVisible && !videoSrc) {
       setVideoSrc(videoUrl);
     }
@@ -56,6 +59,7 @@ export const VideoMenuItemCard = ({
 
   // Play/pause based on visibility
   useEffect(() => {
+    if (!videoUrl) return;
     const video = videoRef.current;
     if (!video || !videoSrc) return;
 
@@ -64,7 +68,7 @@ export const VideoMenuItemCard = ({
     } else {
       video.pause();
     }
-  }, [isVisible, videoSrc]);
+  }, [isVisible, videoSrc, videoUrl]);
 
   const handleAddToCart = useCallback(
     (e: React.MouseEvent) => {
@@ -79,17 +83,30 @@ export const VideoMenuItemCard = ({
       ref={cardRef}
       className="relative rounded-lg overflow-hidden aspect-[4/5] group hover:neon-border transition-all duration-300 bg-card/50 backdrop-blur-sm"
     >
-      {/* Video background */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        muted
-        loop
-        playsInline
-        poster={posterUrl}
-        src={videoSrc || undefined}
-        preload="none"
-      />
+      {/* Background: video → image → placeholder */}
+      {videoUrl ? (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          poster={posterUrl}
+          src={videoSrc || undefined}
+          preload="none"
+        />
+      ) : imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={name}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
+          <ImageOff className="h-12 w-12 text-muted-foreground/40" />
+        </div>
+      )}
 
       {/* Badges */}
       <div className="absolute top-3 right-3 flex gap-2 z-10">

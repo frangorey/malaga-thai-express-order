@@ -5,8 +5,9 @@ import { SupabaseProduct } from "@/types/menu";
 
 export interface FeaturedItem {
   product: SupabaseProduct;
-  videoUrl: string;
+  videoUrl: string | null;
   posterUrl: string;
+  imageUrl?: string | null;
   tags?: string[];
   variants?: ProductVariant[];
   displayName?: string;
@@ -51,6 +52,7 @@ export const TikTokStyleMenu = ({ items, onAddToCart, activeCategory, onCategory
               product={item.product}
               videoUrl={item.videoUrl}
               posterUrl={item.posterUrl}
+              imageUrl={item.imageUrl}
               tags={item.tags}
               onAddToCart={onAddToCart}
               variants={item.variants}

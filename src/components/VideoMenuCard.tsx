@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Plus, Leaf, Flame, Sparkles } from "lucide-react";
+import { Plus, Leaf, Flame, Sparkles, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
 
@@ -30,8 +30,9 @@ export interface ProductVariant {
 
 interface VideoMenuCardProps {
   product: SupabaseProduct;
-  videoUrl: string;
+  videoUrl: string | null;
   posterUrl: string;
+  imageUrl?: string | null;
   tags?: string[];
   onAddToCart: (product: SupabaseProduct) => void;
   /** When provided, show variant buttons instead of single add button */
@@ -48,6 +49,7 @@ export const VideoMenuCard = ({
   product,
   videoUrl,
   posterUrl,
+  imageUrl,
   tags = [],
   onAddToCart,
   variants,
@@ -62,6 +64,7 @@ export const VideoMenuCard = ({
 
   // Lazy-load src only once when first visible
   useEffect(() => {
+    if (!videoUrl) return;
     if (isVisible && !videoSrc) {
       setVideoSrc(videoUrl);
     }
@@ -69,6 +72,7 @@ export const VideoMenuCard = ({
 
   // Play/pause based on visibility
   useEffect(() => {
+    if (!videoUrl) return;
     const video = videoRef.current;
     if (!video || !videoSrc) return;
 
@@ -77,7 +81,7 @@ export const VideoMenuCard = ({
     } else {
       video.pause();
     }
-  }, [isVisible, videoSrc]);
+  }, [isVisible, videoSrc, videoUrl]);
 
   const handleAddToCart = useCallback(
     (e: React.MouseEvent) => {
@@ -102,17 +106,30 @@ export const VideoMenuCard = ({
       ref={cardRef}
       className="relative h-full w-full overflow-hidden"
     >
-      {/* Video background */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        muted
-        loop
-        playsInline
-        poster={posterUrl}
-        src={videoSrc || undefined}
-        preload="none"
-      />
+      {/* Background: video → image → placeholder */}
+      {videoUrl ? (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+          poster={posterUrl}
+          src={videoSrc || undefined}
+          preload="none"
+        />
+      ) : imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={product.name}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
+          <ImageOff className="h-12 w-12 text-muted-foreground/40" />
+        </div>
+      )}
 
       {/* Gradient overlay – stronger at bottom for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
