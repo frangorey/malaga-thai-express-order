@@ -287,6 +287,26 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ maxHeight: "60dvh" }}>
+          {isLoading && (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          )}
+
+          {isError && !isLoading && (
+            <div className="mt-4 p-3 rounded-md border border-destructive/50 bg-destructive/10 text-sm text-destructive">
+              {t("error_loading_variants") || "No pudimos cargar las variantes. Recarga la página."}
+            </div>
+          )}
+
+          {!isLoading && !isError && templateProducts.length === 0 && (
+            <div className="mt-4 p-3 rounded-md border border-border bg-muted text-sm text-muted-foreground">
+              {t("error_no_variants_available") || "No hay variantes disponibles ahora mismo."}
+            </div>
+          )}
+
+          {!isLoading && !isError && templateProducts.length > 0 && (
+            <>
           {currentStep === "protein" && (
             <div className="space-y-2 pt-2">
               <p className="text-sm text-muted-foreground mb-3">Elige tu proteína favorita</p>
