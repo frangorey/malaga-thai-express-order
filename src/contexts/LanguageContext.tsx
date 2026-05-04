@@ -565,7 +565,10 @@ const translations = {
     'priority_kitchen_critical': 'Retraso importante',
     'priority_ready_recent': 'Listo',
     'priority_ready_waiting': 'Esperando recogida',
-    'priority_ready_too_long': 'Pedido frío - urgente'
+    'priority_ready_too_long': 'Pedido frío - urgente',
+    'waiter.card.instructions.toggle': '¿Primera vez? Ver los 4 pasos',
+    'waiter.card.time.now': 'ahora',
+    'waiter.card.time.minutesAgo': 'hace {{minutes}}m'
   },
   
   en: {
