@@ -10,6 +10,8 @@ import { Cart, SupabaseCartItem } from "@/components/Cart";
 import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
 import { SaladCustomizerDrawer, SaladType } from "@/components/SaladCustomizerDrawer";
+import { TonkatsuCustomizerDrawer } from "@/components/TonkatsuCustomizerDrawer";
+import { PolloCoreanoCustomizerDrawer } from "@/components/PolloCoreanoCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -55,6 +57,8 @@ const Index = () => {
   const [riceCustomizer, setRiceCustomizer] = useState<{ open: boolean; type: RiceType }>({ open: false, type: "frito" });
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [saladCustomizer, setSaladCustomizer] = useState<{ open: boolean; type: SaladType }>({ open: false, type: "cesar" });
+  const [tonkatsuDrawerOpen, setTonkatsuDrawerOpen] = useState(false);
+  const [polloCoreanoDrawerOpen, setPolloCoreanoDrawerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { data: dishTemplates } = useDishTemplates();
@@ -91,6 +95,17 @@ const Index = () => {
   const SOUP_CARDS: { slug: string; displayNameKey: string; emoji: string }[] = [
     { slug: "sopa_tom_yam", displayNameKey: "soup_tom_yam", emoji: "🍲" },
     { slug: "sopa_miso",    displayNameKey: "soup_miso",    emoji: "🍜" },
+  ];
+
+  type WorldCard =
+    | { kind: "template"; slug: string; displayNameKey: string; emoji: string; onCustomize: () => void }
+    | { kind: "standalone"; productId: number; displayNameKey: string; emoji: string };
+
+  const WORLD_CARDS: WorldCard[] = [
+    { kind: "template", slug: "tonkatsu", displayNameKey: "world_tonkatsu_card", emoji: "🍱", onCustomize: () => setTonkatsuDrawerOpen(true) },
+    { kind: "template", slug: "pollo_coreano", displayNameKey: "world_pollo_coreano_card", emoji: "🍗", onCustomize: () => setPolloCoreanoDrawerOpen(true) },
+    { kind: "standalone", productId: 270, displayNameKey: "world_pad_ka_prao_card", emoji: "🌶️" },
+    { kind: "standalone", productId: 269, displayNameKey: "world_curry_pina_card", emoji: "🍍" },
   ];
 
   const SALAD_CARDS: { type: SaladType; slug: string; displayNameKey: string; emoji: string }[] = [
@@ -237,6 +252,42 @@ const Index = () => {
       return items;
     }
 
+    // OTRAS DEL MUNDO: 4 cards (2 templates + 2 standalone)
+    if (dbCategory === "Otras del Mundo") {
+      const items: FeaturedItem[] = [];
+      for (const wc of WORLD_CARDS) {
+        if (wc.kind === "template") {
+          const template = templatesBySlug.get(wc.slug);
+          if (!template) continue;
+          const groupProducts = categoryProducts.filter((p) => p.template_id === template.id);
+          if (groupProducts.length === 0) continue;
+          const primary = groupProducts[0];
+          items.push({
+            product: toSupabaseProduct(primary),
+            videoUrl: template.video_url ?? null,
+            posterUrl: template.image_url || primary.image_url || PLACEHOLDER_POSTER,
+            imageUrl: template.image_url ?? primary.image_url,
+            tags: [],
+            displayName: `${wc.emoji} ${t(wc.displayNameKey)}`,
+            onCustomize: wc.onCustomize,
+            customizeLabel: `${t("customize")} ${wc.emoji}`,
+          } as FeaturedItem);
+        } else {
+          const product = categoryProducts.find((p) => p.id === wc.productId);
+          if (!product) continue;
+          items.push({
+            product: toSupabaseProduct(product),
+            videoUrl: product.video_url ?? null,
+            posterUrl: product.image_url || PLACEHOLDER_POSTER,
+            imageUrl: product.image_url,
+            tags: [],
+            displayName: `${wc.emoji} ${t(wc.displayNameKey)}`,
+          } as FeaturedItem);
+        }
+      }
+      return items;
+    }
+
     // Default: one card per product
     return categoryProducts.map((p) => ({
       product: toSupabaseProduct(p),
@@ -360,6 +411,18 @@ const Index = () => {
         onClose={() => setSaladCustomizer((prev) => ({ ...prev, open: false }))}
         onAddToCart={addToCart}
         saladType={saladCustomizer.type}
+      />
+
+      <TonkatsuCustomizerDrawer
+        open={tonkatsuDrawerOpen}
+        onClose={() => setTonkatsuDrawerOpen(false)}
+        onAddToCart={addToCart}
+      />
+
+      <PolloCoreanoCustomizerDrawer
+        open={polloCoreanoDrawerOpen}
+        onClose={() => setPolloCoreanoDrawerOpen(false)}
+        onAddToCart={addToCart}
       />
 
       {validTableNumber && (

@@ -1,68 +1,71 @@
-## Fase 4 — Ensaladas (frontend)
+## Fase 5 — Frontend "Otras del Mundo"
 
-Asume que el seed SQL (6 `dish_templates` + UPDATE `products.template_id`) ya está aplicado, según la verificación previa. Si la BD aún no está sembrada, primero ejecutamos esa migración antes del frontend.
+Plan revisado del Cerebro técnico. La especificación es coherente con el patrón ya validado (Fases 2–4) y con el esquema BD verificado: templates `tonkatsu` y `pollo_coreano` ya seedeados, productos 269/270 sueltos. No requiere cambios en BD, hooks ni otros customizers.
 
-### 1) Nuevo archivo: `src/components/SaladCustomizerDrawer.tsx`
+### Archivos a crear
 
-Replica simplificada del patrón `NoodleCustomizerDrawer` (mismo layout: hero + zona scroll + sticky total), reducida a un único paso "proteína" + summary.
+**1) `src/components/TonkatsuCustomizerDrawer.tsx`**
 
-- Imports: `useState`, `useMemo`, `Drawer*`, `Button`, `ShoppingCart`, `X`, `Loader2`, `ImageOff`, `useLanguage`, `SupabaseProduct`, `useDishTemplate`, `resolveMedia`, `useToast`, `cn`.
-- Exports: `type SaladType = "cesar" | "classic" | "crispy" | "fruta" | "malaysia" | "thailandia"` + componente.
-- Constantes módulo: `SALAD_LABELS`, `SALAD_SLUG_MAP` (slugs `ensalada_<type>`), `SALAD_EMOJI = "🥗"`.
-- Estado: `selectedProtein: ProteinId | ""`.
-- 4 opciones proteína: `normal` (10.40, 🌱), `pollo` (11.40, 🍗), `langostino` (12.90, 🦐), `mixta` (14.40, 🍗🦐). Labels vía `t("salad_protein_*")`.
-- Hero: solo imagen (no `<video>`, los templates de ensaladas tienen `video_url=NULL`). Fallback `<ImageOff>` si no hay imagen.
-- Estados: `isLoading` (spinner), `isError` (`error_loading_variants`), `templateProducts.length===0` (`error_no_variants_available`).
-- Render proteínas: grid 1 col (sm:2). Botón seleccionado con `border-primary bg-primary/10`. Tras seleccionar, summary card con tipo/proteína/total y CTA full-width "Añadir al carrito".
-- Sticky bottom con total cuando hay selección.
+Réplica de `SaladCustomizerDrawer.tsx` extendida a 2 selectores secuenciales.
 
-**Matching (`findMatchingProduct`)** — único punto delicado, orden por especificidad:
+- Props: `{ open, onClose, onAddToCart }` — sin prop de tipo (slug fijo `"tonkatsu"`).
+- `useDishTemplate("tonkatsu")` + `resolveMedia(bundle)`. Hero preparado para `<video>` (si `videoUrl`) → `<img>` (si `imageUrl`) → `<ImageOff>` fallback. Hoy caerá al fallback hasta que se suba media en Fase 6.
+- Estados estándar: `isLoading` (spinner), `isError` (`error_loading_variants`), `templateProducts.length===0` (`error_no_variants_available`).
+- Selector 1 — Guarnición: `Arroz Frito` 🍚 / `Fideos Fritos` 🍜.
+- Selector 2 — Salsa (visible solo tras elegir guarnición): `Agridulce` (amber) / `Barbacoa` (red).
+- Matching: `templateProducts.find(p => p.name.includes(garnishToken) && p.name.includes(sauceToken))`. Seguro por estar prefiltrado por `template_id`.
+- Summary card con total fijo 13.50€ + CTA "Añadir al carrito" disabled hasta tener garnish+sauce.
+- `useEffect` que limpia selecciones al cerrar (`!open`).
+- `handleAddToCart` → toast éxito → `handleClose`. Toast error si `findMatchingProduct()` devuelve null (`error_variant_not_found`).
+- DrawerTitle: "🍱 Tonkatsu".
 
-```ts
-const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-const isMixta = (n: string) => /\bmixta\b/.test(n);
-switch (selectedProtein) {
-  case "mixta":      return isMixta(n);
-  case "normal":     return p.is_vegetarian === true;
-  case "pollo":      return !isMixta(n) && /\bcon pollo\b/.test(n);
-  case "langostino": return !isMixta(n) && /\bcon langostino\b/.test(n);
-}
-```
+**2) `src/components/PolloCoreanoCustomizerDrawer.tsx`**
 
-La exclusión explícita de "mixta" en pollo/langostino evita el falso positivo (el nombre de la mixta contiene también "con pollo y langostino").
+Idéntico a Tonkatsu salvo:
+- Slug `"pollo_coreano"`.
+- Guarnición (3): `Arroz Blanco` 🍚 / `Arroz Japonés` 🍙 (tilde literal, matchToken `"Arroz Japonés"`) / `Patatas Fritas` 🍟.
+- Salsa (3): `Agridulce` (amber) / `Miel Mostaza` (yellow) / `Yogur` (sky).
+- Total 12.70€. DrawerTitle: "🍗 Pollo Coreano".
 
-`handleAddToCart`: llama a `findMatchingProduct()`, si null → toast error; si OK → `onAddToCart(base)`, reset `selectedProtein`, `onClose()`, toast éxito. Sin customizations (no hay verduras/extras).
+### Archivos a modificar
 
-### 2) Modificar `src/pages/Index.tsx`
+**3) `src/pages/Index.tsx`**
 
-- Añadir import `SaladCustomizerDrawer`, `SaladType`.
-- Añadir state: `const [saladCustomizer, setSaladCustomizer] = useState<{open:boolean; type:SaladType}>({open:false, type:"cesar"})`.
-- Añadir constante `SALAD_CARDS` (6 entradas en orden cesar → classic → crispy → fruta → malaysia → thailandia, todas con emoji 🥗 y `displayNameKey: "salad_<type>_card"`).
-- Dentro de `videoItems` useMemo, **antes** del bloque Default y junto al bloque `Sopas`, añadir rama `if (dbCategory === "Ensaladas")` que itera `SALAD_CARDS`, resuelve `templatesBySlug.get(sc.slug)`, filtra `categoryProducts.filter(p => p.template_id === template.id)`, elige `primary = group.find(p=>p.is_vegetarian) ?? group[0]`, y push de `FeaturedItem` con `videoUrl: null`, `posterUrl/imageUrl` desde el template, `onCustomize: () => setSaladCustomizer({open:true, type:sc.type})`, `customizeLabel: \`${t("customize")} 🥗\``.
-- Añadir `<SaladCustomizerDrawer ... />` junto a los otros drawers, antes del cierre de `<main>`.
+- Imports: `TonkatsuCustomizerDrawer`, `PolloCoreanoCustomizerDrawer`.
+- Estados nuevos: `tonkatsuDrawerOpen`, `polloCoreanoDrawerOpen` (booleans).
+- Constante `WORLD_CARDS` con 4 entradas (2 `kind:"template"` + 2 `kind:"standalone"`), en el orden del spec: tonkatsu, pollo_coreano, prod 270, prod 269.
+- En `videoItems` useMemo, **antes del Default y después del bloque Ensaladas**, añadir rama `if (dbCategory === "Otras del Mundo")` que:
+  - Para `template`: resuelve `templatesBySlug.get(slug)`, filtra `categoryProducts` por `template_id`, primer producto como `primary`, push de `FeaturedItem` con `onCustomize` y `customizeLabel`.
+  - Para `standalone`: busca `categoryProducts.find(p => p.id === productId)`, push de `FeaturedItem` sin `onCustomize` (cae al botón "Añadir directo" del default del card).
+- Montar `<TonkatsuCustomizerDrawer />` y `<PolloCoreanoCustomizerDrawer />` junto a los demás drawers, antes del cierre de `<main>`.
 
-Resultado UX: la categoría Ensaladas pasa de 24 cards sueltas a 6 cards agrupadas con drawer.
+**4) `src/contexts/LanguageContext.tsx`**
 
-### 3) Modificar `src/contexts/LanguageContext.tsx`
+Añadir 18 claves nuevas en los 5 bloques `es / en / fr / de / ru` (sin italiano):
+- 4 cards: `world_tonkatsu_card`, `world_pollo_coreano_card`, `world_pad_ka_prao_card`, `world_curry_pina_card`.
+- 6 Tonkatsu: `tonkatsu_choose_garnish/_garnish_fried_rice/_garnish_fried_noodles/_choose_sauce/_sauce_sweet_sour/_sauce_bbq`.
+- 8 Pollo Coreano: `korean_chicken_choose_garnish/_garnish_white_rice/_garnish_japanese_rice/_garnish_fries/_choose_sauce/_sauce_sweet_sour/_sauce_honey_mustard/_sauce_yogurt`.
 
-Añadir 11 claves nuevas en cada uno de los 5 bloques (`es / en / fr / de / ru`, **NO italiano**):
+Si alguna ya existe (improbable), no duplicar. Reutilizar `customize`, `add_to_cart`, `error_loading_variants`, `error_no_variants_available`, `error_variant_not_found`, `order_summary`.
 
-- 6 cards: `salad_cesar_card`, `salad_classic_card`, `salad_crispy_card`, `salad_fruta_card`, `salad_malaysia_card`, `salad_thailandia_card` (traducciones según tabla del prompt).
-- 5 auxiliares drawer: `salad_choose_protein`, `salad_protein_veggie`, `salad_protein_chicken`, `salad_protein_shrimp`, `salad_protein_mix`.
+### Optimizaciones aplicadas al spec
 
-**Atención — colisión detectada**: ya existen claves `salad_protein_chicken` y `salad_protein_shrimp` (líneas 394–397, 929–932, etc.) usadas por el legacy `SaladCustomizer.tsx` con valores como "Añadir Pollo". El spec las quiere sobrescribir a "Con pollo" / "Con langostino". Como `SaladCustomizer.tsx` es código muerto (confirmado por el spec, limpieza en Fase 6), **sobrescribimos** los valores existentes en lugar de duplicar la clave. Las claves auxiliares restantes (`salad_choose_protein`, `salad_protein_veggie`, `salad_protein_mix`) se añaden nuevas.
-
-Reutilizamos sin tocar: `add_to_cart`, `customize`, `step_protein`, `order_summary`, `error_loading_variants`, `error_no_variants_available` (ya existen en los 5 idiomas).
+1. **Factor común sugerido más adelante** (NO ahora): los dos nuevos drawers son casi idénticos. Para esta fase los duplicamos por velocidad y consistencia con el patrón Salad. La extracción a un `<DishCustomizerDrawer>` parametrizado es candidata natural a Fase 6 junto con la limpieza de `SoupCustomizer.tsx`/`RiceCustomizer.tsx`/`SaladCustomizer.tsx` legacy.
+2. **Standalone cards sin `onCustomize`**: confirmado que `TikTokStyleMenu`/`VideoMenuItemCard` ya manejan ese caso con un botón "Añadir" directo (mismo patrón que el bloque Default de Entrantes), así que no hace falta lógica nueva en el card.
+3. **`videoUrl` en standalone**: usamos `product.video_url ?? null` (igual que el Default), por si los productos 269/270 reciben video en el futuro.
+4. **Detección de proteína**: no aplica aquí (Tonkatsu y Pollo Coreano no tienen variantes de proteína), así que la heurística por nombre de Sopas/Ensaladas no se replica.
 
 ### Restricciones
 
-- No tocar: `SoupCustomizer.tsx`, `NoodleCustomizerDrawer.tsx`, `RiceCustomizerDrawer.tsx`, `PokeCustomizer.tsx`, `SaladCustomizer.tsx` (legacy), `useDishTemplate.ts`, `useDishTemplates.ts`, `useProducts.tsx`.
-- No añadir italiano.
-- No modificar el bloque Default de `videoItems`.
+- No tocar BD/RLS, `useDishTemplate`, `useDishTemplates`, `useProducts`.
+- No tocar otros customizers (Soup, Noodle, Rice, Salad, Poke).
+- No añadir italiano. No tocar el Default de `videoItems`.
 
 ### Validación
 
-1. `SaladCustomizerDrawer.tsx` existe, no importa `SaladCustomizer.tsx`.
-2. `Index.tsx`: import + state + `SALAD_CARDS` (6 entradas, orden correcto) + rama `Ensaladas` antes del Default + `<SaladCustomizerDrawer />` montado.
-3. `tsc` limpio.
-4. QA manual con los 4 tests del checklist (especialmente Test 4 — Mixta — para verificar prioridad del regex sobre los substrings "con pollo"/"con langostino").
+- TS build limpio.
+- "Otras del Mundo" muestra exactamente 4 cards.
+- Tonkatsu: 2×2 = 4 combinaciones mapean a productos 271–274.
+- Pollo Coreano: 3×3 = 9 combinaciones mapean a productos 275–283.
+- Pad Ka Prao y Curry y Piña: añaden directo al carrito sin abrir drawer.
+- Bloques previos (Sopas, Tallarines, Arroces, Ensaladas, Entrantes) intactos.
