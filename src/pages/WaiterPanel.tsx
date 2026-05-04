@@ -178,7 +178,7 @@ const WaiterPanel = () => {
   }, [user, isModerator, roleLoading, navigate]);
 
   useEffect(() => {
-    const timer = setInterval(() => setTick(t => t + 1), 1000);
+    const timer = setInterval(() => setTick(t => t + 1), 5000);
     return () => clearInterval(timer);
   }, []);
 
