@@ -169,6 +169,7 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
 
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedProtein || !selectedSauce) return null;
+    if (templateProducts.length === 0) return null;
 
     const proteinMap: Record<string, string> = {
       pollo: "con pollo",
@@ -184,14 +185,12 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
     const saucePattern = selectedSauceData?.dbName || "classic";
 
     return (
-      products.find(
+      templateProducts.find(
         (p) =>
-          p.category === "Tallarines" &&
-          p.subcategory === noodleType &&
           p.name.toLowerCase().includes(proteinPattern.toLowerCase()) &&
           p.name.toLowerCase().includes(saucePattern.toLowerCase())
-      ) as SupabaseProduct | null
-    ) || null;
+      ) ?? null
+    );
   };
 
   const handleAddToCart = () => {
