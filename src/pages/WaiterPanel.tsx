@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck, AlertTriangle, StickyNote, HelpCircle, ChevronDown } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Store, UtensilsCrossed, Clock, CheckCircle, MessageCircle, Globe, Map, List, ChefHat, PackageCheck, AlertTriangle, StickyNote, HelpCircle, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
