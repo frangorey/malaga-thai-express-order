@@ -238,6 +238,31 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
           </button>
         </DrawerHeader>
 
+        {/* Hero multimedia */}
+        <div className="relative aspect-video bg-black overflow-hidden">
+          {videoUrl ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+              src={videoUrl}
+            />
+          ) : imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`Tallarines ${NOODLE_LABELS[noodleType]}`}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted">
+              <ImageOff className="w-10 h-10 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
         {/* Progress steps */}
         <div className="flex items-center gap-1 px-4 py-3 overflow-x-auto">
           {STEP_ORDER.map((step, i) => {
