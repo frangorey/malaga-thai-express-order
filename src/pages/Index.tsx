@@ -136,21 +136,31 @@ const Index = () => {
     // SOPAS: 2 cards with protein variants
     if (dbCategory === "Sopas") {
       const items: FeaturedItem[] = [];
-      for (const group of Object.values(SOUP_GROUPS)) {
-        const groupProducts = categoryProducts.filter((p) => group.ids.includes(p.id));
+      for (const sc of SOUP_CARDS) {
+        const template = templatesBySlug.get(sc.slug);
+        if (!template) continue;
+        const groupProducts = categoryProducts.filter((p) => p.template_id === template.id);
         if (groupProducts.length === 0) continue;
         const primary = groupProducts[0];
         items.push({
           product: toSupabaseProduct(primary),
-          videoUrl: primary.video_url ?? null,
-          posterUrl: primary.image_url || PLACEHOLDER_POSTER,
-          imageUrl: primary.image_url,
+          videoUrl: template.video_url ?? primary.video_url ?? null,
+          posterUrl: template.image_url || primary.image_url || PLACEHOLDER_POSTER,
+          imageUrl: template.image_url ?? primary.image_url,
           tags: [],
-          displayName: `${group.emoji} ${t(group.displayNameKey)}`,
-          variants: groupProducts.map((p) => ({
-            product: toSupabaseProduct(p),
-            label: `${t(group.proteinKeys[p.id] || '')} — ${p.price.toFixed(2)}€`,
-          })),
+          displayName: `${sc.emoji} ${t(sc.displayNameKey)}`,
+          variants: groupProducts.map((p) => {
+            let proteinKey = "";
+            if (p.is_vegetarian === true) proteinKey = "soup_veggie_label";
+            else if (p.name.toLowerCase().includes("langostino")) proteinKey = "soup_prawn_label";
+            else if (p.name.toLowerCase().includes("pollo")) proteinKey = "soup_chicken_label";
+            return {
+              product: toSupabaseProduct(p),
+              label: proteinKey
+                ? `${t(proteinKey)} — ${p.price.toFixed(2)}€`
+                : `${p.name} — ${p.price.toFixed(2)}€`,
+            };
+          }),
         });
       }
       return items;
