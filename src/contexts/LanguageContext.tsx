@@ -568,7 +568,21 @@ const translations = {
     'priority_ready_too_long': 'Pedido frío - urgente',
     'waiter.card.instructions.toggle': '¿Primera vez? Ver los 4 pasos',
     'waiter.card.time.now': 'ahora',
-    'waiter.card.time.minutesAgo': 'hace {{minutes}}m'
+    'waiter.card.time.minutesAgo': 'hace {{minutes}}m',
+    'dashboard_title': 'Panel de control',
+    'dashboard_pickup_title': 'Pickup Web',
+    'dashboard_pickup_subtitle': 'Recogida en local',
+    'dashboard_dine_in_title': 'Mesas QR',
+    'dashboard_dine_in_subtitle': 'Pedidos en mesa',
+    'dashboard_oldest_label': 'Más antiguo',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'Sin pedidos pendientes',
+    'dashboard_view_list': 'Ver lista',
+    'dashboard_view_floor': 'Ver mesas',
+    'dashboard_pending_count': '{{count}} pendientes',
+    'nav_dashboard': 'Panel',
+    'nav_list': 'Lista',
+    'nav_floor': 'Plano'
   },
   
   en: {
@@ -1085,7 +1099,21 @@ const translations = {
     'priority_ready_too_long': 'Order getting cold - urgent',
     'waiter.card.instructions.toggle': 'First time? See the 4 steps',
     'waiter.card.time.now': 'just now',
-    'waiter.card.time.minutesAgo': '{{minutes}}m ago'
+    'waiter.card.time.minutesAgo': '{{minutes}}m ago',
+    'dashboard_title': 'Dashboard',
+    'dashboard_pickup_title': 'Web Pickup',
+    'dashboard_pickup_subtitle': 'In-store collection',
+    'dashboard_dine_in_title': 'QR Tables',
+    'dashboard_dine_in_subtitle': 'Dine-in orders',
+    'dashboard_oldest_label': 'Oldest',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'No pending orders',
+    'dashboard_view_list': 'View list',
+    'dashboard_view_floor': 'View tables',
+    'dashboard_pending_count': '{{count}} pending',
+    'nav_dashboard': 'Dashboard',
+    'nav_list': 'List',
+    'nav_floor': 'Floor'
   },
   
   fr: {
@@ -1596,7 +1624,21 @@ const translations = {
     'priority_ready_too_long': 'Commande froide - urgent',
     'waiter.card.instructions.toggle': 'Première fois ? Voir les 4 étapes',
     'waiter.card.time.now': "à l'instant",
-    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min'
+    'waiter.card.time.minutesAgo': 'il y a {{minutes}} min',
+    'dashboard_title': 'Tableau de bord',
+    'dashboard_pickup_title': 'Pickup Web',
+    'dashboard_pickup_subtitle': 'À emporter sur place',
+    'dashboard_dine_in_title': 'Tables QR',
+    'dashboard_dine_in_subtitle': 'Commandes en salle',
+    'dashboard_oldest_label': 'Plus ancien',
+    'dashboard_minutes_short': 'min',
+    'dashboard_empty': 'Aucune commande en attente',
+    'dashboard_view_list': 'Voir la liste',
+    'dashboard_view_floor': 'Voir les tables',
+    'dashboard_pending_count': '{{count}} en attente',
+    'nav_dashboard': 'Panneau',
+    'nav_list': 'Liste',
+    'nav_floor': 'Plan'
   },
   
   de: {
@@ -2107,7 +2149,21 @@ const translations = {
     'priority_ready_too_long': 'Bestellung wird kalt - dringend',
     'waiter.card.instructions.toggle': 'Zum ersten Mal? Die 4 Schritte ansehen',
     'waiter.card.time.now': 'gerade eben',
-    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.'
+    'waiter.card.time.minutesAgo': 'vor {{minutes}} Min.',
+    'dashboard_title': 'Dashboard',
+    'dashboard_pickup_title': 'Web-Abholung',
+    'dashboard_pickup_subtitle': 'Abholung im Lokal',
+    'dashboard_dine_in_title': 'QR-Tische',
+    'dashboard_dine_in_subtitle': 'Tischbestellungen',
+    'dashboard_oldest_label': 'Älteste',
+    'dashboard_minutes_short': 'Min',
+    'dashboard_empty': 'Keine offenen Bestellungen',
+    'dashboard_view_list': 'Liste ansehen',
+    'dashboard_view_floor': 'Tische ansehen',
+    'dashboard_pending_count': '{{count}} offen',
+    'nav_dashboard': 'Übersicht',
+    'nav_list': 'Liste',
+    'nav_floor': 'Plan'
   },
 
   ru: {
@@ -2618,6 +2674,20 @@ const translations = {
     'priority_ready_too_long': 'Заказ остывает - срочно',
     'waiter.card.instructions.toggle': 'Первый раз? Посмотреть 4 шага',
     'waiter.card.time.now': 'только что',
-    'waiter.card.time.minutesAgo': '{{minutes}} мин назад'
+    'waiter.card.time.minutesAgo': '{{minutes}} мин назад',
+    'dashboard_title': 'Панель управления',
+    'dashboard_pickup_title': 'Самовывоз Web',
+    'dashboard_pickup_subtitle': 'Забрать в ресторане',
+    'dashboard_dine_in_title': 'QR-столы',
+    'dashboard_dine_in_subtitle': 'Заказы за столом',
+    'dashboard_oldest_label': 'Самый старый',
+    'dashboard_minutes_short': 'мин',
+    'dashboard_empty': 'Нет ожидающих заказов',
+    'dashboard_view_list': 'К списку',
+    'dashboard_view_floor': 'К столам',
+    'dashboard_pending_count': '{{count}} в ожидании',
+    'nav_dashboard': 'Панель',
+    'nav_list': 'Список',
+    'nav_floor': 'План'
   }
 };
