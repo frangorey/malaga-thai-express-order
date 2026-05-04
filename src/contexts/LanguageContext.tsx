@@ -2615,6 +2615,9 @@ const translations = {
     'priority_kitchen_critical': 'Серьёзная задержка',
     'priority_ready_recent': 'Готов',
     'priority_ready_waiting': 'Ожидает выдачи',
-    'priority_ready_too_long': 'Заказ остывает - срочно'
+    'priority_ready_too_long': 'Заказ остывает - срочно',
+    'waiter.card.instructions.toggle': 'Первый раз? Посмотреть 4 шага',
+    'waiter.card.time.now': 'только что',
+    'waiter.card.time.minutesAgo': '{{minutes}} мин назад'
   }
 };
