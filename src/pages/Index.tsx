@@ -12,6 +12,8 @@ import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomize
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
+import { useDishTemplates } from "@/hooks/useDishTemplates";
+import type { DishTemplate } from "@/hooks/useDishTemplate";
 
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
