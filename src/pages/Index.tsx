@@ -7,7 +7,7 @@ import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem } from "@/components/Cart";
 // import { Footer } from "@/components/Footer";
-import { RiceCustomizerDrawer } from "@/components/RiceCustomizerDrawer";
+import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,9 +15,6 @@ import { useProducts } from "@/hooks/useProducts";
 
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
-
-const RICE_VIDEO_URL =
-  "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-video.mp4";
 
 const CATEGORY_MAP: Record<string, string> = {
   entrantes: "Entrantes",
@@ -52,7 +49,7 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("arroz");
   const [isViewingFeed, setIsViewingFeed] = useState(false);
-  const [isRiceCustomizerOpen, setIsRiceCustomizerOpen] = useState(false);
+  const [riceCustomizer, setRiceCustomizer] = useState<{ open: boolean; type: RiceType }>({ open: false, type: "frito" });
   const [noodleCustomizer, setNoodleCustomizer] = useState<{ open: boolean; type: NoodleType }>({ open: false, type: "Anchos" });
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
@@ -66,6 +63,11 @@ const Index = () => {
     { type: "Finos", displayNameKey: "noodles_finos_card", videoUrl: FALLBACK_VIDEO_URL, emoji: "🥢" },
     { type: "Glass", displayNameKey: "noodles_glass_card", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/glass-videotiktok.mp4", emoji: "✨" },
     { type: "Udon", displayNameKey: "noodles_udon_card", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/udon-video.mp4", emoji: "🍲" },
+  ];
+
+  const RICE_CARDS: { type: RiceType; subcategoryAnchor: string; displayNameKey: string; emoji: string; videoUrl: string | null }[] = [
+    { type: "frito", subcategoryAnchor: "Classic",        displayNameKey: "rice_fried_card", emoji: "🍚", videoUrl: "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/arroz-video.mp4" },
+    { type: "curry", subcategoryAnchor: "Curry Amarillo", displayNameKey: "rice_curry_card", emoji: "🍛", videoUrl: null },
   ];
 
   const VARIANT_GROUPS: Record<string, { displayNameKey: string; ids: number[]; labelKeys: Record<number, string> }> = {
@@ -86,20 +88,22 @@ const Index = () => {
 
     const categoryProducts = products.filter((p) => p.category === dbCategory);
 
-    // ARROCES: single customizable card
+    // ARROCES: 2 cards (Frito, Curry) — patrón análogo a NOODLE_CARDS
     if (dbCategory === "Arroces") {
-      const firstRice = categoryProducts[0];
-      if (!firstRice) return [];
-      return [{
-        product: toSupabaseProduct(firstRice),
-        videoUrl: RICE_VIDEO_URL,
-        posterUrl: firstRice.image_url || PLACEHOLDER_POSTER,
-        imageUrl: firstRice.image_url,
-        tags: [],
-        displayName: `🍚 ${t('rice_fried_thai')}`,
-        onCustomize: () => setIsRiceCustomizerOpen(true),
-        customizeLabel: `${t('customize')} 🍚`,
-      }] as FeaturedItem[];
+      return RICE_CARDS.map((rc) => {
+        const anchor = categoryProducts.find((p) => p.subcategory === rc.subcategoryAnchor);
+        if (!anchor) return null;
+        return {
+          product: toSupabaseProduct(anchor),
+          videoUrl: rc.videoUrl,
+          posterUrl: anchor.image_url || PLACEHOLDER_POSTER,
+          imageUrl: anchor.image_url,
+          tags: [] as string[],
+          displayName: `${rc.emoji} ${t(rc.displayNameKey)}`,
+          onCustomize: () => setRiceCustomizer({ open: true, type: rc.type }),
+          customizeLabel: `${t("customize")} ${rc.emoji}`,
+        } as FeaturedItem;
+      }).filter(Boolean) as FeaturedItem[];
     }
 
     // TALLARINES: 4 cards, one per noodle type
@@ -285,9 +289,10 @@ const Index = () => {
       )}
 
       <RiceCustomizerDrawer
-        open={isRiceCustomizerOpen}
-        onClose={() => setIsRiceCustomizerOpen(false)}
+        open={riceCustomizer.open}
+        onClose={() => setRiceCustomizer((prev) => ({ ...prev, open: false }))}
         onAddToCart={addToCart}
+        riceType={riceCustomizer.type}
       />
 
       <NoodleCustomizerDrawer
