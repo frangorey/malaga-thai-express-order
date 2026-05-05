@@ -12,6 +12,7 @@ import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomize
 import { SaladCustomizerDrawer, SaladType } from "@/components/SaladCustomizerDrawer";
 import { TonkatsuCustomizerDrawer } from "@/components/TonkatsuCustomizerDrawer";
 import { PolloCoreanoCustomizerDrawer } from "@/components/PolloCoreanoCustomizerDrawer";
+import { PadKaPraoCustomizerDrawer } from "@/components/PadKaPraoCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
@@ -59,6 +60,7 @@ const Index = () => {
   const [saladCustomizer, setSaladCustomizer] = useState<{ open: boolean; type: SaladType }>({ open: false, type: "cesar" });
   const [tonkatsuDrawerOpen, setTonkatsuDrawerOpen] = useState(false);
   const [polloCoreanoDrawerOpen, setPolloCoreanoDrawerOpen] = useState(false);
+  const [padKaPraoDrawerOpen, setPadKaPraoDrawerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { data: dishTemplates } = useDishTemplates();
@@ -104,7 +106,7 @@ const Index = () => {
   const WORLD_CARDS: WorldCard[] = [
     { kind: "template", slug: "tonkatsu", displayNameKey: "world_tonkatsu_card", emoji: "🍱", onCustomize: () => setTonkatsuDrawerOpen(true) },
     { kind: "template", slug: "pollo_coreano", displayNameKey: "world_pollo_coreano_card", emoji: "🍗", onCustomize: () => setPolloCoreanoDrawerOpen(true) },
-    { kind: "standalone", productId: 270, displayNameKey: "world_pad_ka_prao_card", emoji: "🌶️" },
+    { kind: "template", slug: "pad_ka_prao", displayNameKey: "world_pad_ka_prao_card", emoji: "🌶️", onCustomize: () => setPadKaPraoDrawerOpen(true) },
     { kind: "standalone", productId: 269, displayNameKey: "world_curry_pina_card", emoji: "🍍" },
   ];
 
@@ -422,6 +424,12 @@ const Index = () => {
       <PolloCoreanoCustomizerDrawer
         open={polloCoreanoDrawerOpen}
         onClose={() => setPolloCoreanoDrawerOpen(false)}
+        onAddToCart={addToCart}
+      />
+
+      <PadKaPraoCustomizerDrawer
+        open={padKaPraoDrawerOpen}
+        onClose={() => setPadKaPraoDrawerOpen(false)}
         onAddToCart={addToCart}
       />
 
