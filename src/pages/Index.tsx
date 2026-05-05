@@ -300,25 +300,50 @@ const Index = () => {
     }));
   }, [products, activeCategory, t, templatesBySlug]);
 
+  const customizationsEqual = (a?: string[], b?: string[]): boolean => {
+    const arrA = (a || []).slice().sort();
+    const arrB = (b || []).slice().sort();
+    if (arrA.length !== arrB.length) return false;
+    return arrA.every((v, i) => v === arrB[i]);
+  };
+
   const addToCart = (product: SupabaseProduct) => {
     setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
+      const incomingCustomizations = (product as SupabaseProduct & { customizations?: string[] }).customizations;
+      const existing = prev.find(item =>
+        item.id === product.id &&
+        item.name === product.name &&
+        item.price === product.price &&
+        customizationsEqual(item.customizations, incomingCustomizations)
+      );
+      if (existing) {
         return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.cartItemId === existing.cartItemId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [
+        ...prev,
+        {
+          ...product,
+          quantity: 1,
+          customizations: incomingCustomizations,
+          cartItemId: crypto.randomUUID(),
+        } as SupabaseCartItem,
+      ];
     });
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
-    if (quantity <= 0) { removeFromCart(id); return; }
-    setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
+  const updateQuantity = (cartItemId: string, quantity: number) => {
+    if (quantity <= 0) { removeFromCart(cartItemId); return; }
+    setCartItems(prev => prev.map(item =>
+      item.cartItemId === cartItemId ? { ...item, quantity } : item
+    ));
   };
 
-  const removeFromCart = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const removeFromCart = (cartItemId: string) => {
+    setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
   };
 
   const handleOrderClick = () => {

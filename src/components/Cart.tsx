@@ -18,14 +18,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export interface SupabaseCartItem extends SupabaseProduct {
   quantity: number;
   customizations?: string[];
+  cartItemId: string;
 }
 
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
   items: SupabaseCartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (cartItemId: string, quantity: number) => void;
+  onRemoveItem: (cartItemId: string) => void;
   tableNumber?: number | null;
 }
 
@@ -146,7 +147,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         
         setOrderType(tableNumber ? 'dine_in' : null);
         setCustomerInfo({ name: "", phonePrefix: "", phone: "", address: "", email: "", notes: "" });
-        items.forEach(item => onRemoveItem(item.id));
+        items.forEach(item => onRemoveItem(item.cartItemId));
         onClose();
       } else {
       throw new Error(data?.error || t('order_error'));
@@ -196,7 +197,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
             <>
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
-                  <Card key={item.id} className="bg-card/50">
+                  <Card key={item.cartItemId} className="bg-card/50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <img 
@@ -212,7 +213,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                              onClick={() => onUpdateQuantity(item.cartItemId, Math.max(0, item.quantity - 1))}
                             >
                               <Minus className="w-3 h-3" />
                             </Button>
@@ -220,14 +221,14 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => onUpdateQuantity(item.cartItemId, item.quantity + 1)}
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
                             <Button 
                               size="sm" 
                               variant="destructive"
-                              onClick={() => onRemoveItem(item.id)}
+                              onClick={() => onRemoveItem(item.cartItemId)}
                               className="ml-auto"
                             >
                               <X className="w-3 h-3" />
