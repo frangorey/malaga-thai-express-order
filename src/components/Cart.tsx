@@ -147,7 +147,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
         
         setOrderType(tableNumber ? 'dine_in' : null);
         setCustomerInfo({ name: "", phonePrefix: "", phone: "", address: "", email: "", notes: "" });
-        items.forEach(item => onRemoveItem(item.id));
+        items.forEach(item => onRemoveItem(item.cartItemId));
         onClose();
       } else {
       throw new Error(data?.error || t('order_error'));
