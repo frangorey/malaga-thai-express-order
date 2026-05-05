@@ -17,6 +17,7 @@ interface RiceCustomizerDrawerProps {
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
   riceType: RiceType;
+  editingItem?: EditingItem;
 }
 
 type Step = "protein" | "sauce" | "vegetables" | "extras" | "summary";
