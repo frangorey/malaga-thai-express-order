@@ -345,6 +345,15 @@ const Index = () => {
     setIsCartOpen(true);
   };
 
+  const editingItem: EditingItem | undefined = editingCartItemId
+    ? (() => {
+        const it = cartItems.find(i => i.cartItemId === editingCartItemId);
+        return it?.customizationData
+          ? { cartItemId: it.cartItemId, customizationData: it.customizationData }
+          : undefined;
+      })()
+    : undefined;
+
   const addToCart = (product: SupabaseProductWithCustomization) => {
     setCartItems(prev => {
       if (editingCartItemId) {
