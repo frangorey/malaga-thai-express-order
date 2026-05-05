@@ -1,71 +1,49 @@
-## Fase 5 — Frontend "Otras del Mundo"
+# Fase 6 — Pestaña "Plantillas" en AdminPanel
 
-Plan revisado del Cerebro técnico. La especificación es coherente con el patrón ya validado (Fases 2–4) y con el esquema BD verificado: templates `tonkatsu` y `pollo_coreano` ya seedeados, productos 269/270 sueltos. No requiere cambios en BD, hooks ni otros customizers.
+Añadir una 5ª pestaña al `Tabs` de `src/pages/AdminPanel.tsx` que permita subir/cambiar `image_url` y `video_url` de los 16 `dish_templates` activos. Solo upload de media — sin crear, borrar ni editar otros campos.
 
-### Archivos a crear
+## Verificación previa
 
-**1) `src/components/TonkatsuCustomizerDrawer.tsx`**
+- `dish_templates` ya tiene `image_url`, `video_url`, `slug`, `display_name`, `category`, `customizer_key`, `display_order`, `is_active` (confirmado en schema).
+- Bucket `Fotos_Thaii` existe y es público.
+- RLS: `dish_templates_update_admin` permite UPDATE solo a admins → coherente con el guard `isAdmin` ya existente en `AdminPanel.tsx`.
+- El archivo ya importa `supabase`, `toast`, `Tabs`, `Card`, `Input`, etc. — no hacen falta imports nuevos salvo `Layers` de lucide-react.
 
-Réplica de `SaladCustomizerDrawer.tsx` extendida a 2 selectores secuenciales.
+## Cambios en `src/pages/AdminPanel.tsx`
 
-- Props: `{ open, onClose, onAddToCart }` — sin prop de tipo (slug fijo `"tonkatsu"`).
-- `useDishTemplate("tonkatsu")` + `resolveMedia(bundle)`. Hero preparado para `<video>` (si `videoUrl`) → `<img>` (si `imageUrl`) → `<ImageOff>` fallback. Hoy caerá al fallback hasta que se suba media en Fase 6.
-- Estados estándar: `isLoading` (spinner), `isError` (`error_loading_variants`), `templateProducts.length===0` (`error_no_variants_available`).
-- Selector 1 — Guarnición: `Arroz Frito` 🍚 / `Fideos Fritos` 🍜.
-- Selector 2 — Salsa (visible solo tras elegir guarnición): `Agridulce` (amber) / `Barbacoa` (red).
-- Matching: `templateProducts.find(p => p.name.includes(garnishToken) && p.name.includes(sauceToken))`. Seguro por estar prefiltrado por `template_id`.
-- Summary card con total fijo 13.50€ + CTA "Añadir al carrito" disabled hasta tener garnish+sauce.
-- `useEffect` que limpia selecciones al cerrar (`!open`).
-- `handleAddToCart` → toast éxito → `handleClose`. Toast error si `findMatchingProduct()` devuelve null (`error_variant_not_found`).
-- DrawerTitle: "🍱 Tonkatsu".
+1. **Import lucide-react**: añadir `Layers` al import existente.
+2. **Tipo + emoji map**: añadir `interface Template` y `TEMPLATE_EMOJI_MAP` (16 slugs) tras `interface Product`.
+3. **Estado**: 4 nuevos `useState` (`templates`, `templateSearch`, `uploadingTemplateImageId`, `uploadingTemplateVideoId`).
+4. **Fetch**: llamar `fetchTemplates()` en el `useEffect` admin junto a `fetchOrders` / `fetchProducts`.
+5. **`fetchTemplates`**: SELECT activos ordenados por `display_order`.
+6. **`handleTemplateImageUpload`**: valida tipo imagen + 5MB, sube a `templates/{id}-{ts}.{ext}`, hace `UPDATE dish_templates SET image_url`.
+7. **`handleTemplateVideoUpload`**: valida MP4 + 5MB, sube a `templates/videos/{id}-{ts}.mp4`, hace `UPDATE dish_templates SET video_url`.
+8. **`filteredTemplates`**: filtro local por display_name / category / slug.
+9. **TabsTrigger** "Plantillas" con icono `Layers`, insertado antes de `layout`.
+10. **TabsContent** replicando la estructura de la pestaña "photos" (grid responsive, doble cuadro foto/vídeo, dos labels de upload, info hint), insertado entre `photos` y `qrs`.
 
-**2) `src/components/PolloCoreanoCustomizerDrawer.tsx`**
+## Detalles técnicos clave
 
-Idéntico a Tonkatsu salvo:
-- Slug `"pollo_coreano"`.
-- Guarnición (3): `Arroz Blanco` 🍚 / `Arroz Japonés` 🍙 (tilde literal, matchToken `"Arroz Japonés"`) / `Patatas Fritas` 🍟.
-- Salsa (3): `Agridulce` (amber) / `Miel Mostaza` (yellow) / `Yogur` (sky).
-- Total 12.70€. DrawerTitle: "🍗 Pollo Coreano".
+- IDs de templates son `uuid` (string) — los estados `uploading*Id` usan `string | null`, no `number`.
+- `upsert: true` en `supabase.storage.upload` para sobrescribir media anterior del mismo template (mismo timestamp evita colisión, pero por seguridad).
+- Toast de éxito tras update; `fetchTemplates()` para refrescar el grid.
+- Hint indica al admin que el media subido se propaga a todos los productos vinculados vía `template_id` (consumido por `useDishTemplate` / `resolveMedia`).
 
-### Archivos a modificar
+## Restricciones respetadas
 
-**3) `src/pages/Index.tsx`**
+- No se tocan otros tabs (orders, photos, qrs, layout).
+- No se modifican migrations ni `src/integrations/supabase/`.
+- Strings hardcoded en español (consistente con el archivo).
+- Tailwind/shadcn idéntico a la pestaña "photos".
 
-- Imports: `TonkatsuCustomizerDrawer`, `PolloCoreanoCustomizerDrawer`.
-- Estados nuevos: `tonkatsuDrawerOpen`, `polloCoreanoDrawerOpen` (booleans).
-- Constante `WORLD_CARDS` con 4 entradas (2 `kind:"template"` + 2 `kind:"standalone"`), en el orden del spec: tonkatsu, pollo_coreano, prod 270, prod 269.
-- En `videoItems` useMemo, **antes del Default y después del bloque Ensaladas**, añadir rama `if (dbCategory === "Otras del Mundo")` que:
-  - Para `template`: resuelve `templatesBySlug.get(slug)`, filtra `categoryProducts` por `template_id`, primer producto como `primary`, push de `FeaturedItem` con `onCustomize` y `customizeLabel`.
-  - Para `standalone`: busca `categoryProducts.find(p => p.id === productId)`, push de `FeaturedItem` sin `onCustomize` (cae al botón "Añadir directo" del default del card).
-- Montar `<TonkatsuCustomizerDrawer />` y `<PolloCoreanoCustomizerDrawer />` junto a los demás drawers, antes del cierre de `<main>`.
+## Validación post-implementación
 
-**4) `src/contexts/LanguageContext.tsx`**
+- TS compila limpio.
+- `/admin` muestra 5 pestañas; "Plantillas" lista 16 cards ordenados por `display_order`.
+- Subir foto/vídeo en una card actualiza la BD y, tras invalidación de cache de `useDishTemplate`, los Customizers (Soup, Noodle, Rice, Salad, Tonkatsu, PolloCoreano) reflejan el nuevo media.
 
-Añadir 18 claves nuevas en los 5 bloques `es / en / fr / de / ru` (sin italiano):
-- 4 cards: `world_tonkatsu_card`, `world_pollo_coreano_card`, `world_pad_ka_prao_card`, `world_curry_pina_card`.
-- 6 Tonkatsu: `tonkatsu_choose_garnish/_garnish_fried_rice/_garnish_fried_noodles/_choose_sauce/_sauce_sweet_sour/_sauce_bbq`.
-- 8 Pollo Coreano: `korean_chicken_choose_garnish/_garnish_white_rice/_garnish_japanese_rice/_garnish_fries/_choose_sauce/_sauce_sweet_sour/_sauce_honey_mustard/_sauce_yogurt`.
+## Fuera de scope
 
-Si alguna ya existe (improbable), no duplicar. Reutilizar `customize`, `add_to_cart`, `error_loading_variants`, `error_no_variants_available`, `error_variant_not_found`, `order_summary`.
-
-### Optimizaciones aplicadas al spec
-
-1. **Factor común sugerido más adelante** (NO ahora): los dos nuevos drawers son casi idénticos. Para esta fase los duplicamos por velocidad y consistencia con el patrón Salad. La extracción a un `<DishCustomizerDrawer>` parametrizado es candidata natural a Fase 6 junto con la limpieza de `SoupCustomizer.tsx`/`RiceCustomizer.tsx`/`SaladCustomizer.tsx` legacy.
-2. **Standalone cards sin `onCustomize`**: confirmado que `TikTokStyleMenu`/`VideoMenuItemCard` ya manejan ese caso con un botón "Añadir" directo (mismo patrón que el bloque Default de Entrantes), así que no hace falta lógica nueva en el card.
-3. **`videoUrl` en standalone**: usamos `product.video_url ?? null` (igual que el Default), por si los productos 269/270 reciben video en el futuro.
-4. **Detección de proteína**: no aplica aquí (Tonkatsu y Pollo Coreano no tienen variantes de proteína), así que la heurística por nombre de Sopas/Ensaladas no se replica.
-
-### Restricciones
-
-- No tocar BD/RLS, `useDishTemplate`, `useDishTemplates`, `useProducts`.
-- No tocar otros customizers (Soup, Noodle, Rice, Salad, Poke).
-- No añadir italiano. No tocar el Default de `videoItems`.
-
-### Validación
-
-- TS build limpio.
-- "Otras del Mundo" muestra exactamente 4 cards.
-- Tonkatsu: 2×2 = 4 combinaciones mapean a productos 271–274.
-- Pollo Coreano: 3×3 = 9 combinaciones mapean a productos 275–283.
-- Pad Ka Prao y Curry y Piña: añaden directo al carrito sin abrir drawer.
-- Bloques previos (Sopas, Tallarines, Arroces, Ensaladas, Entrantes) intactos.
+- No se añade gestión de creación/borrado de templates.
+- No se añaden campos editables (`display_name`, `slug`, etc.).
+- No se invalida manualmente la cache de React Query — se confiará en `staleTime` (1h) o refresh manual; si se requiere instantáneo, podría añadirse `queryClient.invalidateQueries(['dish_template'])` en una fase posterior.

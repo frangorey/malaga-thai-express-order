@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map, Film, Info } from 'lucide-react';
+import { ArrowLeft, Package, Clock, ChefHat, Bike, CheckCircle, XCircle, RefreshCw, Upload, Image, Camera, QrCode, Map, Film, Info, Layers } from 'lucide-react';
 import TableQRCodes from '@/components/admin/TableQRCodes';
 import TableLayoutEditor from '@/components/admin/TableLayoutEditor';
 import { format } from 'date-fns';
@@ -46,6 +46,37 @@ interface Product {
   is_available: boolean | null;
 }
 
+interface Template {
+  id: string;
+  slug: string;
+  display_name: string;
+  category: string;
+  customizer_key: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  display_order: number;
+  is_active: boolean;
+}
+
+const TEMPLATE_EMOJI_MAP: Record<string, string> = {
+  sopa_tom_yam: '🍲',
+  sopa_miso: '🍜',
+  arroz_curry: '🍛',
+  arroz_frito: '🍚',
+  tallarines_anchos: '🍝',
+  tallarines_finos: '🥢',
+  tallarines_glass: '🌾',
+  tallarines_udon: '🍥',
+  ensalada_cesar: '🥗',
+  ensalada_classic: '🥗',
+  ensalada_crispy: '🥗',
+  ensalada_fruta: '🥗',
+  ensalada_malaysia: '🥗',
+  ensalada_thailandia: '🥗',
+  tonkatsu: '🍱',
+  pollo_coreano: '🍗',
+};
+
 const ORDER_STATUSES = [
   { value: 'received', label: 'Recibido', icon: Package, color: 'bg-blue-500' },
   { value: 'confirmed', label: 'Confirmado', icon: CheckCircle, color: 'bg-green-500' },
@@ -67,6 +98,10 @@ const AdminPanel = () => {
   const [uploadingProductId, setUploadingProductId] = useState<number | null>(null);
   const [uploadingVideoProductId, setUploadingVideoProductId] = useState<number | null>(null);
   const [productSearch, setProductSearch] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [uploadingTemplateImageId, setUploadingTemplateImageId] = useState<string | null>(null);
+  const [uploadingTemplateVideoId, setUploadingTemplateVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!roleLoading && !user) {
@@ -83,6 +118,7 @@ const AdminPanel = () => {
     if (isAdmin) {
       fetchOrders();
       fetchProducts();
+      fetchTemplates();
 
       const channel = supabase
         .channel('admin-orders')
@@ -120,6 +156,21 @@ const AdminPanel = () => {
       console.error('Error fetching products:', error);
     } else {
       setProducts(data || []);
+    }
+  };
+
+  const fetchTemplates = async () => {
+    const { data, error } = await supabase
+      .from('dish_templates')
+      .select('id, slug, display_name, category, customizer_key, image_url, video_url, display_order, is_active')
+      .eq('is_active', true)
+      .order('display_order');
+
+    if (error) {
+      console.error('Error fetching templates:', error);
+      toast.error('Error al cargar las plantillas');
+    } else {
+      setTemplates((data as Template[]) || []);
     }
   };
 
@@ -221,6 +272,91 @@ const AdminPanel = () => {
     }
   };
 
+  const handleTemplateImageUpload = async (templateId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten archivos de imagen');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen no puede superar los 5MB');
+      return;
+    }
+
+    setUploadingTemplateImageId(templateId);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `templates/${templateId}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('dish_templates')
+        .update({ image_url: urlData.publicUrl })
+        .eq('id', templateId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Foto de plantilla actualizada correctamente');
+      fetchTemplates();
+    } catch (error) {
+      console.error('Template image upload error:', error);
+      toast.error('Error al subir la foto');
+    } finally {
+      setUploadingTemplateImageId(null);
+    }
+  };
+
+  const handleTemplateVideoUpload = async (templateId: string, file: File) => {
+    if (file.type !== 'video/mp4') {
+      toast.error('Solo se aceptan archivos MP4');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El vídeo no puede superar 5 MB');
+      return;
+    }
+
+    setUploadingTemplateVideoId(templateId);
+
+    try {
+      const filePath = `templates/videos/${templateId}-${Date.now()}.mp4`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true, contentType: 'video/mp4' });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('dish_templates')
+        .update({ video_url: urlData.publicUrl })
+        .eq('id', templateId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Vídeo de plantilla subido correctamente');
+      fetchTemplates();
+    } catch (error) {
+      console.error('Template video upload error:', error);
+      toast.error('Error al subir el vídeo');
+    } finally {
+      setUploadingTemplateVideoId(null);
+    }
+  };
+
   const filteredOrders = statusFilter === 'all'
     ? orders
     : orders.filter(o => o.order_status === statusFilter);
@@ -228,6 +364,14 @@ const AdminPanel = () => {
   const filteredProducts = productSearch
     ? products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.category.toLowerCase().includes(productSearch.toLowerCase()))
     : products;
+
+  const filteredTemplates = templateSearch
+    ? templates.filter(t =>
+        t.display_name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+        t.category.toLowerCase().includes(templateSearch.toLowerCase()) ||
+        t.slug.toLowerCase().includes(templateSearch.toLowerCase())
+      )
+    : templates;
 
   const getStatusBadge = (status: string) => {
     const statusInfo = ORDER_STATUSES.find(s => s.value === status);
@@ -273,6 +417,10 @@ const AdminPanel = () => {
             <TabsTrigger value="qrs" className="flex items-center gap-2">
               <QrCode className="w-4 h-4" />
               QRs de Mesa
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <Layers className="w-4 h-4" />
+              Plantillas
             </TabsTrigger>
             <TabsTrigger value="layout" className="flex items-center gap-2">
               <Map className="w-4 h-4" />
@@ -479,6 +627,115 @@ const AdminPanel = () => {
                               if (file) handleVideoUpload(product.id, file);
                             }}
                             disabled={uploadingVideoProductId !== null}
+                          />
+                        </label>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TEMPLATES TAB */}
+          <TabsContent value="templates">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Layers className="w-5 h-5" />
+                    Plantillas de Platos ({filteredTemplates.length})
+                  </CardTitle>
+                  <Input
+                    placeholder="Buscar plantilla..."
+                    value={templateSearch}
+                    onChange={(e) => setTemplateSearch(e.target.value)}
+                    className="w-64"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-4 px-4 flex items-center gap-2">
+                  <Info className="w-4 h-4 flex-shrink-0" />
+                  💡 Sube imagen y vídeo del template. Aplica automáticamente a todos los productos vinculados (campo template_id). Vídeo MP4 máx 5MB.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredTemplates.map(template => (
+                    <Card key={template.id} className="overflow-hidden">
+                      <div className="aspect-square bg-muted relative">
+                        {template.image_url ? (
+                          <img
+                            src={template.image_url}
+                            alt={template.display_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Image className="w-12 h-12 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        {uploadingTemplateImageId === template.id && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <RefreshCw className="w-8 h-8 animate-spin text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="aspect-square bg-muted relative border-t border-border">
+                        {template.video_url ? (
+                          <video
+                            src={template.video_url}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            controls={false}
+                            poster={template.image_url || undefined}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Film className="w-12 h-12 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        {uploadingTemplateVideoId === template.id && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <RefreshCw className="w-8 h-8 animate-spin text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-3">
+                        <p className="font-medium text-sm truncate">
+                          {TEMPLATE_EMOJI_MAP[template.slug] ?? '🍽️'} {template.display_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {template.category}{template.customizer_key ? ` · ${template.customizer_key}` : ''}
+                        </p>
+                        <label className="mt-2 flex items-center justify-center gap-2 cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary rounded-md py-2 px-3 text-sm transition-colors">
+                          <Upload className="w-4 h-4" />
+                          {template.image_url ? 'Cambiar foto' : 'Subir foto'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleTemplateImageUpload(template.id, file);
+                            }}
+                            disabled={uploadingTemplateImageId !== null}
+                          />
+                        </label>
+                        <label className="mt-2 flex items-center justify-center gap-2 cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary rounded-md py-2 px-3 text-sm transition-colors">
+                          <Upload className="w-4 h-4" />
+                          {template.video_url ? 'Cambiar vídeo' : 'Subir vídeo'}
+                          <input
+                            type="file"
+                            accept="video/mp4"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleTemplateVideoUpload(template.id, file);
+                            }}
+                            disabled={uploadingTemplateVideoId !== null}
                           />
                         </label>
                       </CardContent>
