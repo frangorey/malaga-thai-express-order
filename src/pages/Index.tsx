@@ -12,6 +12,7 @@ import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomize
 import { SaladCustomizerDrawer, SaladType } from "@/components/SaladCustomizerDrawer";
 import { TonkatsuCustomizerDrawer } from "@/components/TonkatsuCustomizerDrawer";
 import { PolloCoreanoCustomizerDrawer } from "@/components/PolloCoreanoCustomizerDrawer";
+import { PadKaPraoCustomizerDrawer } from "@/components/PadKaPraoCustomizerDrawer";
 import { SupabaseProduct } from "@/types/menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProducts } from "@/hooks/useProducts";
