@@ -365,6 +365,14 @@ const AdminPanel = () => {
     ? products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.category.toLowerCase().includes(productSearch.toLowerCase()))
     : products;
 
+  const filteredTemplates = templateSearch
+    ? templates.filter(t =>
+        t.display_name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+        t.category.toLowerCase().includes(templateSearch.toLowerCase()) ||
+        t.slug.toLowerCase().includes(templateSearch.toLowerCase())
+      )
+    : templates;
+
   const getStatusBadge = (status: string) => {
     const statusInfo = ORDER_STATUSES.find(s => s.value === status);
     if (!statusInfo) return <Badge variant="outline">{status}</Badge>;
