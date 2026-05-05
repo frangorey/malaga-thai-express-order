@@ -165,9 +165,25 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType,
   };
 
   const handleClose = () => {
-    handleReset();
     onClose();
   };
+
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'noodle') { handleReset(); return; }
+      if (cd.drawerVariant !== noodleType) { handleReset(); return; }
+      setSelectedProtein(cd.selections.protein ?? "");
+      setSelectedSauce(cd.selections.sauce ?? "");
+      setSelectedVegetables(cd.selections.vegetables ?? []);
+      setSelectedExtras(cd.selections.extras ?? []);
+      setCurrentStep('summary');
+    } else {
+      handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, bundle?.products?.length]);
 
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedProtein || !selectedSauce) return null;
