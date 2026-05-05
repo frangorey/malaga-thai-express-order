@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
+import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onAddToCart: (product: SupabaseProduct) => void;
+  onAddToCart: (product: SupabaseProductWithCustomization) => void;
 }
 
 type GarnishId = "fried_rice" | "fried_noodles";
@@ -75,7 +76,14 @@ export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) 
       });
       return;
     }
-    onAddToCart(base);
+    const customizationData: CustomizationData = {
+      customizerType: 'tonkatsu',
+      selections: {
+        garnish: garnish || undefined,
+        sauce: sauce || undefined,
+      },
+    };
+    onAddToCart({ ...base, customizationData });
     toast({ title: "✅", description: base.name });
     handleClose();
   };
