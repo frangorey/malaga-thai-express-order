@@ -98,6 +98,10 @@ const AdminPanel = () => {
   const [uploadingProductId, setUploadingProductId] = useState<number | null>(null);
   const [uploadingVideoProductId, setUploadingVideoProductId] = useState<number | null>(null);
   const [productSearch, setProductSearch] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [uploadingTemplateImageId, setUploadingTemplateImageId] = useState<string | null>(null);
+  const [uploadingTemplateVideoId, setUploadingTemplateVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!roleLoading && !user) {
