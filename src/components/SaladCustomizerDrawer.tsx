@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ interface SaladCustomizerDrawerProps {
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
   saladType: SaladType;
+  editingItem?: EditingItem;
 }
 
 type ProteinId = "normal" | "pollo" | "langostino" | "mixta";
