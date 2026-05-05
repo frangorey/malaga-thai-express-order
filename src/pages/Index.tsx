@@ -493,6 +493,7 @@ const Index = () => {
         onClose={() => { setRiceCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         riceType={riceCustomizer.type}
+        editingItem={editingItem}
       />
 
       <NoodleCustomizerDrawer
@@ -500,6 +501,7 @@ const Index = () => {
         onClose={() => { setNoodleCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
+        editingItem={editingItem}
       />
 
       <SaladCustomizerDrawer
@@ -507,6 +509,7 @@ const Index = () => {
         onClose={() => { setSaladCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         saladType={saladCustomizer.type}
+        editingItem={editingItem}
       />
 
       <TonkatsuCustomizerDrawer
