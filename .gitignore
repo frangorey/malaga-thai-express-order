@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Database extracts (NO commitear nunca)
+thaii_*.sql
+thaii_*.txt
+
+# Supabase CLI temp
+supabase/.temp/
