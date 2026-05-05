@@ -272,6 +272,91 @@ const AdminPanel = () => {
     }
   };
 
+  const handleTemplateImageUpload = async (templateId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten archivos de imagen');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen no puede superar los 5MB');
+      return;
+    }
+
+    setUploadingTemplateImageId(templateId);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `templates/${templateId}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('dish_templates')
+        .update({ image_url: urlData.publicUrl })
+        .eq('id', templateId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Foto de plantilla actualizada correctamente');
+      fetchTemplates();
+    } catch (error) {
+      console.error('Template image upload error:', error);
+      toast.error('Error al subir la foto');
+    } finally {
+      setUploadingTemplateImageId(null);
+    }
+  };
+
+  const handleTemplateVideoUpload = async (templateId: string, file: File) => {
+    if (file.type !== 'video/mp4') {
+      toast.error('Solo se aceptan archivos MP4');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El vídeo no puede superar 5 MB');
+      return;
+    }
+
+    setUploadingTemplateVideoId(templateId);
+
+    try {
+      const filePath = `templates/videos/${templateId}-${Date.now()}.mp4`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('Fotos_Thaii')
+        .upload(filePath, file, { upsert: true, contentType: 'video/mp4' });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('Fotos_Thaii')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('dish_templates')
+        .update({ video_url: urlData.publicUrl })
+        .eq('id', templateId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Vídeo de plantilla subido correctamente');
+      fetchTemplates();
+    } catch (error) {
+      console.error('Template video upload error:', error);
+      toast.error('Error al subir el vídeo');
+    } finally {
+      setUploadingTemplateVideoId(null);
+    }
+  };
+
   const filteredOrders = statusFilter === 'all'
     ? orders
     : orders.filter(o => o.order_status === statusFilter);
