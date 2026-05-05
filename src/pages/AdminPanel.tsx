@@ -159,6 +159,21 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchTemplates = async () => {
+    const { data, error } = await supabase
+      .from('dish_templates')
+      .select('id, slug, display_name, category, customizer_key, image_url, video_url, display_order, is_active')
+      .eq('is_active', true)
+      .order('display_order');
+
+    if (error) {
+      console.error('Error fetching templates:', error);
+      toast.error('Error al cargar las plantillas');
+    } else {
+      setTemplates((data as Template[]) || []);
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     const { error } = await supabase
       .from('orders')
