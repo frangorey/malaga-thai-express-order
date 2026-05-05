@@ -92,10 +92,26 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType, e
     );
   };
 
-  const handleClose = () => {
+  const resetSelections = () => {
     setSelectedProtein("");
+  };
+
+  const handleClose = () => {
     onClose();
   };
+
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'salad') { resetSelections(); return; }
+      if (cd.drawerVariant !== saladType) { resetSelections(); return; }
+      setSelectedProtein((cd.selections.protein ?? "") as ProteinId | "");
+    } else {
+      resetSelections();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, templateProducts.length]);
 
   const handleAddToCart = () => {
     const base = findMatchingProduct();
@@ -108,10 +124,18 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType, e
       drawerVariant: saladType,
       selections: { protein: selectedProtein || undefined },
     };
-    onAddToCart({ ...base, customizationData });
-    setSelectedProtein("");
+    const payload: SupabaseProductWithCustomization = {
+      ...base,
+      customizationData,
+      ...(editingItem ? { cartItemId: editingItem.cartItemId } : {}),
+    };
+    onAddToCart(payload);
+    resetSelections();
     onClose();
-    toast({ title: "✅ Añadido al carrito", description: base.name });
+    toast({
+      title: editingItem ? '✅ ' + t('update_item') : '✅ Añadido al carrito',
+      description: base.name,
+    });
   };
 
   return (
