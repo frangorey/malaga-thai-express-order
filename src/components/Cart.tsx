@@ -39,7 +39,13 @@ export interface CustomizationData {
 export type SupabaseProductWithCustomization = SupabaseProduct & {
   customizations?: string[];
   customizationData?: CustomizationData;
+  cartItemId?: string;
 };
+
+export interface EditingItem {
+  cartItemId: string;
+  customizationData: CustomizationData;
+}
 
 // Nuevo tipo para el carrito con productos de Supabase
 export interface SupabaseCartItem extends SupabaseProduct {

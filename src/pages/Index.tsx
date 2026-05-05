@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
-import { Cart, SupabaseCartItem, SupabaseProductWithCustomization } from "@/components/Cart";
+import { Cart, SupabaseCartItem, SupabaseProductWithCustomization, EditingItem } from "@/components/Cart";
 // import { Footer } from "@/components/Footer";
 import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
@@ -345,6 +345,15 @@ const Index = () => {
     setIsCartOpen(true);
   };
 
+  const editingItem: EditingItem | undefined = editingCartItemId
+    ? (() => {
+        const it = cartItems.find(i => i.cartItemId === editingCartItemId);
+        return it?.customizationData
+          ? { cartItemId: it.cartItemId, customizationData: it.customizationData }
+          : undefined;
+      })()
+    : undefined;
+
   const addToCart = (product: SupabaseProductWithCustomization) => {
     setCartItems(prev => {
       if (editingCartItemId) {
@@ -484,6 +493,7 @@ const Index = () => {
         onClose={() => { setRiceCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         riceType={riceCustomizer.type}
+        editingItem={editingItem}
       />
 
       <NoodleCustomizerDrawer
@@ -491,6 +501,7 @@ const Index = () => {
         onClose={() => { setNoodleCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
+        editingItem={editingItem}
       />
 
       <SaladCustomizerDrawer
@@ -498,6 +509,7 @@ const Index = () => {
         onClose={() => { setSaladCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         saladType={saladCustomizer.type}
+        editingItem={editingItem}
       />
 
       <TonkatsuCustomizerDrawer

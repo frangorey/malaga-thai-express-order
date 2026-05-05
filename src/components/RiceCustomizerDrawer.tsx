@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { allExtras } from "@/data/extrasData";
@@ -17,6 +17,7 @@ interface RiceCustomizerDrawerProps {
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
   riceType: RiceType;
+  editingItem?: EditingItem;
 }
 
 type Step = "protein" | "sauce" | "vegetables" | "extras" | "summary";
@@ -57,7 +58,7 @@ const RICE_SLUG_MAP: Record<RiceType, string> = {
   curry: "arroz_curry",
 };
 
-export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType }: RiceCustomizerDrawerProps) => {
+export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType, editingItem }: RiceCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
 
@@ -175,11 +176,29 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType }: R
 
   // Reset al cambiar de tipo de arroz (las salsas no son compatibles entre tipos)
   useEffect(() => {
+    if (editingItem) return;
     handleReset();
-  }, [riceType, handleReset]);
+  }, [riceType, editingItem, handleReset]);
+
+  // Precarga en modo edición
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'rice') { handleReset(); return; }
+      if (cd.drawerVariant !== riceType) { handleReset(); return; }
+      setSelectedProtein(cd.selections.protein ?? "");
+      setSelectedSauce(cd.selections.sauce ?? "");
+      setSelectedVegetables(cd.selections.vegetables ?? []);
+      setSelectedExtras(cd.selections.extras ?? []);
+      setCurrentStep('summary');
+    } else {
+      handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, bundle?.products?.length]);
 
   const handleClose = () => {
-    handleReset();
     onClose();
   };
 
@@ -249,11 +268,15 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType }: R
       price: baseProduct.price + extrasTotal,
       customizations: allCustomizations,
       customizationData,
+      ...(editingItem ? { cartItemId: editingItem.cartItemId } : {}),
     };
 
     onAddToCart(customProduct);
     handleClose();
-    toast({ title: "✅ Añadido al carrito", description: customProduct.name });
+    toast({
+      title: editingItem ? '✅ ' + t('update_item') : '✅ Añadido al carrito',
+      description: customProduct.name,
+    });
   };
 
   const stepLabels: Record<Step, string> = {
@@ -532,7 +555,7 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType }: R
                       className="flex-1 gap-2"
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      {t("add_to_cart")}
+                      {editingItem ? t("update_item") : t("add_to_cart")}
                     </Button>
                   </div>
                 </div>

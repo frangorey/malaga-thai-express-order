@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ interface SaladCustomizerDrawerProps {
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
   saladType: SaladType;
+  editingItem?: EditingItem;
 }
 
 type ProteinId = "normal" | "pollo" | "langostino" | "mixta";
@@ -47,7 +48,7 @@ const SALAD_SLUG_MAP: Record<SaladType, string> = {
 
 const SALAD_EMOJI = "🥗";
 
-export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }: SaladCustomizerDrawerProps) => {
+export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType, editingItem }: SaladCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const slug = SALAD_SLUG_MAP[saladType];
   const { data: bundle, isLoading, isError } = useDishTemplate(slug);
@@ -91,10 +92,26 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }:
     );
   };
 
-  const handleClose = () => {
+  const resetSelections = () => {
     setSelectedProtein("");
+  };
+
+  const handleClose = () => {
     onClose();
   };
+
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'salad') { resetSelections(); return; }
+      if (cd.drawerVariant !== saladType) { resetSelections(); return; }
+      setSelectedProtein((cd.selections.protein ?? "") as ProteinId | "");
+    } else {
+      resetSelections();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, templateProducts.length]);
 
   const handleAddToCart = () => {
     const base = findMatchingProduct();
@@ -107,10 +124,18 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }:
       drawerVariant: saladType,
       selections: { protein: selectedProtein || undefined },
     };
-    onAddToCart({ ...base, customizationData });
-    setSelectedProtein("");
+    const payload: SupabaseProductWithCustomization = {
+      ...base,
+      customizationData,
+      ...(editingItem ? { cartItemId: editingItem.cartItemId } : {}),
+    };
+    onAddToCart(payload);
+    resetSelections();
     onClose();
-    toast({ title: "✅ Añadido al carrito", description: base.name });
+    toast({
+      title: editingItem ? '✅ ' + t('update_item') : '✅ Añadido al carrito',
+      description: base.name,
+    });
   };
 
   return (
@@ -201,7 +226,7 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }:
                   </div>
                   <Button onClick={handleAddToCart} className="w-full mt-2" size="lg">
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t("add_to_cart")}
+                    {editingItem ? t("update_item") : t("add_to_cart")}
                   </Button>
                 </div>
               )}

@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Check, ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { allExtras } from "@/data/extrasData";
@@ -17,6 +17,7 @@ interface NoodleCustomizerDrawerProps {
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
   noodleType: NoodleType;
+  editingItem?: EditingItem;
 }
 
 type Step = "protein" | "sauce" | "vegetables" | "extras" | "summary";
@@ -56,7 +57,7 @@ const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
   Udon: "tallarines_udon",
 };
 
-export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType }: NoodleCustomizerDrawerProps) => {
+export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType, editingItem }: NoodleCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const slug = NOODLE_SLUG_MAP[noodleType];
   const { data: bundle, isLoading, isError } = useDishTemplate(slug);
@@ -164,9 +165,25 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
   };
 
   const handleClose = () => {
-    handleReset();
     onClose();
   };
+
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'noodle') { handleReset(); return; }
+      if (cd.drawerVariant !== noodleType) { handleReset(); return; }
+      setSelectedProtein(cd.selections.protein ?? "");
+      setSelectedSauce(cd.selections.sauce ?? "");
+      setSelectedVegetables(cd.selections.vegetables ?? []);
+      setSelectedExtras(cd.selections.extras ?? []);
+      setCurrentStep('summary');
+    } else {
+      handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, bundle?.products?.length]);
 
   const findMatchingProduct = (): SupabaseProduct | null => {
     if (!selectedProtein || !selectedSauce) return null;
@@ -224,11 +241,15 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
       price: baseProduct.price + extrasTotal,
       customizations: allCustomizations,
       customizationData,
+      ...(editingItem ? { cartItemId: editingItem.cartItemId } : {}),
     };
 
     onAddToCart(customProduct);
     handleClose();
-    toast({ title: "✅ Añadido al carrito", description: customProduct.name });
+    toast({
+      title: editingItem ? '✅ ' + t('update_item') : '✅ Añadido al carrito',
+      description: customProduct.name,
+    });
   };
 
   const stepLabels: Record<Step, string> = {
@@ -469,7 +490,7 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType 
                 <Button variant="outline" size="sm" onClick={goBack} className="flex-1">← {t("step_extras")}</Button>
                 <Button onClick={handleAddToCart} className="flex-1 gap-2" disabled={isLoading || isError || templateProducts.length === 0}>
                   <ShoppingCart className="w-4 h-4" />
-                  {t("add_to_cart")}
+                  {editingItem ? t("update_item") : t("add_to_cart")}
                 </Button>
               </div>
             </div>
