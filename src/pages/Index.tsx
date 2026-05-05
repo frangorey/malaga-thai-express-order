@@ -60,6 +60,7 @@ const Index = () => {
   const [saladCustomizer, setSaladCustomizer] = useState<{ open: boolean; type: SaladType }>({ open: false, type: "cesar" });
   const [tonkatsuDrawerOpen, setTonkatsuDrawerOpen] = useState(false);
   const [polloCoreanoDrawerOpen, setPolloCoreanoDrawerOpen] = useState(false);
+  const [padKaPraoDrawerOpen, setPadKaPraoDrawerOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { data: dishTemplates } = useDishTemplates();
