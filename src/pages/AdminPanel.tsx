@@ -46,6 +46,37 @@ interface Product {
   is_available: boolean | null;
 }
 
+interface Template {
+  id: string;
+  slug: string;
+  display_name: string;
+  category: string;
+  customizer_key: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  display_order: number;
+  is_active: boolean;
+}
+
+const TEMPLATE_EMOJI_MAP: Record<string, string> = {
+  sopa_tom_yam: '🍲',
+  sopa_miso: '🍜',
+  arroz_curry: '🍛',
+  arroz_frito: '🍚',
+  tallarines_anchos: '🍝',
+  tallarines_finos: '🥢',
+  tallarines_glass: '🌾',
+  tallarines_udon: '🍥',
+  ensalada_cesar: '🥗',
+  ensalada_classic: '🥗',
+  ensalada_crispy: '🥗',
+  ensalada_fruta: '🥗',
+  ensalada_malaysia: '🥗',
+  ensalada_thailandia: '🥗',
+  tonkatsu: '🍱',
+  pollo_coreano: '🍗',
+};
+
 const ORDER_STATUSES = [
   { value: 'received', label: 'Recibido', icon: Package, color: 'bg-blue-500' },
   { value: 'confirmed', label: 'Confirmado', icon: CheckCircle, color: 'bg-green-500' },
