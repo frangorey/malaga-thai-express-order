@@ -48,7 +48,7 @@ const SALAD_SLUG_MAP: Record<SaladType, string> = {
 
 const SALAD_EMOJI = "🥗";
 
-export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }: SaladCustomizerDrawerProps) => {
+export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType, editingItem }: SaladCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const slug = SALAD_SLUG_MAP[saladType];
   const { data: bundle, isLoading, isError } = useDishTemplate(slug);
