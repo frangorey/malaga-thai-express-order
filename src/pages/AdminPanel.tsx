@@ -418,6 +418,10 @@ const AdminPanel = () => {
               <QrCode className="w-4 h-4" />
               QRs de Mesa
             </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <Layers className="w-4 h-4" />
+              Plantillas
+            </TabsTrigger>
             <TabsTrigger value="layout" className="flex items-center gap-2">
               <Map className="w-4 h-4" />
               🗺️ Plano de Mesas
