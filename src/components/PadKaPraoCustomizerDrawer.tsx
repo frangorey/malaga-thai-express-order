@@ -205,7 +205,7 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart, editingI
                   </div>
                   <Button onClick={handleAddToCart} className="w-full mt-2" size="lg">
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t("add_to_cart")}
+                    {editingItem ? t('update_item') : t('add_to_cart')}
                   </Button>
                 </div>
               )}

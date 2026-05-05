@@ -516,18 +516,21 @@ const Index = () => {
         open={tonkatsuDrawerOpen}
         onClose={() => { setTonkatsuDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
+        editingItem={editingItem}
       />
 
       <PolloCoreanoCustomizerDrawer
         open={polloCoreanoDrawerOpen}
         onClose={() => { setPolloCoreanoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
+        editingItem={editingItem}
       />
 
       <PadKaPraoCustomizerDrawer
         open={padKaPraoDrawerOpen}
         onClose={() => { setPadKaPraoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
+        editingItem={editingItem}
       />
 
       {validTableNumber && (
