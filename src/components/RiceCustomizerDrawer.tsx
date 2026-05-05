@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { allExtras } from "@/data/extrasData";
