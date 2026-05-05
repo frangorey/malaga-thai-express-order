@@ -475,45 +475,46 @@ const Index = () => {
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeFromCart}
           tableNumber={validTableNumber}
+          onEditItem={handleEditItem}
         />
       )}
 
       <RiceCustomizerDrawer
         open={riceCustomizer.open}
-        onClose={() => setRiceCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setRiceCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         riceType={riceCustomizer.type}
       />
 
       <NoodleCustomizerDrawer
         open={noodleCustomizer.open}
-        onClose={() => setNoodleCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setNoodleCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
       />
 
       <SaladCustomizerDrawer
         open={saladCustomizer.open}
-        onClose={() => setSaladCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setSaladCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         saladType={saladCustomizer.type}
       />
 
       <TonkatsuCustomizerDrawer
         open={tonkatsuDrawerOpen}
-        onClose={() => setTonkatsuDrawerOpen(false)}
+        onClose={() => { setTonkatsuDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
       <PolloCoreanoCustomizerDrawer
         open={polloCoreanoDrawerOpen}
-        onClose={() => setPolloCoreanoDrawerOpen(false)}
+        onClose={() => { setPolloCoreanoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
       <PadKaPraoCustomizerDrawer
         open={padKaPraoDrawerOpen}
-        onClose={() => setPadKaPraoDrawerOpen(false)}
+        onClose={() => { setPadKaPraoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
