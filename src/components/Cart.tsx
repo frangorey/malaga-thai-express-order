@@ -14,11 +14,39 @@ import { useToast } from "@/hooks/use-toast";
 import { trackOrder } from "@/hooks/useOrderRealtime";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+// Tipos estructurados de customización (Fase 7B)
+export type CustomizerType =
+  | 'noodle' | 'rice' | 'salad'
+  | 'tonkatsu' | 'pollo_coreano' | 'pad_ka_prao';
+
+export type NoodleVariant = 'Anchos' | 'Finos' | 'Glass' | 'Udon';
+export type RiceVariant = 'frito' | 'curry';
+export type SaladVariant = 'cesar' | 'classic' | 'crispy' | 'fruta' | 'malaysia' | 'thailandia';
+export type DrawerVariant = NoodleVariant | RiceVariant | SaladVariant;
+
+export interface CustomizationData {
+  customizerType: CustomizerType;
+  drawerVariant?: DrawerVariant;
+  selections: {
+    protein?: string;
+    sauce?: string;
+    garnish?: string;
+    vegetables?: string[];
+    extras?: string[];
+  };
+}
+
+export type SupabaseProductWithCustomization = SupabaseProduct & {
+  customizations?: string[];
+  customizationData?: CustomizationData;
+};
+
 // Nuevo tipo para el carrito con productos de Supabase
 export interface SupabaseCartItem extends SupabaseProduct {
   quantity: number;
   customizations?: string[];
   cartItemId: string;
+  customizationData?: CustomizationData;
 }
 
 interface CartProps {

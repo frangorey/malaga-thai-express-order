@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
+import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onAddToCart: (product: SupabaseProduct) => void;
+  onAddToCart: (product: SupabaseProductWithCustomization) => void;
 }
 
 type ProteinId =
@@ -82,7 +83,11 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props)
       });
       return;
     }
-    onAddToCart(matched);
+    const customizationData: CustomizationData = {
+      customizerType: 'pad_ka_prao',
+      selections: { protein: selectedProtein || undefined },
+    };
+    onAddToCart({ ...matched, customizationData });
     toast({ title: "✅", description: matched.name });
     handleClose();
   };

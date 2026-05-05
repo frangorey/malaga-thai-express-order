@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
+import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ export type SaladType = "cesar" | "classic" | "crispy" | "fruta" | "malaysia" | 
 interface SaladCustomizerDrawerProps {
   open: boolean;
   onClose: () => void;
-  onAddToCart: (product: SupabaseProduct) => void;
+  onAddToCart: (product: SupabaseProductWithCustomization) => void;
   saladType: SaladType;
 }
 
@@ -101,7 +102,12 @@ export const SaladCustomizerDrawer = ({ open, onClose, onAddToCart, saladType }:
       toast({ title: "Error", description: "Producto no encontrado", variant: "destructive" });
       return;
     }
-    onAddToCart(base);
+    const customizationData: CustomizationData = {
+      customizerType: 'salad',
+      drawerVariant: saladType,
+      selections: { protein: selectedProtein || undefined },
+    };
+    onAddToCart({ ...base, customizationData });
     setSelectedProtein("");
     onClose();
     toast({ title: "✅ Añadido al carrito", description: base.name });

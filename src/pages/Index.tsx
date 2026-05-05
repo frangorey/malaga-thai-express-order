@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
-import { Cart, SupabaseCartItem } from "@/components/Cart";
+import { Cart, SupabaseCartItem, SupabaseProductWithCustomization } from "@/components/Cart";
 // import { Footer } from "@/components/Footer";
 import { RiceCustomizerDrawer, RiceType } from "@/components/RiceCustomizerDrawer";
 import { NoodleCustomizerDrawer, NoodleType } from "@/components/NoodleCustomizerDrawer";
@@ -307,9 +307,10 @@ const Index = () => {
     return arrA.every((v, i) => v === arrB[i]);
   };
 
-  const addToCart = (product: SupabaseProduct) => {
+  const addToCart = (product: SupabaseProductWithCustomization) => {
     setCartItems(prev => {
-      const incomingCustomizations = (product as SupabaseProduct & { customizations?: string[] }).customizations;
+      const incomingCustomizations = product.customizations;
+      const incomingCustomizationData = product.customizationData;
       const existing = prev.find(item =>
         item.id === product.id &&
         item.name === product.name &&
@@ -329,6 +330,7 @@ const Index = () => {
           ...product,
           quantity: 1,
           customizations: incomingCustomizations,
+          customizationData: incomingCustomizationData,
           cartItemId: crypto.randomUUID(),
         } as SupabaseCartItem,
       ];

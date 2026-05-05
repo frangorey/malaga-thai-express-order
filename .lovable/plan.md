@@ -1,34 +1,92 @@
-## Fase 7A — `cartItemId` único en el carrito (bug fix de merge)
+## Fase 7B — Modelo estructurado de `customizationData` en el carrito
 
-### Problema
-Items con el mismo `product.id` pero distintas `customizations` se mergeen en `quantity: 2` y se pierde el segundo set de customizaciones.
+Refactor que enriquece cada item del carrito con metadata tipada (`customizationData`) sin cambiar la firma `onAddToCart(product)` ni el payload enviado a la edge function. Sienta las bases para Fase 7C (carrito editable).
 
-### Solución
-Asignar un `cartItemId` (UUID) único por entrada del carrito. El merge sólo ocurre cuando `id + name + price + customizations` coinciden 100%.
+### Archivos a modificar (8)
 
-### Archivos a modificar (solo 2)
+**1. `src/components/Cart.tsx`** — añadir tipos exportados antes de `SupabaseCartItem` y ampliar la interfaz:
 
-**1. `src/components/Cart.tsx`**
-- Ampliar `SupabaseCartItem` con `cartItemId: string`.
-- Cambiar `CartProps.onUpdateQuantity` y `onRemoveItem` a `(cartItemId: string, ...)`.
-- En el render de items (línea 199 en adelante): `key={item.cartItemId}` y los 3 botones (`-`, `+`, eliminar, líneas 215/223/230) usan `item.cartItemId`.
-- En `handleOrder` (línea 149): `items.forEach(item => onRemoveItem(item.cartItemId))`.
-- El `cartItems.map` que se envía a la edge function (línea ~114) **NO** incluye `cartItemId` — payload intacto: `{id, name, price, quantity, customizations}`.
+```ts
+export type CustomizerType =
+  | 'noodle' | 'rice' | 'salad'
+  | 'tonkatsu' | 'pollo_coreano' | 'pad_ka_prao';
 
-**2. `src/pages/Index.tsx`**
-- Añadir helper puro `customizationsEqual(a, b)` (compara arrays ordenados).
-- Reescribir `addToCart`: busca existente por `id + name + price + customizationsEqual`; si existe, incrementa por `cartItemId`; si no, push con `crypto.randomUUID()`.
-- Reescribir `updateQuantity(cartItemId, quantity)` y `removeFromCart(cartItemId)` para filtrar/mapear por `cartItemId`.
-- El `<Cart .../>` mount no cambia (las firmas matchean por inferencia).
+export type NoodleVariant = 'Anchos' | 'Finos' | 'Glass' | 'Udon';
+export type RiceVariant = 'frito' | 'curry';
+export type SaladVariant = 'cesar' | 'classic' | 'crispy' | 'fruta' | 'malaysia' | 'thailandia';
+export type DrawerVariant = NoodleVariant | RiceVariant | SaladVariant;
 
-### NO se toca
-- Edge function `create-whatsapp-order` (ya ignora campos extra; igualmente no enviamos `cartItemId`).
-- Drawers `*CustomizerDrawer` (la firma `onAddToCart(product)` no cambia).
-- BD, RLS, `src/integrations/supabase/types.ts`, i18n.
+export interface CustomizationData {
+  customizerType: CustomizerType;
+  drawerVariant?: DrawerVariant;
+  selections: {
+    protein?: string;
+    sauce?: string;
+    garnish?: string;
+    vegetables?: string[];
+    extras?: string[];
+  };
+}
+
+export type SupabaseProductWithCustomization = SupabaseProduct & {
+  customizations?: string[];
+  customizationData?: CustomizationData;
+};
+
+export interface SupabaseCartItem extends SupabaseProduct {
+  quantity: number;
+  customizations?: string[];
+  cartItemId: string;
+  customizationData?: CustomizationData;   // NUEVO
+}
+```
+
+`handleOrder` y el `cartItems.map` que envía a `create-whatsapp-order` **no se tocan** — el map ya proyecta solo `{id, name, price, quantity, customizations}`, así que `customizationData` queda fuera del payload automáticamente (igual que `cartItemId`).
+
+**2. `src/pages/Index.tsx`** — importar `SupabaseProductWithCustomization` desde `@/components/Cart`, cambiar la firma de `addToCart` a:
+
+```ts
+const addToCart = (product: SupabaseProductWithCustomization) => { ... }
+```
+
+Sustituir el cast actual `(product as SupabaseProduct & { customizations?: string[] }).customizations` por uso directo de `product.customizations` y `product.customizationData`. Al pushear nuevo item, incluir `customizationData: product.customizationData`. La comparación de duplicados **sigue** usando `customizationsEqual` sobre `customizations: string[]` — `customizationData` no participa en la igualdad.
+
+**3–8. Seis customizer drawers** — en cada uno:
+
+- Cambiar el tipo de prop:
+  ```ts
+  onAddToCart: (product: SupabaseProductWithCustomization) => void;
+  ```
+  e importar `SupabaseProductWithCustomization` y `CustomizationData` desde `@/components/Cart`.
+
+- En `handleAddToCart`, construir `customizationData` y devolver un `customProduct` spread (en Tonkatsu/PolloCoreano/PadKaPrao/Salad hoy se hace `onAddToCart(base)` directamente — pasa a `onAddToCart({ ...base, customizationData })`):
+
+| Drawer | customizerType | drawerVariant | selections |
+|---|---|---|---|
+| `NoodleCustomizerDrawer` | `'noodle'` | `noodleType` | `protein`, `sauce`, `vegetables`, `extras` |
+| `RiceCustomizerDrawer` | `'rice'` | `riceType` | `protein`, `sauce`, `vegetables`, `extras` |
+| `SaladCustomizerDrawer` | `'salad'` | `saladType` | `protein` |
+| `TonkatsuCustomizerDrawer` | `'tonkatsu'` | — | `garnish`, `sauce` |
+| `PolloCoreanoCustomizerDrawer` | `'pollo_coreano'` | — | `garnish`, `sauce` |
+| `PadKaPraoCustomizerDrawer` | `'pad_ka_prao'` | — | `protein` |
+
+Arrays vacíos y strings vacíos se normalizan a `undefined` (`selectedVegetables.length ? selectedVegetables : undefined`, `selectedProtein || undefined`, etc.).
+
+En Noodle/Rice, donde ya existe `customProduct`, se mantiene la estructura y se añade el campo `customizationData` junto a `customizations: allCustomizations`.
+
+### Restricciones (obligatorias)
+
+- No tocar `supabase/functions/create-whatsapp-order/index.ts`.
+- No eliminar `customizations: string[]` (cocina y edge function dependen de él).
+- No usar `customizationData` en la comparación de duplicados.
+- No cambiar la firma a `(product, customizationData)` — sigue siendo 1 argumento.
+- No añadir lógica de edición desde el carrito (eso es Fase 7C).
+- Sin cambios en BD, RLS, `src/integrations/supabase/types.ts`, ni i18n.
 
 ### Validación
-- TS compila strict sin warnings.
-- 2× mismo plato sin extras → 1 fila qty 2.
-- Mismo plato con/sin extras → 2 filas separadas, qty 1 cada una.
-- +/- en una fila no afecta a la otra.
-- Pedido `pickup` llega a `orders.items` sin `cartItemId` y con items separados.
+
+- TS compila estricto sin warnings.
+- Carrito visualmente idéntico.
+- `orders.items` en Supabase no contiene `customizationData` ni `cartItemId`.
+- React DevTools: cada `SupabaseCartItem` del estado de `Index.tsx` muestra `customizationData` poblado según el drawer de origen.
+- Comportamiento de merge de Fase 7A intacto: 2× mismo plato sin extras → 1 fila qty 2; mismo plato con/sin extras → 2 filas separadas.
