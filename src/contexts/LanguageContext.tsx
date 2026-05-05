@@ -400,6 +400,7 @@ const translations = {
     'world_tonkatsu_card': 'Tonkatsu',
     'world_pollo_coreano_card': 'Pollo Coreano',
     'world_pad_ka_prao_card': 'Pad Ka Prao',
+    'padkaprao_choose_protein': 'Elige tu proteína',
     'world_curry_pina_card': 'Arroz Curry y Piña',
     'tonkatsu_choose_garnish': 'Elige tu guarnición',
     'tonkatsu_garnish_fried_rice': 'Arroz Frito',
