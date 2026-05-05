@@ -1,20 +1,24 @@
 ## Objetivo
-En modo edición, abrir el drawer en el paso `protein` (en vez de `summary`) para que el cliente recorra los 4 pasos con las selecciones ya precargadas.
+Añadir botón "← Atrás" (a proteína) en el step `sauce` de Noodle y Rice. El auto-avance al seleccionar salsa se mantiene intacto.
 
 ## Cambios
 
 ### 1. `src/components/NoodleCustomizerDrawer.tsx`
-En el `useEffect` con deps `[open, editingItem, bundle?.products?.length]`:
-- Reemplazar `setCurrentStep('summary')` por `setCurrentStep('protein')`.
+Dentro del bloque `{currentStep === "sauce" && (...)}`, tras el `.map` de `sauces`, añadir:
+```tsx
+<div className="flex gap-2 mt-4">
+  <Button variant="outline" size="sm" onClick={goBack} className="flex-1">
+    ← {t("step_protein")}
+  </Button>
+</div>
+```
 
 ### 2. `src/components/RiceCustomizerDrawer.tsx`
-En el `useEffect` equivalente:
-- Reemplazar `setCurrentStep('summary')` por `setCurrentStep('protein')`.
+Idéntico cambio en su bloque `sauce`.
 
 ## No tocar
-- SaladCustomizerDrawer.
-- Tonkatsu / PolloCoreano / PadKaPrao.
-- Lógica de selecciones, precarga de protein/sauce/vegetables/extras, validaciones de `customizerType`/`drawerVariant`, ni UI.
-- `handleAddToCart`, `findMatchingProduct`, ni el `cartItemId` propagado.
-
-Cambio total: 2 líneas (una por archivo).
+- `handleSauceSelect` ni el auto-avance.
+- No añadir botón "Siguiente" en `sauce`.
+- Otros steps (protein/vegetables/extras/summary).
+- Salad / Tonkatsu / PolloCoreano / PadKaPrao.
+- BD ni edge functions.
