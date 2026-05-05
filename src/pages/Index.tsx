@@ -307,9 +307,10 @@ const Index = () => {
     return arrA.every((v, i) => v === arrB[i]);
   };
 
-  const addToCart = (product: SupabaseProduct) => {
+  const addToCart = (product: SupabaseProductWithCustomization) => {
     setCartItems(prev => {
-      const incomingCustomizations = (product as SupabaseProduct & { customizations?: string[] }).customizations;
+      const incomingCustomizations = product.customizations;
+      const incomingCustomizationData = product.customizationData;
       const existing = prev.find(item =>
         item.id === product.id &&
         item.name === product.name &&
@@ -329,6 +330,7 @@ const Index = () => {
           ...product,
           quantity: 1,
           customizations: incomingCustomizations,
+          customizationData: incomingCustomizationData,
           cartItemId: crypto.randomUUID(),
         } as SupabaseCartItem,
       ];
