@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
+  editingItem?: EditingItem;
 }
 
 type ProteinId =
@@ -27,7 +28,7 @@ type ProteinId =
 const SLUG = "pad_ka_prao";
 const SIMPLE_IDS: ProteinId[] = ["pollo", "ternera", "gambas"];
 
-export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) => {
+export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart, editingItem }: Props) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const { data: bundle, isLoading, isError } = useDishTemplate(SLUG);
@@ -36,9 +37,23 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props)
 
   const [selectedProtein, setSelectedProtein] = useState<ProteinId | "">("");
 
+  const resetSelections = () => {
+    setSelectedProtein("");
+  };
+
   useEffect(() => {
-    if (!open) setSelectedProtein("");
-  }, [open]);
+    if (!open) return;
+    if (editingItem) {
+      if (editingItem.customizationData?.customizerType !== 'pad_ka_prao') {
+        resetSelections();
+        return;
+      }
+      const sel = editingItem.customizationData.selections ?? {};
+      setSelectedProtein((sel.protein as ProteinId) ?? "");
+    } else {
+      resetSelections();
+    }
+  }, [open, editingItem]);
 
   const proteins: { id: ProteinId; nameKey: string; emoji: string; matchToken: string }[] = [
     { id: "pollo", nameKey: "protein_chicken", emoji: "🍗", matchToken: "con pollo" },
@@ -70,7 +85,6 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props)
   const selProtein = proteins.find((p) => p.id === selectedProtein) ?? null;
 
   const handleClose = () => {
-    setSelectedProtein("");
     onClose();
   };
 
@@ -87,8 +101,8 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props)
       customizerType: 'pad_ka_prao',
       selections: { protein: selectedProtein || undefined },
     };
-    onAddToCart({ ...matched, customizationData });
-    toast({ title: "✅", description: matched.name });
+    onAddToCart({ ...matched, customizationData, ...(editingItem?.cartItemId ? { cartItemId: editingItem.cartItemId } : {}) });
+    toast({ title: editingItem ? '✅ ' + t('update_item') : "✅", description: matched.name });
     handleClose();
   };
 
@@ -191,7 +205,7 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart }: Props)
                   </div>
                   <Button onClick={handleAddToCart} className="w-full mt-2" size="lg">
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t("add_to_cart")}
+                    {editingItem ? t('update_item') : t('add_to_cart')}
                   </Button>
                 </div>
               )}
