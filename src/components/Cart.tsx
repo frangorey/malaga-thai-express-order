@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle, Store, Truck, UtensilsCrossed } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, CreditCard, MessageCircle, Store, Truck, UtensilsCrossed, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,9 +56,10 @@ interface CartProps {
   onUpdateQuantity: (cartItemId: string, quantity: number) => void;
   onRemoveItem: (cartItemId: string) => void;
   tableNumber?: number | null;
+  onEditItem?: (cartItemId: string) => void;
 }
 
-export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, tableNumber }: CartProps) => {
+export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, tableNumber, onEditItem }: CartProps) => {
   const { t } = useLanguage();
   const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in' | null>(
     tableNumber ? 'dine_in' : null
@@ -253,11 +254,22 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
+                            {item.customizationData && onEditItem && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => onEditItem(item.cartItemId)}
+                                aria-label={t('edit_item')}
+                                className="ml-auto"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </Button>
+                            )}
                             <Button 
                               size="sm" 
                               variant="destructive"
                               onClick={() => onRemoveItem(item.cartItemId)}
-                              className="ml-auto"
+                              className={item.customizationData && onEditItem ? "" : "ml-auto"}
                             >
                               <X className="w-3 h-3" />
                             </Button>
