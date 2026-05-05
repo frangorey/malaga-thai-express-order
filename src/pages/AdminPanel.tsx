@@ -118,6 +118,7 @@ const AdminPanel = () => {
     if (isAdmin) {
       fetchOrders();
       fetchProducts();
+      fetchTemplates();
 
       const channel = supabase
         .channel('admin-orders')
