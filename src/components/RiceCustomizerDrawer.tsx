@@ -176,11 +176,29 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType, edi
 
   // Reset al cambiar de tipo de arroz (las salsas no son compatibles entre tipos)
   useEffect(() => {
+    if (editingItem) return;
     handleReset();
-  }, [riceType, handleReset]);
+  }, [riceType, editingItem, handleReset]);
+
+  // Precarga en modo edición
+  useEffect(() => {
+    if (!open) return;
+    if (editingItem) {
+      const cd = editingItem.customizationData;
+      if (cd.customizerType !== 'rice') { handleReset(); return; }
+      if (cd.drawerVariant !== riceType) { handleReset(); return; }
+      setSelectedProtein(cd.selections.protein ?? "");
+      setSelectedSauce(cd.selections.sauce ?? "");
+      setSelectedVegetables(cd.selections.vegetables ?? []);
+      setSelectedExtras(cd.selections.extras ?? []);
+      setCurrentStep('summary');
+    } else {
+      handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editingItem, bundle?.products?.length]);
 
   const handleClose = () => {
-    handleReset();
     onClose();
   };
 
