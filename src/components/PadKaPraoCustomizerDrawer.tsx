@@ -85,7 +85,6 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart, editingI
   const selProtein = proteins.find((p) => p.id === selectedProtein) ?? null;
 
   const handleClose = () => {
-    setSelectedProtein("");
     onClose();
   };
 
@@ -102,8 +101,8 @@ export const PadKaPraoCustomizerDrawer = ({ open, onClose, onAddToCart, editingI
       customizerType: 'pad_ka_prao',
       selections: { protein: selectedProtein || undefined },
     };
-    onAddToCart({ ...matched, customizationData });
-    toast({ title: "✅", description: matched.name });
+    onAddToCart({ ...matched, customizationData, ...(editingItem?.cartItemId ? { cartItemId: editingItem.cartItemId } : {}) });
+    toast({ title: editingItem ? '✅ ' + t('update_item') : "✅", description: matched.name });
     handleClose();
   };
 
