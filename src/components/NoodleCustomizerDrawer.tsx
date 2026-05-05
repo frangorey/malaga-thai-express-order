@@ -376,6 +376,11 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType,
                   <span className="font-medium text-sm">{s.name}</span>
                 </button>
               ))}
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" size="sm" onClick={goBack} className="flex-1">
+                  ← {t("step_protein")}
+                </Button>
+              </div>
             </div>
           )}
 
