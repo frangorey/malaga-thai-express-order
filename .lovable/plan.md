@@ -1,142 +1,100 @@
-## Fase 7C — Parte 1/3: UI de edición en Cart + Index + i18n
+## Fase 7C — Parte 2/3: Drawers con variante (Noodle, Rice, Salad)
 
-Implementa la UX de edición end-to-end (botón "Editar" + flujo REPLACE preservando `quantity`) sin tocar todavía la precarga interna de los 6 drawers (eso queda para partes 2 y 3). Al pulsar "Editar" se cerrará el carrito y se abrirá el drawer correspondiente; al confirmar, el item se reemplaza in-place conservando su `cartItemId` y cantidad.
+Añade precarga de selecciones en modo edición a los 3 drawers que reciben prop de variante. Reutiliza el step `summary` como entrada en edición y propaga `cartItemId` para que el flujo REPLACE de Parte 1 funcione end-to-end.
+
+### Huecos detectados en el prompt original (corregidos abajo)
+
+1. **`EditingItem` no existe en `@/components/Cart`** → Hay que definirlo (ajuste mínimo a Cart.tsx, sin tocar UI ni payload).
+2. **`Index.tsx` no pasa `editingItem` a los drawers** → Hay que añadirlo a las 3 llamadas (Noodle, Rice, Salad). Sin esto, el `useEffect` de precarga nunca recibe datos.
+
+Ambos ajustes son no-funcionales para el carrito (no cambian dedupe, payload, BD ni edge functions) y son requisitos para que Parte 2/3 funcione.
 
 ---
 
-### 1. `src/components/Cart.tsx`
+### 1. `src/components/Cart.tsx` (ajuste mínimo)
 
-- Importar `Pencil` desde `lucide-react` (junto a Minus/Plus/X).
-- Extender `CartProps`:
+Añadir tipo exportado bajo el bloque de tipos Fase 7B:
+
+```ts
+export interface EditingItem {
+  cartItemId: string;
+  customizationData: CustomizationData;
+}
+```
+
+Nada más en este archivo.
+
+### 2. `src/pages/Index.tsx` (ajuste mínimo)
+
+- Importar `EditingItem` desde `@/components/Cart`.
+- Calcular el `editingItem` derivado del state existente:
   ```ts
-  onEditItem?: (cartItemId: string) => void;
+  const editingItem: EditingItem | undefined = editingCartItemId
+    ? (() => {
+        const it = cartItems.find(i => i.cartItemId === editingCartItemId);
+        return it?.customizationData
+          ? { cartItemId: it.cartItemId, customizationData: it.customizationData }
+          : undefined;
+      })()
+    : undefined;
   ```
-- Desestructurar `onEditItem` en el componente.
-- En la card de cada item (línea ~256, justo antes del botón destructive `X`), insertar:
-  ```tsx
-  {item.customizationData && onEditItem && (
-    <Button
-      size="sm"
-      variant="ghost"
-      onClick={() => onEditItem(item.cartItemId)}
-      aria-label={t('edit_item')}
-    >
-      <Pencil className="w-3 h-3" />
-    </Button>
-  )}
-  ```
-- No tocar nada más de Cart.tsx (ni `handleOrder`, ni payload, ni dedupe).
+- Pasar `editingItem={editingItem}` SOLO a los 3 drawers de esta parte: `<NoodleCustomizerDrawer />`, `<RiceCustomizerDrawer />`, `<SaladCustomizerDrawer />` (Tonkatsu / PolloCoreano / PadKaPrao se cubren en Parte 3/3).
 
-### 2. `src/pages/Index.tsx`
+### 3. `src/components/NoodleCustomizerDrawer.tsx`
 
-- Nuevo state:
-  ```ts
-  const [editingCartItemId, setEditingCartItemId] = useState<string | null>(null);
-  ```
-- Feature flag bajo el state:
-  ```ts
-  const EDIT_ENABLED: Record<'noodle'|'rice'|'salad'|'tonkatsu'|'pollo_coreano'|'pad_ka_prao', boolean> = {
-    noodle: true, rice: true, salad: true, tonkatsu: true, pollo_coreano: true, pad_ka_prao: true,
-  };
-  ```
-- `handleEditItem(cartItemId)`:
-  - Localiza el item en `cartItems` por `cartItemId`.
-  - Si no tiene `customizationData` o el flag está desactivado → `return`.
-  - `setEditingCartItemId(cartItemId)` + `setIsCartOpen(false)`.
-  - `switch` sobre `customizationData.customizerType` y abre el drawer adecuado usando `drawerVariant` con fallback:
-    - `noodle` → `setNoodleCustomizer({ open: true, type: (drawerVariant ?? 'Anchos') as NoodleType })`
-    - `rice` → `setRiceCustomizer({ open: true, type: (drawerVariant ?? 'frito') as RiceType })`
-    - `salad` → `setSaladCustomizer({ open: true, type: (drawerVariant ?? 'cesar') as SaladType })`
-    - `tonkatsu` → `setTonkatsuDrawerOpen(true)`
-    - `pollo_coreano` → `setPolloCoreanoDrawerOpen(true)`
-    - `pad_ka_prao` → `setPadKaPraoDrawerOpen(true)`
-- `handleCancelEdit()`:
-  ```ts
-  setEditingCartItemId(null);
-  setIsCartOpen(true);
-  ```
-- Refactor `addToCart` con rama REPLACE preservando quantity:
-  ```ts
-  const addToCart = (product: SupabaseProductWithCustomization) => {
-    setCartItems(prev => {
-      if (editingCartItemId) {
-        const original = prev.find(i => i.cartItemId === editingCartItemId);
-        const preservedQty = original?.quantity ?? 1;
-        return prev.map(item =>
-          item.cartItemId === editingCartItemId
-            ? {
-                ...product,
-                quantity: preservedQty,
-                customizations: product.customizations,
-                customizationData: product.customizationData,
-                cartItemId: editingCartItemId,
-              } as SupabaseCartItem
-            : item
-        );
-      }
-      // Lógica original Fase 7A (dedupe por customizationsEqual) — intacta.
-      const incomingCustomizations = product.customizations;
-      const incomingCustomizationData = product.customizationData;
-      const existing = prev.find(item =>
-        item.id === product.id &&
-        item.name === product.name &&
-        item.price === product.price &&
-        customizationsEqual(item.customizations, incomingCustomizations)
-      );
-      if (existing) {
-        return prev.map(item =>
-          item.cartItemId === existing.cartItemId
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [
-        ...prev,
-        { ...product, quantity: 1, customizations: incomingCustomizations, customizationData: incomingCustomizationData, cartItemId: crypto.randomUUID() } as SupabaseCartItem,
-      ];
-    });
-    if (editingCartItemId) {
-      setEditingCartItemId(null);
-      setIsCartOpen(true);
-    }
-  };
-  ```
-- En `<Cart … />` añadir prop `onEditItem={handleEditItem}`.
-- En los 6 drawers, envolver `onClose` para detectar cancelación de edit, p.ej:
-  ```tsx
-  onClose={() => {
-    setNoodleCustomizer(prev => ({ ...prev, open: false }));
-    if (editingCartItemId) handleCancelEdit();
-  }}
-  ```
-  Aplicar el mismo patrón a Rice, Salad, Tonkatsu, PolloCoreano y PadKaPrao con su setter respectivo.
-- NO añadir aún la prop `editingItem` a los drawers (parte 2 y 3).
+- Importar `EditingItem` desde `@/components/Cart` y `useEffect` desde `react`.
+- Extender props: `editingItem?: EditingItem`.
+- En `handleClose`: eliminar la llamada a `handleReset()`. Dejar solo `onClose()`.
+- Nuevo `useEffect` con deps `[open, editingItem, bundle?.products?.length]`:
+  - `if (!open) return;`
+  - `if (editingItem)`:
+    - Si `editingItem.customizationData.customizerType !== 'noodle'` → `handleReset()`; `return`.
+    - Si `editingItem.customizationData.drawerVariant !== noodleType` → `handleReset()`; `return`.
+    - Cargar `selections.protein`, `selections.sauce`, `selections.vegetables ?? []`, `selections.extras ?? []`.
+    - `setCurrentStep('summary')`.
+  - `else` → `handleReset()`.
+- En `handleAddToCart`, ampliar el tipo del payload local con `cartItemId?: string` y, si `editingItem` existe, propagar `cartItemId: editingItem.cartItemId` dentro del objeto pasado a `onAddToCart`.
+- Toast tras add/update: si `editingItem` → `toast({ title: '✅ ' + t('update_item'), description: customProduct.name })`. Si no, mantener actual.
+- Botón summary: label dinámico `editingItem ? t('update_item') : t('add_to_cart')`.
 
-### 3. `src/contexts/LanguageContext.tsx`
+### 4. `src/components/RiceCustomizerDrawer.tsx`
 
-Añadir keys en los 5 idiomas (es/en/fr/de/ru):
+Mismo patrón que Noodle, con dos diferencias:
 
-| key | es | en | fr | de | ru |
-|---|---|---|---|---|---|
-| `edit_item` | Editar | Edit | Modifier | Bearbeiten | Редактировать |
-| `update_item` | Actualizar | Update | Mettre à jour | Aktualisieren | Обновить |
-| `cancel` (verificar; añadir si falta) | Cancelar | Cancel | Annuler | Abbrechen | Отмена |
+- Validar `drawerVariant === riceType`.
+- En el `useEffect` existente `[riceType, handleReset]`, añadir guard al inicio: `if (editingItem) return;` para evitar que el reset por cambio de variante pise la precarga al abrir en modo edit. Ajustar deps a `[riceType, editingItem, handleReset]`.
+
+### 5. `src/components/SaladCustomizerDrawer.tsx`
+
+- Mismo patrón, pero Salad solo tiene `selectedProtein` (sin steps).
+- Crear función local `resetSelections()` que haga `setSelectedProtein('')`. Actualizar las llamadas inline existentes (`setSelectedProtein('')` en `handleClose` y tras `handleAddToCart`) para usar `resetSelections()`.
+- En `handleClose`: eliminar el reset inline → dejar solo `onClose()`.
+- Nuevo `useEffect` con deps `[open, editingItem, templateProducts.length]`:
+  - `if (!open) return;`
+  - `if (editingItem)`:
+    - Si `customizerType !== 'salad'` → `resetSelections()`; `return`.
+    - Si `drawerVariant !== saladType` → `resetSelections()`; `return`.
+    - Cargar SOLO `selections.protein` (Salad ignora vegetables/extras).
+  - `else` → `resetSelections()`.
+- En `handleAddToCart`, propagar `cartItemId: editingItem.cartItemId` cuando aplique. Cambiar toast y label como en Noodle.
 
 ---
 
 ### Restricciones (no hacer)
 
 - No tocar BD, edge functions, ni `supabase/functions/create-whatsapp-order`.
-- No alterar el payload enviado al pedido.
-- No cambiar la firma de `addToCart`.
+- No alterar el payload del pedido (Index.tsx ya excluye `customizationData` y `cartItemId` al enviar).
+- No modificar `findMatchingProduct` en ninguno de los 3 drawers.
+- No añadir un step "edit"; reutilizar `summary`.
+- No tocar `customizationsEqual` ni la rama de dedupe en `addToCart` (en modo edit la rama REPLACE corre primero y no entra a dedupe).
+- No modificar Tonkatsu / PolloCoreano / PadKaPrao (Parte 3/3).
 - No crear archivos nuevos.
-- No modificar `customizationsEqual` ni la lógica de dedupe.
-- En modo "añadir nuevo" (sin `editingCartItemId`) el comportamiento debe ser idéntico al actual.
 
 ### Validación manual
 
-1. Añadir un Pad Thai personalizado → aparece icono lápiz en el carrito.
-2. Pulsar lápiz → carrito se cierra y se abre el drawer adecuado (sin precarga visible aún, esperado en parte 1).
-3. Confirmar en drawer → item se reemplaza preservando quantity y `cartItemId`.
-4. Cancelar drawer (cerrar) → carrito se reabre con el item original intacto.
-5. Añadir un item nuevo sin estar editando → flujo Fase 7A intacto (dedupe correcto).
+1. Tallarines Anchos pollo classic + huevo → añadir → en carrito aparece lápiz → pulsar → drawer abre en step `summary` con todo marcado.
+2. Cancelar (X o backdrop) → carrito reabre, item intacto, mismo `cartItemId`.
+3. Cambiar proteína a ternera → "Actualizar" → carrito reabre, fila reemplazada in-place, mismo `cartItemId`, quantity preservada.
+4. Repetir flujo con Arroz Curry verde (con guard de `riceType` activo) y Ensalada César.
+5. Añadir un item nuevo sin estar editando → comportamiento idéntico a Fase 7A (dedupe correcto).
+6. Enviar pedido pickup → en `orders.items` no debe aparecer `cartItemId` ni `customizationData`.
