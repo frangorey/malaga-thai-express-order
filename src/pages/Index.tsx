@@ -61,6 +61,10 @@ const Index = () => {
   const [tonkatsuDrawerOpen, setTonkatsuDrawerOpen] = useState(false);
   const [polloCoreanoDrawerOpen, setPolloCoreanoDrawerOpen] = useState(false);
   const [padKaPraoDrawerOpen, setPadKaPraoDrawerOpen] = useState(false);
+  const [editingCartItemId, setEditingCartItemId] = useState<string | null>(null);
+  const EDIT_ENABLED: Record<'noodle'|'rice'|'salad'|'tonkatsu'|'pollo_coreano'|'pad_ka_prao', boolean> = {
+    noodle: true, rice: true, salad: true, tonkatsu: true, pollo_coreano: true, pad_ka_prao: true,
+  };
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { data: dishTemplates } = useDishTemplates();
@@ -307,8 +311,57 @@ const Index = () => {
     return arrA.every((v, i) => v === arrB[i]);
   };
 
+  const handleEditItem = (cartItemId: string) => {
+    const item = cartItems.find(i => i.cartItemId === cartItemId);
+    if (!item?.customizationData) return;
+    const cd = item.customizationData;
+    if (!EDIT_ENABLED[cd.customizerType]) return;
+    setEditingCartItemId(cartItemId);
+    setIsCartOpen(false);
+    switch (cd.customizerType) {
+      case 'noodle':
+        setNoodleCustomizer({ open: true, type: ((cd.drawerVariant as NoodleType) ?? 'Anchos') });
+        break;
+      case 'rice':
+        setRiceCustomizer({ open: true, type: ((cd.drawerVariant as RiceType) ?? 'frito') });
+        break;
+      case 'salad':
+        setSaladCustomizer({ open: true, type: ((cd.drawerVariant as SaladType) ?? 'cesar') });
+        break;
+      case 'tonkatsu':
+        setTonkatsuDrawerOpen(true);
+        break;
+      case 'pollo_coreano':
+        setPolloCoreanoDrawerOpen(true);
+        break;
+      case 'pad_ka_prao':
+        setPadKaPraoDrawerOpen(true);
+        break;
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCartItemId(null);
+    setIsCartOpen(true);
+  };
+
   const addToCart = (product: SupabaseProductWithCustomization) => {
     setCartItems(prev => {
+      if (editingCartItemId) {
+        const original = prev.find(i => i.cartItemId === editingCartItemId);
+        const preservedQty = original?.quantity ?? 1;
+        return prev.map(item =>
+          item.cartItemId === editingCartItemId
+            ? {
+                ...product,
+                quantity: preservedQty,
+                customizations: product.customizations,
+                customizationData: product.customizationData,
+                cartItemId: editingCartItemId,
+              } as SupabaseCartItem
+            : item
+        );
+      }
       const incomingCustomizations = product.customizations;
       const incomingCustomizationData = product.customizationData;
       const existing = prev.find(item =>
@@ -335,6 +388,10 @@ const Index = () => {
         } as SupabaseCartItem,
       ];
     });
+    if (editingCartItemId) {
+      setEditingCartItemId(null);
+      setIsCartOpen(true);
+    }
   };
 
   const updateQuantity = (cartItemId: string, quantity: number) => {
@@ -418,45 +475,46 @@ const Index = () => {
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeFromCart}
           tableNumber={validTableNumber}
+          onEditItem={handleEditItem}
         />
       )}
 
       <RiceCustomizerDrawer
         open={riceCustomizer.open}
-        onClose={() => setRiceCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setRiceCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         riceType={riceCustomizer.type}
       />
 
       <NoodleCustomizerDrawer
         open={noodleCustomizer.open}
-        onClose={() => setNoodleCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setNoodleCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         noodleType={noodleCustomizer.type}
       />
 
       <SaladCustomizerDrawer
         open={saladCustomizer.open}
-        onClose={() => setSaladCustomizer((prev) => ({ ...prev, open: false }))}
+        onClose={() => { setSaladCustomizer((prev) => ({ ...prev, open: false })); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
         saladType={saladCustomizer.type}
       />
 
       <TonkatsuCustomizerDrawer
         open={tonkatsuDrawerOpen}
-        onClose={() => setTonkatsuDrawerOpen(false)}
+        onClose={() => { setTonkatsuDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
       <PolloCoreanoCustomizerDrawer
         open={polloCoreanoDrawerOpen}
-        onClose={() => setPolloCoreanoDrawerOpen(false)}
+        onClose={() => { setPolloCoreanoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
       <PadKaPraoCustomizerDrawer
         open={padKaPraoDrawerOpen}
-        onClose={() => setPadKaPraoDrawerOpen(false)}
+        onClose={() => { setPadKaPraoDrawerOpen(false); if (editingCartItemId) handleCancelEdit(); }}
         onAddToCart={addToCart}
       />
 
