@@ -178,7 +178,7 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType,
       setSelectedSauce(cd.selections.sauce ?? "");
       setSelectedVegetables(cd.selections.vegetables ?? []);
       setSelectedExtras(cd.selections.extras ?? []);
-      setCurrentStep('summary');
+      setCurrentStep('protein');
     } else {
       handleReset();
     }

@@ -191,7 +191,7 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType, edi
       setSelectedSauce(cd.selections.sauce ?? "");
       setSelectedVegetables(cd.selections.vegetables ?? []);
       setSelectedExtras(cd.selections.extras ?? []);
-      setCurrentStep('summary');
+      setCurrentStep('protein');
     } else {
       handleReset();
     }
