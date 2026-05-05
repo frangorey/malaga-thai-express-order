@@ -427,6 +427,12 @@ const Index = () => {
         onAddToCart={addToCart}
       />
 
+      <PadKaPraoCustomizerDrawer
+        open={padKaPraoDrawerOpen}
+        onClose={() => setPadKaPraoDrawerOpen(false)}
+        onAddToCart={addToCart}
+      />
+
       {validTableNumber && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-primary/30 py-3 px-4">
           <div className="flex items-center justify-between gap-3 max-w-2xl mx-auto">
