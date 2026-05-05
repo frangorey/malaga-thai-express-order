@@ -241,11 +241,15 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType,
       price: baseProduct.price + extrasTotal,
       customizations: allCustomizations,
       customizationData,
+      ...(editingItem ? { cartItemId: editingItem.cartItemId } : {}),
     };
 
     onAddToCart(customProduct);
     handleClose();
-    toast({ title: "✅ Añadido al carrito", description: customProduct.name });
+    toast({
+      title: editingItem ? '✅ ' + t('update_item') : '✅ Añadido al carrito',
+      description: customProduct.name,
+    });
   };
 
   const stepLabels: Record<Step, string> = {
