@@ -106,7 +106,7 @@ const Index = () => {
   const WORLD_CARDS: WorldCard[] = [
     { kind: "template", slug: "tonkatsu", displayNameKey: "world_tonkatsu_card", emoji: "🍱", onCustomize: () => setTonkatsuDrawerOpen(true) },
     { kind: "template", slug: "pollo_coreano", displayNameKey: "world_pollo_coreano_card", emoji: "🍗", onCustomize: () => setPolloCoreanoDrawerOpen(true) },
-    { kind: "standalone", productId: 270, displayNameKey: "world_pad_ka_prao_card", emoji: "🌶️" },
+    { kind: "template", slug: "pad_ka_prao", displayNameKey: "world_pad_ka_prao_card", emoji: "🌶️", onCustomize: () => setPadKaPraoDrawerOpen(true) },
     { kind: "standalone", productId: 269, displayNameKey: "world_curry_pina_card", emoji: "🍍" },
   ];
 
