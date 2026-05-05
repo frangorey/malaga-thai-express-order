@@ -58,7 +58,7 @@ const RICE_SLUG_MAP: Record<RiceType, string> = {
   curry: "arroz_curry",
 };
 
-export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType }: RiceCustomizerDrawerProps) => {
+export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType, editingItem }: RiceCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
 
