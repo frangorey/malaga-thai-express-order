@@ -2640,6 +2640,7 @@ const translations = {
     'world_tonkatsu_card': 'Тонкацу',
     'world_pollo_coreano_card': 'Корейская курица',
     'world_pad_ka_prao_card': 'Пад Ка Прао',
+    'padkaprao_choose_protein': 'Выберите белок',
     'world_curry_pina_card': 'Карри-рис с ананасом',
     'tonkatsu_choose_garnish': 'Выберите гарнир',
     'tonkatsu_garnish_fried_rice': 'Жареный рис',
