@@ -490,7 +490,7 @@ export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType,
                 <Button variant="outline" size="sm" onClick={goBack} className="flex-1">← {t("step_extras")}</Button>
                 <Button onClick={handleAddToCart} className="flex-1 gap-2" disabled={isLoading || isError || templateProducts.length === 0}>
                   <ShoppingCart className="w-4 h-4" />
-                  {t("add_to_cart")}
+                  {editingItem ? t("update_item") : t("add_to_cart")}
                 </Button>
               </div>
             </div>
