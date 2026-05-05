@@ -57,7 +57,7 @@ const NOODLE_SLUG_MAP: Record<NoodleType, string> = {
   Udon: "tallarines_udon",
 };
 
-export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType }: NoodleCustomizerDrawerProps) => {
+export const NoodleCustomizerDrawer = ({ open, onClose, onAddToCart, noodleType, editingItem }: NoodleCustomizerDrawerProps) => {
   const { t } = useLanguage();
   const slug = NOODLE_SLUG_MAP[noodleType];
   const { data: bundle, isLoading, isError } = useDishTemplate(slug);
