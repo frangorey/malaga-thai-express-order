@@ -18,14 +18,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export interface SupabaseCartItem extends SupabaseProduct {
   quantity: number;
   customizations?: string[];
+  cartItemId: string;
 }
 
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
   items: SupabaseCartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (cartItemId: string, quantity: number) => void;
+  onRemoveItem: (cartItemId: string) => void;
   tableNumber?: number | null;
 }
 
