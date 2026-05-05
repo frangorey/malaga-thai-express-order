@@ -555,7 +555,7 @@ export const RiceCustomizerDrawer = ({ open, onClose, onAddToCart, riceType, edi
                       className="flex-1 gap-2"
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      {t("add_to_cart")}
+                      {editingItem ? t("update_item") : t("add_to_cart")}
                     </Button>
                   </div>
                 </div>
