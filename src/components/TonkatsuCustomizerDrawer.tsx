@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, Loader2, ImageOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SupabaseProduct } from "@/types/menu";
-import { SupabaseProductWithCustomization, CustomizationData } from "@/components/Cart";
+import { SupabaseProductWithCustomization, CustomizationData, EditingItem } from "@/components/Cart";
 import { useDishTemplate, resolveMedia } from "@/hooks/useDishTemplate";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onAddToCart: (product: SupabaseProductWithCustomization) => void;
+  editingItem?: EditingItem;
 }
 
 type GarnishId = "fried_rice" | "fried_noodles";
@@ -21,7 +22,7 @@ type SauceId = "sweet_sour" | "bbq";
 const TOTAL_PRICE = 13.5;
 const SLUG = "tonkatsu";
 
-export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) => {
+export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart, editingItem }: Props) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const { data: bundle, isLoading, isError } = useDishTemplate(SLUG);
@@ -31,12 +32,25 @@ export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) 
   const [garnish, setGarnish] = useState<GarnishId | "">("");
   const [sauce, setSauce] = useState<SauceId | "">("");
 
+  const resetSelections = () => {
+    setGarnish("");
+    setSauce("");
+  };
+
   useEffect(() => {
-    if (!open) {
-      setGarnish("");
-      setSauce("");
+    if (!open) return;
+    if (editingItem) {
+      if (editingItem.customizationData?.customizerType !== 'tonkatsu') {
+        resetSelections();
+        return;
+      }
+      const sel = editingItem.customizationData.selections ?? {};
+      setGarnish((sel.garnish as GarnishId) ?? "");
+      setSauce((sel.sauce as SauceId) ?? "");
+    } else {
+      resetSelections();
     }
-  }, [open]);
+  }, [open, editingItem]);
 
   const garnishes: { id: GarnishId; name: string; emoji: string; matchToken: string }[] = [
     { id: "fried_rice", name: t("tonkatsu_garnish_fried_rice"), emoji: "🍚", matchToken: "Arroz Frito" },
@@ -61,8 +75,6 @@ export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) 
   };
 
   const handleClose = () => {
-    setGarnish("");
-    setSauce("");
     onClose();
   };
 
@@ -83,8 +95,8 @@ export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) 
         sauce: sauce || undefined,
       },
     };
-    onAddToCart({ ...base, customizationData });
-    toast({ title: "✅", description: base.name });
+    onAddToCart({ ...base, customizationData, ...(editingItem?.cartItemId ? { cartItemId: editingItem.cartItemId } : {}) });
+    toast({ title: editingItem ? '✅ ' + t('update_item') : "✅", description: base.name });
     handleClose();
   };
 
@@ -206,7 +218,7 @@ export const TonkatsuCustomizerDrawer = ({ open, onClose, onAddToCart }: Props) 
                   </div>
                   <Button onClick={handleAddToCart} className="w-full mt-2" size="lg">
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t("add_to_cart")}
+                    {editingItem ? t('update_item') : t('add_to_cart')}
                   </Button>
                 </div>
               )}
