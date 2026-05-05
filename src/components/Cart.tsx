@@ -197,7 +197,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
             <>
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
-                  <Card key={item.id} className="bg-card/50">
+                  <Card key={item.cartItemId} className="bg-card/50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <img 
@@ -213,7 +213,7 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                              onClick={() => onUpdateQuantity(item.cartItemId, Math.max(0, item.quantity - 1))}
                             >
                               <Minus className="w-3 h-3" />
                             </Button>
@@ -221,14 +221,14 @@ export const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, t
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => onUpdateQuantity(item.cartItemId, item.quantity + 1)}
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
                             <Button 
                               size="sm" 
                               variant="destructive"
-                              onClick={() => onRemoveItem(item.id)}
+                              onClick={() => onRemoveItem(item.cartItemId)}
                               className="ml-auto"
                             >
                               <X className="w-3 h-3" />
