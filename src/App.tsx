@@ -18,23 +18,24 @@ import MesaPanel from "./pages/MesaPanel";
 const queryClient = new QueryClient();
 
 // Set to false to restore the app
-const MAINTENANCE_MODE = false;
+const MAINTENANCE_MODE = true;
 
 const App = () => {
   if (MAINTENANCE_MODE) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-2xl">
           <h1 className="text-2xl md:text-4xl font-bold text-foreground">
-            Esta página web no está operativa
+            Esta web está fuera de servicio, está en mantenimiento.
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground">
-            Disculpen las molestias
+            Esperamos poder resolver próximamente esta incidencia. Muchas gracias.
           </p>
         </div>
       </div>
     );
   }
+
 
   return (
     <QueryClientProvider client={queryClient}>
