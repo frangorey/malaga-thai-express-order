@@ -61,6 +61,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Hero v2 - paleta chart (identidad visual por categoria, valores corregidos por La Musa 2026-11-19) */
+    --chart-1: 85 55% 62%;
+    --chart-2: 65 55% 52%;
+    --chart-3: 42 85% 54%;
+    --chart-4: 24 88% 62%;
+    --chart-5: 8 82% 60%;
   }
 
   .dark {

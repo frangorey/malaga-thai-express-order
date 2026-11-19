@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { HeroV2 } from "@/components/HeroV2";
 import { MainCategoriesNav } from "@/components/MainCategoriesNav";
 import { TikTokStyleMenu, FeaturedItem } from "@/components/TikTokStyleMenu";
 import { Cart, SupabaseCartItem, SupabaseProductWithCustomization, EditingItem } from "@/components/Cart";
@@ -21,6 +22,11 @@ import type { DishTemplate } from "@/hooks/useDishTemplate";
 
 const FALLBACK_VIDEO_URL =
   "https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/video-hero-web%20(1).mp4";
+
+// Hero v2 (SushiConveyorMenu 21st.dev) - feature flag para rollback trivial.
+// OFF por defecto. Activar en produccion con variable de entorno VITE_HERO_V2_ENABLED=true.
+const HERO_V2_ENABLED =
+  (import.meta.env.VITE_HERO_V2_ENABLED ?? "false").toString() === "true";
 
 const CATEGORY_MAP: Record<string, string> = {
   entrantes: "Entrantes",
@@ -424,6 +430,26 @@ const Index = () => {
     setIsViewingFeed(true);
   };
 
+  // Hero v2: handler mixto (Opcion B).
+  // Tallarines / Arroz / Ensaladas -> abren CustomizerDrawer directo (2 taps al pedido).
+  // Resto (Entrantes, Sopas, Pokes, Postres, Otras del Mundo, Bebidas) -> feed inmersivo filtrado.
+  const handleHeroV2CategoryClick = (categoryId: string) => {
+    switch (categoryId) {
+      case "tallarines":
+        setNoodleCustomizer({ open: true, type: "Anchos" });
+        return;
+      case "arroz":
+        setRiceCustomizer({ open: true, type: "frito" });
+        return;
+      case "ensaladas":
+        setSaladCustomizer({ open: true, type: "cesar" });
+        return;
+      default:
+        handleCategoryChange(categoryId);
+        return;
+    }
+  };
+
   const handleGoHome = () => {
     setIsViewingFeed(false);
   };
@@ -449,7 +475,11 @@ const Index = () => {
       {!isViewingFeed ? (
         /* HOME VIEW */
         <div className="flex-1 overflow-y-auto">
-          <Hero onOrderClick={handleOrderClick} />
+          {HERO_V2_ENABLED ? (
+            <HeroV2 onCategoryClick={handleHeroV2CategoryClick} />
+          ) : (
+            <Hero onOrderClick={handleOrderClick} />
+          )}
 
           <MainCategoriesNav
             activeCategory={activeCategory}
