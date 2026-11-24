@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { SushiConveyorMenu, ConveyorDish, DishTier } from "@/components/ui/sushi-conveyor-menu";
+import { HeroV2Mobile } from "@/components/HeroV2Mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useDishTemplates } from "@/hooks/useDishTemplates";
 import { useHeroCategories } from "@/hooks/useHeroCategories";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -81,6 +83,7 @@ const FALLBACK_IMG = "/placeholder.svg";
 
 export function HeroV2({ onCategoryClick }: HeroV2Props) {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const { data: templates } = useDishTemplates();
   const { data: heroCats } = useHeroCategories();
 
@@ -122,6 +125,29 @@ export function HeroV2({ onCategoryClick }: HeroV2Props) {
     }));
   }, [templates, heroCats, t]);
 
+  const labels = {
+    add: t("hero_v2_label_add"),
+    close: t("hero_v2_label_close"),
+    previous: t("hero_v2_label_prev"),
+    next: t("hero_v2_label_next"),
+    pause: t("hero_v2_label_pause"),
+  };
+
+  if (isMobile) {
+    return (
+      <HeroV2Mobile
+        items={items}
+        eyebrow={t("hero_v2_eyebrow")}
+        heading={t("hero_v2_heading")}
+        caption={t("hero_v2_caption")}
+        labels={labels}
+        onAdd={(dish) => onCategoryClick(dish.id as HeroV2CategoryId)}
+        autoplay
+        interval={3500}
+      />
+    );
+  }
+
   return (
     <section className="w-full bg-background">
       <SushiConveyorMenu
@@ -133,13 +159,7 @@ export function HeroV2({ onCategoryClick }: HeroV2Props) {
         autoplay
         interval={5000}
         onAdd={(dish) => onCategoryClick(dish.id as HeroV2CategoryId)}
-        labels={{
-          add: t("hero_v2_label_add"),
-          close: t("hero_v2_label_close"),
-          previous: t("hero_v2_label_prev"),
-          next: t("hero_v2_label_next"),
-          pause: t("hero_v2_label_pause"),
-        }}
+        labels={labels}
       />
     </section>
   );
