@@ -63,7 +63,7 @@ const translations = {
     'prepare_to_taste': 'PREPÁRALO',
     'to_your_liking': 'AL GUSTO',
     'choose_what_you_like': 'Elige tu plato favorito y...',
-    'take_it_home': '¡llévátelo a casa!',
+    'take_it_home': '¡llévatelo a casa!',
     'order_online': 'HACER PEDIDO ONLINE',
      'call_us': 'LLAMAR: 951 40 19 37',
      
@@ -149,7 +149,7 @@ const translations = {
     'see_full_menu': 'VER MENÚ COMPLETO',
     
     // Footer
-    'restaurant_description': 'Comida asiática auténtica para llevar. Prepáralo al gusto y llévátelo a casa.',
+    'restaurant_description': 'Comida asiática auténtica para llevar. Prepáralo al gusto y llévatelo a casa.',
     'contact_title': 'CONTACTO',
     'hours_title': 'HORARIOS',
     'monday_sunday': 'Lunes - Domingo',
