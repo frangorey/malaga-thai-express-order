@@ -25,8 +25,7 @@ const FALLBACK_VIDEO_URL =
 
 // Hero v2 (SushiConveyorMenu 21st.dev) - feature flag para rollback trivial.
 // OFF por defecto. Activar en produccion con variable de entorno VITE_HERO_V2_ENABLED=true.
-const HERO_V2_ENABLED =
-  (import.meta.env.VITE_HERO_V2_ENABLED ?? "false").toString() === "true";
+const HERO_V2_ENABLED = true; // Hero v2 ON en main (2026-11-24)
 
 const CATEGORY_MAP: Record<string, string> = {
   entrantes: "Entrantes",
