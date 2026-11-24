@@ -429,24 +429,10 @@ const Index = () => {
     setIsViewingFeed(true);
   };
 
-  // Hero v2: handler mixto (Opcion B).
-  // Tallarines / Arroz / Ensaladas -> abren CustomizerDrawer directo (2 taps al pedido).
-  // Resto (Entrantes, Sopas, Pokes, Postres, Otras del Mundo, Bebidas) -> feed inmersivo filtrado.
+  // Hero v2: todas las categorias se comportan igual que un click en MainCategoriesNav
+  // (filtra el feed inmersivo por esa categoria, no abre CustomizerDrawer directo).
   const handleHeroV2CategoryClick = (categoryId: string) => {
-    switch (categoryId) {
-      case "tallarines":
-        setNoodleCustomizer({ open: true, type: "Anchos" });
-        return;
-      case "arroz":
-        setRiceCustomizer({ open: true, type: "frito" });
-        return;
-      case "ensaladas":
-        setSaladCustomizer({ open: true, type: "cesar" });
-        return;
-      default:
-        handleCategoryChange(categoryId);
-        return;
-    }
+    handleCategoryChange(categoryId);
   };
 
   const handleGoHome = () => {
