@@ -617,7 +617,7 @@ const translations = {
     'dashboard_pending_count': '{{count}} pendientes',
     'nav_dashboard': 'Panel',
     'nav_list': 'Lista',
-    'nav_floor': 'Plano'
+    'nav_floor': 'Plano',
     // Hero v2 (SushiConveyorMenu 21st.dev) - anadido 2026-11-19
     'hero_v2_eyebrow': 'Carta Thaii Express',
     'hero_v2_heading': 'Tus Noodles de Málaga',
@@ -1219,7 +1219,7 @@ const translations = {
     'dashboard_pending_count': '{{count}} pending',
     'nav_dashboard': 'Dashboard',
     'nav_list': 'List',
-    'nav_floor': 'Floor'
+    'nav_floor': 'Floor',
     // Hero v2 (SushiConveyorMenu 21st.dev) - anadido 2026-11-19
     'hero_v2_eyebrow': 'Thaii Express Menu',
     'hero_v2_heading': 'Your Noodles in Málaga',
@@ -1815,7 +1815,7 @@ const translations = {
     'dashboard_pending_count': '{{count}} en attente',
     'nav_dashboard': 'Panneau',
     'nav_list': 'Liste',
-    'nav_floor': 'Plan'
+    'nav_floor': 'Plan',
     // Hero v2 (SushiConveyorMenu 21st.dev) - anadido 2026-11-19
     'hero_v2_eyebrow': 'Carte Thaii Express',
     'hero_v2_heading': 'Vos nouilles à Málaga',
@@ -2411,7 +2411,7 @@ const translations = {
     'dashboard_pending_count': '{{count}} offen',
     'nav_dashboard': 'Übersicht',
     'nav_list': 'Liste',
-    'nav_floor': 'Plan'
+    'nav_floor': 'Plan',
     // Hero v2 (SushiConveyorMenu 21st.dev) - anadido 2026-11-19
     'hero_v2_eyebrow': 'Thaii Express Karte',
     'hero_v2_heading': 'Deine Nudeln in Málaga',
@@ -3007,7 +3007,7 @@ const translations = {
     'dashboard_pending_count': '{{count}} в ожидании',
     'nav_dashboard': 'Панель',
     'nav_list': 'Список',
-    'nav_floor': 'План'
+    'nav_floor': 'План',
     // Hero v2 (SushiConveyorMenu 21st.dev) - anadido 2026-11-19
     'hero_v2_eyebrow': 'Меню Thaii Express',
     'hero_v2_heading': 'Твоя лапша в Малаге',

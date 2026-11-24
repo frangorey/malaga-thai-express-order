@@ -29,3 +29,10 @@ thaii_*.txt
 
 # Supabase CLI temp
 supabase/.temp/
+
+# Hero v2 - imagenes viven en Supabase Storage (bucket Fotos_Thaii/hero-v2/)
+# Solo versionamos el script y los .gitkeep
+scripts/hero-raw/*
+!scripts/hero-raw/.gitkeep
+scripts/hero-processed/*
+!scripts/hero-processed/.gitkeep
