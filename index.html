@@ -111,7 +111,9 @@
     <!-- Hero v2 Noto Serif Display 600 - aprobada 2026-11-19 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600&display=swap&subset=latin,latin-ext,cyrillic" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600&display=swap&subset=latin,latin-ext,cyrillic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600&display=swap&subset=latin,latin-ext,cyrillic" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@600&display=swap&subset=latin,latin-ext,cyrillic"></noscript>
     <!-- Hero v2: preload SOLO las 3 primeras (resto carga on-demand al avanzar la cinta) -->
     <link rel="preload" as="image" href="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/hero-v2/entrantes.webp?v=20261124b" type="image/webp" fetchpriority="high">
     <link rel="preload" as="image" href="https://xqqffccvnpnmdoqowdlc.supabase.co/storage/v1/object/public/Fotos_Thaii/hero-v2/arroz.webp?v=20261124b" type="image/webp">
